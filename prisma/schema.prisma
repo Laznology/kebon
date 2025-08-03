@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider = "mysql"
-  url      = "mysql://root@localhost:3306/docs"
+  url      = env("DATABASE_URL")
 }
 
 model User {
@@ -14,7 +14,7 @@ model User {
   password  String  
   documents Document[]
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  updatedAt DateTime @default(now()) @updatedAt
 }
 
 model Document {
@@ -27,7 +27,7 @@ model Document {
   author    User     @relation(fields: [authorId], references: [id])
   documentVersions DocumentVersion[]
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  updatedAt DateTime @default(now()) @updatedAt
 }
 
 model DocumentVersion {
@@ -36,4 +36,5 @@ model DocumentVersion {
   documentId String
   document   Document @relation(fields: [documentId], references: [id])
   createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now()) @updatedAt
 }
