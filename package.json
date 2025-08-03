@@ -1,37 +1,42 @@
 {
-  "name": "novel",
+  "name": "kebon",
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "next dev ",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "seed": "ts-node prisma/seed.ts"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.10.0",
+    "@mantine/core": "^8.2.2",
+    "@mantine/hooks": "^8.2.2",
     "@prisma/client": "^6.13.0",
     "@prisma/extension-accelerate": "^2.0.2",
+    "class-variance-authority": "^0.7.1",
     "dotenv": "^17.2.1",
+    "lowlight": "^3.3.0",
     "next": "15.4.5",
     "next-auth": "^4.24.11",
     "novel": "^1.0.2",
     "postcss": "^8.5.6",
-    "react": "19.1.0",
-    "react-dom": "19.1.0"
+    "react": "19.1.1",
+    "react-dom": "19.1.1"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3",
+    "@eslint/eslintrc": "^3.3.1",
     "@tailwindcss/postcss": "^4.1.11",
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "eslint": "^9",
+    "@types/node": "^24.1.0",
+    "@types/react": "^19.1.9",
+    "@types/react-dom": "^19.1.7",
+    "eslint": "^9.32.0",
     "eslint-config-next": "15.4.5",
     "prisma": "^6.13.0",
     "tailwindcss": "^4.1.11",
     "tsx": "^4.20.3",
-    "typescript": "^5"
+    "typescript": "^5.8.0"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
