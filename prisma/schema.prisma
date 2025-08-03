@@ -1,0 +1,39 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = "mysql://root@localhost:3306/docs"
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  password  String  
+  documents Document[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Document {
+  id        String   @id @default(cuid())
+  title     String
+  slug      String   @unique
+  published Boolean  @default(false)
+  content   Json?
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id])
+  documentVersions DocumentVersion[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model DocumentVersion {
+  id         String   @id @default(cuid())
+  content    Json?
+  documentId String
+  document   Document @relation(fields: [documentId], references: [id])
+  createdAt  DateTime @default(now())
+}
