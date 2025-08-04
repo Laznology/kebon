@@ -15,7 +15,7 @@ export default function DashboardPage() {
                 const reslut = await response.json()
                 setData(reslut)
             } catch (error) {
-                console.error
+            console.error(error)
             } finally {
                 setLoading(false)
             }

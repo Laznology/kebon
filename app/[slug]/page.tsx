@@ -14,12 +14,11 @@ export default function DocsPage({ params }: { params: Promise<{ slug: string }>
             const response = await fetch(`/api/documents/${slug}`)
             const data = await response.json()
             setDocument(data)
-            
-            // Convert content to markdown
             if (data?.content) {
                 try {
                   // Try the full conversion first
                   const markdown = convertNovelToMarkdown(data.content);
+                  console.log("Converted Markdown:", markdown);
                   setMarkdownContent(markdown);
                 } catch (error) {
                   console.error('Error converting to markdown:', error);
@@ -52,9 +51,7 @@ export default function DocsPage({ params }: { params: Promise<{ slug: string }>
             <article className="prose prose-lg max-w-none">
                 {markdownContent ? (
                     <div className="markdown-content">
-                        <pre className="whitespace-pre-wrap font-sans leading-relaxed">
-                            {markdownContent}
-                        </pre>
+                        <div dangerouslySetInnerHTML={{ __html: markdownContent }} />
                     </div>
                 ) : (
                     <div className="text-gray-500 italic">

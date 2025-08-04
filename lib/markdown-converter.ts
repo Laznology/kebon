@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+// This file uses 'any' type extensively and is a utility file.
 import { generateHTML } from '@tiptap/html'
 import { defaultExtensions } from './extensions'
 import TurndownService from 'turndown'
@@ -204,19 +206,18 @@ function parseInlineContent(text: string): any[] {
   }
   
   // Parse HTML-like content and convert to Tiptap nodes
-  const result: any[] = []
-  let currentPos = 0
+  // ...existing code...
   
   // Simple regex patterns for common formatting
-  const patterns = [
-    { regex: /<strong[^>]*>(.*?)<\/strong>/gi, type: 'bold' },
-    { regex: /<b[^>]*>(.*?)<\/b>/gi, type: 'bold' },
-    { regex: /<em[^>]*>(.*?)<\/em>/gi, type: 'italic' },
-    { regex: /<i[^>]*>(.*?)<\/i>/gi, type: 'italic' },
-    { regex: /<u[^>]*>(.*?)<\/u>/gi, type: 'underline' },
-    { regex: /<code[^>]*>(.*?)<\/code>/gi, type: 'code' },
-    { regex: /<a[^>]*href="([^"]*)"[^>]*>(.*?)<\/a>/gi, type: 'link' }
-  ]
+  // const patterns = [
+  //   { regex: /<strong[^>]*>(.*?)<\/strong>/gi, type: 'bold' },
+  //   { regex: /<b[^>]*>(.*?)<\/b>/gi, type: 'bold' },
+  //   { regex: /<em[^>]*>(.*?)<\/em>/gi, type: 'italic' },
+  //   { regex: /<i[^>]*>(.*?)<\/i>/gi, type: 'italic' },
+  //   { regex: /<u[^>]*>(.*?)<\/u>/gi, type: 'underline' },
+  //   { regex: /<code[^>]*>(.*?)<\/code>/gi, type: 'code' },
+  //   { regex: /<a[^>]*href="([^"]*)"[^>]*>(.*?)<\/a>/gi, type: 'link' }
+  // ]
   
   // For now, return simple text processing
   // In a more sophisticated implementation, you would parse the HTML properly

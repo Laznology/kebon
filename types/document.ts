@@ -4,14 +4,8 @@ export interface Document{
     slug: string,
     published: boolean,
     content: Record<string, any>,
-    author: Author | null,
+    authorId: string | null,
     documentVersions: any[],
     createdAt: string,
     updatedAt: string
-}
-
-interface Author {
-    id: string,
-    name: string | null,
-    email: string | null,
 }

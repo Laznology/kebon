@@ -7,7 +7,7 @@ const prisma = new PrismaClient();
 
 export async function POST(req: Request) {
   try {
-    const { email, password } = await req.json();
+    const { email } = await req.json();
 
     // Use NextAuth to validate credentials
     const session = await getServerSession();

@@ -9,16 +9,7 @@ export async function GET() {
             }
         });
         return NextResponse.json(documents);
-    } catch (error) {
-        console.error("Error fetching documents: ", error)
+    } catch {
         return NextResponse.error();
-    }
-}
-
-export async function POST() {
-    try {
-
-    } catch (error) {
-        return NextResponse.json({ error: "Error adding Document"})
     }
 }

@@ -20,25 +20,21 @@ export default function LoginPage() {
 
     const handleLogin = async () => {
         try {
-            const res = await signIn("credentials", {
-                redirect: false,
-                email,
-                password,
-            });
+            const res = await signIn("credentials", { redirect: false, email, password });
             if (res?.error) {
                 setError(res.error);
             }
-        } catch (err) {
-            setError("An unexpected error occurred.");
-        }
+    } catch {
+      setError("An unexpected error occurred.");
+    }
     };
 
     const handleGithubLogin = async () => {
         try {
             await signIn("github");
-        } catch (err) {
-            setError("An unexpected error occurred.");
-        }
+    } catch {
+      setError("An unexpected error occurred.");
+    }
     };
 
     if (status === "loading") {
