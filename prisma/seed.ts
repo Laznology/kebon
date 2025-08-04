@@ -3,6 +3,12 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 async function main() {
+  // Hapus data lama
+  await prisma.document.deleteMany(); // Hapus semua dokumen
+  await prisma.user.deleteMany(); // Hapus semua user
+
+  console.log('Data lama berhasil dihapus.');
+
   // Seed users
   const users = await prisma.user.createMany({
     data: [
@@ -11,6 +17,15 @@ async function main() {
       { email: 'user2@example.com', name: 'User Two', password: 'hashed_password' },
     ],
   });
+
+  // Ambil user IDs berdasarkan email
+  const admin = await prisma.user.findUnique({ where: { email: 'admin@example.com' } });
+  const user1 = await prisma.user.findUnique({ where: { email: 'user1@example.com' } });
+  const user2 = await prisma.user.findUnique({ where: { email: 'user2@example.com' } });
+
+  if (!admin || !user1 || !user2) {
+    throw new Error('Gagal menemukan user untuk seeding dokumen.');
+  }
 
   // Seed documents
   const documents = await prisma.document.createMany({
@@ -24,7 +39,7 @@ async function main() {
             { type: 'paragraph', data: { text: 'This is the content of Document 1.' } },
           ],
         },
-        authorId: 'admin@example.com',
+        authorId: admin.id, // Gunakan ID admin
       },
       {
         title: 'Document 2',
@@ -35,7 +50,7 @@ async function main() {
             { type: 'paragraph', data: { text: 'This is the content of Document 2.' } },
           ],
         },
-        authorId: 'user1@example.com',
+        authorId: user1.id, // Gunakan ID user1
       },
       {
         title: 'Document 3',
@@ -46,7 +61,7 @@ async function main() {
             { type: 'paragraph', data: { text: 'This is the content of Document 3.' } },
           ],
         },
-        authorId: 'user2@example.com',
+        authorId: user2.id, // Gunakan ID user2
       },
     ],
   });
