@@ -9,13 +9,11 @@ export async function POST(req: Request) {
   try {
     const { email } = await req.json();
 
-    // Use NextAuth to validate credentials
     const session = await getServerSession();
     if (!session) {
       return NextResponse.json({ error: "Invalid email or password" }, { status: 401 });
     }
 
-    // Find user by email
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) {
       return NextResponse.json({ error: "Invalid email or password" }, { status: 401 });

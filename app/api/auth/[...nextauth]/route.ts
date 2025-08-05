@@ -1,10 +1,8 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GithubProvider from "next-auth/providers/github";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/prisma"
 import crypto from "crypto";
-
-const prisma = new PrismaClient();
 
 const authOptions = {
   providers: [
