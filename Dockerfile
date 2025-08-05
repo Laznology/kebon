@@ -25,11 +25,11 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
 RUN corepack enable && corepack prepare pnpm@latest --activate && \
-  if [ -f pnpm.lock ]; then pnpm run build; \
-  elif [ -f package-lock.json ]; then npm run build; \
-  elif [ -f pnpm-lock.yaml ]; then pnpm run build; \
-  else echo "Lockfile not found." && exit 1; \
-  fi
+    if [ -f pnpm.lock ]; then pnpm install --frozen-lockfile && pnpm prisma generate && pnpm run build; \
+    elif [ -f package-lock.json ]; then npm install && npx prisma generate && npm run build; \
+    elif [ -f pnpm-lock.yaml ]; then pnpm install --frozen-lockfile && pnpm prisma generate && pnpm run build; \
+    else echo "Lockfile not found." && exit 1; \
+    fi
 
 # Production image, copy all the files and run next
 FROM base AS runner
