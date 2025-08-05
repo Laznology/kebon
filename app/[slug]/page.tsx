@@ -1,33 +1,38 @@
 'use client'
 import { useState, useEffect } from "react";
 import { Document } from "@/types/document";
-import { convertNovelToMarkdown, convertNovelBlocksToMarkdown } from "@/lib/markdown-converter";
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import json2md from 'json2md';
 
 export default function DocsPage({ params }: { params: Promise<{ slug: string }> }) {
     const [document, setDocument] = useState<Document | null>(null);
-    const [markdownContent, setMarkdownContent] = useState<string>('');
+    const [markdownContent, setMarkdownContent] = useState<string | null>(null);
 
     useEffect(() => {
         async function fetchDocument() {
-            const resolvedParams = await params
-            const slug = resolvedParams.slug
-            const response = await fetch(`/api/documents/${slug}`)
-            const data = await response.json()
-            setDocument(data)
-            if (data?.content) {
-                try {
-                  // Try the full conversion first
-                  const markdown = convertNovelToMarkdown(data.content);
-                  console.log("Converted Markdown:", markdown);
-                  setMarkdownContent(markdown);
-                } catch (error) {
-                  console.error('Error converting to markdown:', error);
-                  // Fallback to simple conversion
-                  if (data.content.blocks) {
-                    const simpleMarkdown = convertNovelBlocksToMarkdown(data.content.blocks);
-                    setMarkdownContent(simpleMarkdown);
-                  }
-                }
+            const resolvedParams = await params;
+            const slug = resolvedParams.slug;
+            const response = await fetch(`/api/documents/${slug}`);
+            const data = await response.json();
+            setDocument(data);
+
+            if (data?.content?.blocks) {
+                const markdown = json2md(data.content.blocks.map((block: { type: string; data: { text?: string; items?: string[] } }) => {
+                    switch (block.type) {
+                        case 'paragraph':
+                            return { p: block.data.text };
+                        case 'header':
+                            return { h1: block.data.text };
+                        case 'list':
+                            return { ul: block.data.items };
+                        default:
+                            return null;
+                    }
+                }).filter(Boolean));
+                setMarkdownContent(markdown);
+            } else {
+                setMarkdownContent('');
             }
         }
         fetchDocument();
@@ -48,11 +53,9 @@ export default function DocsPage({ params }: { params: Promise<{ slug: string }>
                 </p>
             </div>
             
-            <article className="prose prose-lg max-w-none">
+            <article className="prose prose-lg max-w-none dark:prose-invert">
                 {markdownContent ? (
-                    <div className="markdown-content">
-                        <div dangerouslySetInnerHTML={{ __html: markdownContent }} />
-                    </div>
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{markdownContent}</ReactMarkdown>
                 ) : (
                     <div className="text-gray-500 italic">
                         {document ? 'No content available' : 'Loading...'}
