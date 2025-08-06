@@ -57,7 +57,7 @@ export default function EditPage({ params }: { params: Promise<{ slug: string }>
         if (contentString === lastContentRef.current) return;
         try {
             setSavignStatus('saving');
-            const response = await fetch(`/api/documents/${slug}`, {
+            const response = await fetch(`/api/pages/${slug}`, {
                 method: "PUT",
                 headers: {
                     'Content-Type': 'application/json',
@@ -95,7 +95,7 @@ export default function EditPage({ params }: { params: Promise<{ slug: string }>
                 const resolvedParams = await params
                 const currentSlug = resolvedParams.slug
                 setSlug(currentSlug)
-                const response = await fetch(`/api/documents/${currentSlug}`)
+                const response = await fetch(`/api/pages/${currentSlug}`)
                 if(!response.ok) throw new Error("Failed to fetch")
 
                     

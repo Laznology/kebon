@@ -25,9 +25,9 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
 RUN corepack enable && corepack prepare pnpm@latest --activate && \
-    if [ -f pnpm.lock ]; then pnpm install --frozen-lockfile && pnpm prisma generate && pnpm run build; \
-    elif [ -f package-lock.json ]; then npm install && npx prisma generate && npm run build; \
-    elif [ -f pnpm-lock.yaml ]; then pnpm install --frozen-lockfile && pnpm prisma generate && pnpm run build; \
+    if [ -f pnpm.lock ]; then pnpm install --frozen-lockfile && pnpx prisma migrate dev --name "init" && pnpx prisma db seed && pnpx prisma generate && pnpm run build; \
+    elif [ -f package-lock.json ]; then npm install && npx prisma migrate dev --name "init" && npx prisma db seed && npx prisma generate && npm run build; \
+    elif [ -f pnpm-lock.yaml ]; then pnpm install --frozen-lockfile && pnpx prisma migrate dev --name "init" && pnpx prisma db seed && pnpx prisma generate && pnpm run build; \
     else echo "Lockfile not found." && exit 1; \
     fi
 

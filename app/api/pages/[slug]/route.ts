@@ -4,15 +4,15 @@ import { NextRequest, NextResponse } from 'next/server';
 export async function GET(request: NextRequest, context: { params: Promise<{ slug: string }> }) {
     try {
         const { slug } = await context.params;        
-        const document = await prisma.document.findUnique({
+        const pages = await prisma.page.findUnique({
             where: { slug },
         });
 
-        if (!document) {
-            return NextResponse.json({ error: "Document not found" }, { status: 404 });
+        if (!pages) {
+            return NextResponse.json({ error: "Page not found" }, { status: 404 });
         }
 
-        return NextResponse.json(document);
+        return NextResponse.json(pages);
     } catch (error) {
         console.error('GET Error:', error);
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
@@ -25,12 +25,12 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ slu
         const body = await request.json();
         const { title, content } = body;
 
-        const updatedDocument = await prisma.document.update({
+        const updatedPage = await prisma.page.update({
             where: { slug },
             data: { title, content },
         });
 
-        return NextResponse.json(updatedDocument);
+        return NextResponse.json(updatedPage);
     } catch (error) {
         console.error('PUT Error:', error);
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });

@@ -3,41 +3,47 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
+  id        String    @id @default(cuid())
+  email     String    @unique
   name      String?
-  password  String  
-  documents Document[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now()) @updatedAt
+  password  String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @default(now()) @updatedAt
   deletedAt DateTime?
+  pages     Page[]
+
+  @@index([deletedAt])
 }
 
-model Document {
-  id        String   @id @default(cuid())
-  title     String
-  slug      String   @unique
-  published Boolean  @default(false)
+model Page {
+  id          String        @id @default(cuid())
+  title       String
+  slug        String        @unique
+  published   Boolean       @default(false)
+  content     Json?
+  authorId    String
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @default(now()) @updatedAt
+  deletedAt   DateTime?
+  author      User          @relation(fields: [authorId], references: [id])
+  pageVersion PageVersion[]
+
+  @@index([deletedAt, authorId, title])
+}
+
+model PageVersion {
+  id        String    @id @default(cuid())
   content   Json?
-  authorId  String
-  author    User     @relation(fields: [authorId], references: [id])
-  documentVersions DocumentVersion[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now()) @updatedAt
+  pageId    String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @default(now()) @updatedAt
   deletedAt DateTime?
-}
+  page      Page      @relation(fields: [pageId], references: [id])
 
-model DocumentVersion {
-  id         String   @id @default(cuid())
-  content    Json?
-  documentId String
-  document   Document @relation(fields: [documentId], references: [id])
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @default(now()) @updatedAt
-  deletedAt  DateTime? 
+  @@index([pageId, deletedAt])
 }

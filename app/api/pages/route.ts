@@ -3,12 +3,12 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET() {
     try {
-        const documents = await prisma.document.findMany({
+        const pages = await prisma.page.findMany({
             include: {
                 author: true,
             }
         });
-        return NextResponse.json(documents);
+        return NextResponse.json(pages);
     } catch {
         return NextResponse.error();
     }

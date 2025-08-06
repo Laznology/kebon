@@ -2,7 +2,7 @@
   "name": "kebon",
   "version": "0.1.0",
   "private": true,
-  "packageManager": "pnpm@10.4.1",
+  "packageManager": "pnpm@10.14.0",
   "scripts": {
     "dev": "next dev ",
     "build": "next build",
@@ -61,8 +61,5 @@
       "sharp",
       "unrs-resolver"
     ]
-  },
-  "prisma": {
-    "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
   }
 }

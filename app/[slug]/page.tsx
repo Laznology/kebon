@@ -13,7 +13,7 @@ export default function DocsPage({ params }: { params: Promise<{ slug: string }>
         async function fetchDocument() {
             const resolvedParams = await params;
             const slug = resolvedParams.slug;
-            const response = await fetch(`/api/documents/${slug}`);
+            const response = await fetch(`/api/pages/${slug}`);
             const data = await response.json();
             setDocument(data);
 
