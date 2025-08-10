@@ -22,6 +22,8 @@ import {
   StarterKit
 } from "novel";
 
+import { slashCommand } from "@/components/editor/slash-command";
+
 import { cx } from "class-variance-authority";
 import { common, createLowlight } from "lowlight";
 
@@ -77,28 +79,28 @@ const horizontalRule = HorizontalRule.configure({
 const starterKit = StarterKit.configure({
   bulletList: {
     HTMLAttributes: {
-      class: cx("list-disc list-outside leading-3 -mt-2"),
+      class: cx("list-disc list-outside leading-normal ml-6"),
     },
   },
   orderedList: {
     HTMLAttributes: {
-      class: cx("list-decimal list-outside leading-3 -mt-2"),
+      class: cx("list-decimal list-outside leading-normal ml-6"),
     },
   },
   listItem: {
     HTMLAttributes: {
-      class: cx("leading-normal -mb-2"),
+      class: cx("leading-normal mb-1"),
     },
   },
   blockquote: {
     HTMLAttributes: {
-      class: cx("border-l-4 border-primary"),
+      class: cx("border-l-4 border-primary pl-4"),
     },
   },
   codeBlock: false,
   code: {
     HTMLAttributes: {
-      class: cx("rounded-md bg-muted  px-1.5 py-1 font-mono font-medium"),
+      class: cx("rounded-md bg-muted px-1.5 py-1 font-mono font-medium"),
       spellcheck: "false",
     },
   },
@@ -108,6 +110,17 @@ const starterKit = StarterKit.configure({
     width: 4,
   },
   gapcursor: false,
+  paragraph: {
+    HTMLAttributes: {
+      class: cx("leading-7 mb-4"),
+    },
+  },
+  heading: {
+    HTMLAttributes: {
+      class: cx("scroll-m-20 tracking-tight font-semibold"),
+    },
+    levels: [1, 2, 3, 4, 5, 6],
+  },
 });
 
 const codeBlockLowlight = CodeBlockLowlight.configure({
@@ -160,4 +173,5 @@ export const defaultExtensions = [
   Color,
   CustomKeymap,
   GlobalDragHandle,
+  slashCommand,
 ];
