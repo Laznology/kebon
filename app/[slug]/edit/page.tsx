@@ -7,7 +7,6 @@ import { suggestionItems } from "@/components/editor/slash-command"
 import { NodeSelector } from "@/components/editor/bubble/node-selector"
 
 
-
 type saveStatus = 'saved' | 'saving' | 'error' | 'unsaved'
 
 
@@ -271,7 +270,8 @@ export default function EditPage({ params }: { params: Promise<{ slug: string }>
                             },
                             attributes: {
                                     class: "py-12 prose prose-base dark:prose-invert focus:outline-none max-w-full min-h-[500px] prose-headings:font-semibold prose-h1:text-xl prose-h2:text-lg prose-h3:text-base prose-p:text-sm prose-p:leading-relaxed prose-p:mb-3 "
-                            }
+                            },
+                            
                         }}
                         onUpdate={({ editor }) => {
                             if (initialLoadRef.current) return;
@@ -289,6 +289,7 @@ export default function EditPage({ params }: { params: Promise<{ slug: string }>
                                 editor.commands.focus('end')
                             }, 100)
                         }}
+
                     >
                         
                         <EditorCommand className="z-50 h-auto max-h-[330px] overflow-y-auto bg-white dark:bg-gray-900 px-1 py-2  transition-all">

@@ -16,7 +16,6 @@ import { EditorBubbleItem,useEditor } from "novel";
 import { Popover } from "@radix-ui/react-popover";
 import { PopoverContent, PopoverTrigger } from "@radix-ui/react-popover";
 import { Button } from "@/components/ui/button";
-import { isActive } from "@tiptap/core";
 
 export type SelectorItem = {
     name: string;
@@ -106,23 +105,25 @@ export const NodeSelector = ({ open, onOpenChange }: NodeSelectorProps) => {
                     <ChevronDown className="w-4 aspect-square" />
                 </Button>
             </PopoverTrigger>
-            {items.map((item, index) => (
-                <EditorBubbleItem key={index}
-                    onSelect={(editor) => {
-                        item.command(editor)
-                        onOpenChange(false)
-                    }}
-                    className="flex cursor-pointer items-center justify-between rounded-sm px-2 py-1 text-sm hover:bg-accent"
-                >
-                    <div className='flex items-center space-x-2'>
-                        <div className='rounded-sm border p-1'>
-                            <item.icon className='h-3 w-3' />
+            <PopoverContent sideOffset={5} align="start" className="w-48 p-1">
+                {items.map((item, index) => (
+                    <EditorBubbleItem key={index}
+                        onSelect={(editor) => {
+                            item.command(editor)
+                            onOpenChange(false)
+                        }}
+                        className="flex cursor-pointer items-center justify-between rounded-sm px-2 py-1 text-sm hover:bg-accent"
+                    >
+                        <div className='flex items-center space-x-2'>
+                            <div className='rounded-sm border p-1'>
+                                <item.icon className='h-3 w-3' />
+                            </div>
+                            <span>{item.name}</span>
                         </div>
-                        <span>{item.name}</span>
-                    </div>
-                    {activeItem.name === item.name && <Check className='h-4 w-4' />}
-                </EditorBubbleItem>
-            ))}
+                        {activeItem.name === item.name && <Check className='h-4 w-4' />}
+                    </EditorBubbleItem>
+                ))}
+            </PopoverContent>
         </Popover>
     )
 }
