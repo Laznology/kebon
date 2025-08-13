@@ -5,7 +5,9 @@ export async function GET() {
     try {
         const pages = await prisma.page.findMany({
             include: {
-                author: true,
+                author: {
+                    select: { name: true },
+                }
             }
         });
         return NextResponse.json(pages);
