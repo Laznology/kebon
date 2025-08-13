@@ -1,9 +1,11 @@
 'use client'
 import { Document } from "@/types/document"
-import { EditorRoot, EditorContent, JSONContent, EditorCommand, EditorCommandEmpty, EditorCommandItem, EditorCommandList, handleCommandNavigation } from "novel"
+import { EditorRoot, EditorContent, JSONContent, EditorCommand, EditorCommandEmpty, EditorCommandItem, EditorCommandList, handleCommandNavigation, EditorBubble } from "novel"
 import { defaultExtensions } from "@/lib/extensions"
 import { useState, useEffect, useRef, useCallback } from "react"
 import { suggestionItems } from "@/components/editor/slash-command"
+import { NodeSelector } from "@/components/editor/bubble/node-selector"
+
 
 
 type saveStatus = 'saved' | 'saving' | 'error' | 'unsaved'
@@ -16,6 +18,7 @@ export default function EditPage({ params }: { params: Promise<{ slug: string }>
     const [loading, setLoading] = useState<boolean>(true);
     const [saveStatus, setSaveStatus] = useState<saveStatus>('saved') 
     const [slug, setSlug] = useState<string>('')
+    const [openNode, setOpenNode] = useState<boolean>(false)
     
     const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null)
     const lastContentRef = useRef<string>('')
@@ -180,7 +183,6 @@ export default function EditPage({ params }: { params: Promise<{ slug: string }>
                 if (initialContent) {
                     lastContentRef.current = JSON.stringify(convertJSONContentToBlocks(initialContent));
                 }
-                console.log('Data: ', initialContent)
             } catch (error) {
                 console.error('Error fetching data', error)
             } finally {
@@ -209,7 +211,7 @@ export default function EditPage({ params }: { params: Promise<{ slug: string }>
             <div className="bg-white dark:bg-gray-900 ">
                 <div className="flex items-start justify-between mb-6">
                     <div className="flex-1">
-                        <h1 className="text-3xl md:text-6xl font-bold mb-3 text-gray-900 dark:text-gray-100">{data?.title}</h1>
+                        <h1 className="text-2xl md:text-4xl font-bold mb-3 text-gray-900 dark:text-gray-100">{data?.title}</h1>
                         {data?.author && (
                             <div className="flex items-center gap-2 mb-2">
                                 <div className="w-6 h-6 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-xs font-semibold">
@@ -262,7 +264,7 @@ export default function EditPage({ params }: { params: Promise<{ slug: string }>
                         key={slug}
                         initialContent={initialContent || undefined}
                         extensions={defaultExtensions}
-                            className="relative min-h-[600px] w-full transition-all duration-200 "
+                        className="relative min-h-[600px] w-full transition-all duration-200 "
                         editorProps={{
                             handleDOMEvents: {
                                 keydown: (_view, event) => handleCommandNavigation(event),
@@ -288,6 +290,7 @@ export default function EditPage({ params }: { params: Promise<{ slug: string }>
                             }, 100)
                         }}
                     >
+                        
                         <EditorCommand className="z-50 h-auto max-h-[330px] overflow-y-auto bg-white dark:bg-gray-900 px-1 py-2  transition-all">
                             <EditorCommandEmpty className="px-2 text-gray-500 dark:text-gray-400">No results</EditorCommandEmpty>
                             <EditorCommandList>
@@ -309,6 +312,14 @@ export default function EditPage({ params }: { params: Promise<{ slug: string }>
                                 ))}
                             </EditorCommandList>
                         </EditorCommand>
+                        <EditorBubble
+                        tippyOptions={{
+                            placement: "bottom-start",
+                        }}
+                        
+                        className="flex w-fit max-w-[90vw] overflow-hidden rounded border border-muted bg-background shadow-md">
+                            <NodeSelector open={openNode} onOpenChange={setOpenNode} />
+                        </EditorBubble>
                     </EditorContent>
                 </EditorRoot>
                 </article>
