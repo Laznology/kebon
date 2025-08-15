@@ -4,6 +4,7 @@ import { EditorRoot, EditorContent, JSONContent, EditorCommand, EditorCommandEmp
 import { defaultExtensions } from "@/lib/extensions"
 import { suggestionItems } from "@/components/editor/slash-command"
 import { NodeSelector } from "@/components/editor/bubble/node-selector"
+import { TextButtons} from "@/components/editor/bubble/text-buttons";
 
 type EditorProps = {
     initialContent?: JSONContent | null
@@ -63,6 +64,7 @@ export default function Editor({ initialContent, onUpdate, onCreate, contentKey,
                     className="flex w-fit max-w-[90vw] overflow-hidden rounded border border-muted bg-background shadow-md"
                 >
                     <NodeSelector open={openNode} onOpenChange={setOpenNode} />
+                    <TextButtons />
                 </EditorBubble>
             </EditorContent>
         </EditorRoot>
