@@ -1,10 +1,9 @@
 'use client'
 import { Document } from "@/types/document"
-import { EditorRoot, EditorContent, JSONContent, EditorCommand, EditorCommandEmpty, EditorCommandItem, EditorCommandList, handleCommandNavigation, EditorBubble } from "novel"
-import { defaultExtensions } from "@/lib/extensions"
+import { JSONContent } from "novel"
+import Editor from '@/components/editor/Editor'
 import { useState, useEffect, useRef, useCallback } from "react"
-import { suggestionItems } from "@/components/editor/slash-command"
-import { NodeSelector } from "@/components/editor/bubble/node-selector"
+
 
 
 type saveStatus = 'saved' | 'saving' | 'error' | 'unsaved'
@@ -17,7 +16,6 @@ export default function EditPage({ params }: { params: Promise<{ slug: string }>
     const [loading, setLoading] = useState<boolean>(true);
     const [saveStatus, setSaveStatus] = useState<saveStatus>('saved') 
     const [slug, setSlug] = useState<string>('')
-    const [openNode, setOpenNode] = useState<boolean>(false)
     
     const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null)
     const lastContentRef = useRef<string>('')
@@ -258,27 +256,16 @@ export default function EditPage({ params }: { params: Promise<{ slug: string }>
 
             <div className="bg-white dark:bg-gray-900 rounded-xl">
                 <article className="prose prose-base max-w-none dark:prose-invert prose-headings:text-gray-900 dark:prose-headings:text-gray-100 prose-h1:text-xl prose-h1:font-semibold prose-h2:text-lg prose-h2:font-semibold prose-h3:text-base prose-h3:font-semibold">
-                <EditorRoot>
-                    <EditorContent
-                        key={slug}
-                        initialContent={initialContent || undefined}
-                        extensions={defaultExtensions}
+                    <Editor
+                        contentKey={slug}
+                        initialContent={initialContent}
                         className="relative min-h-[600px] w-full transition-all duration-200 "
-                        editorProps={{
-                            handleDOMEvents: {
-                                keydown: (_view, event) => handleCommandNavigation(event),
-                            },
-                            attributes: {
-                                    class: "py-12 prose prose-base dark:prose-invert focus:outline-none max-w-full min-h-[500px] prose-headings:font-semibold prose-h1:text-xl prose-h2:text-lg prose-h3:text-base prose-p:text-sm prose-p:leading-relaxed prose-p:mb-3 "
-                            },
-                            
-                        }}
                         onUpdate={({ editor }) => {
                             if (initialLoadRef.current) return;
 
                             const content = editor.getJSON()
                             setInitialContent(content)
-                            
+
                             if (data?.title) {
                                 debounceAutoSave(content, data.title)
                             }
@@ -289,40 +276,7 @@ export default function EditPage({ params }: { params: Promise<{ slug: string }>
                                 editor.commands.focus('end')
                             }, 100)
                         }}
-
-                    >
-                        
-                        <EditorCommand className="z-50 h-auto max-h-[330px] overflow-y-auto bg-white dark:bg-gray-900 px-1 py-2  transition-all">
-                            <EditorCommandEmpty className="px-2 text-gray-500 dark:text-gray-400">No results</EditorCommandEmpty>
-                            <EditorCommandList>
-                                {suggestionItems.map((item) => (
-                                    <EditorCommandItem
-                                        value={item.title}
-                                        onCommand={(val) => item.command && item.command(val)}
-                                        className="flex w-full items-center space-x-3 rounded-md px-3 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-800 aria-selected:bg-blue-50 dark:aria-selected:bg-blue-900 cursor-pointer transition-colors"
-                                        key={item.title}
-                                    >
-                                        <div className="flex h-10 w-10 items-center justify-center bg-white dark:bg-gray-800">
-                                            {item.icon}
-                                        </div>
-                                        <div>
-                                            <p className="font-medium text-gray-900 dark:text-gray-100">{item.title}</p>
-                                            <p className="text-xs text-gray-500 dark:text-gray-400">{item.description}</p>
-                                        </div>
-                                    </EditorCommandItem>
-                                ))}
-                            </EditorCommandList>
-                        </EditorCommand>
-                        <EditorBubble
-                        tippyOptions={{
-                            placement: "bottom-start",
-                        }}
-                        
-                        className="flex w-fit max-w-[90vw] overflow-hidden rounded border border-muted bg-background shadow-md">
-                            <NodeSelector open={openNode} onOpenChange={setOpenNode} />
-                        </EditorBubble>
-                    </EditorContent>
-                </EditorRoot>
+                    />
                 </article>
             </div>
         </div>

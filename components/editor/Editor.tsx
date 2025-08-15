@@ -1,0 +1,70 @@
+"use client"
+import React, { useState } from 'react'
+import { EditorRoot, EditorContent, JSONContent, EditorCommand, EditorCommandEmpty, EditorCommandItem, EditorCommandList, handleCommandNavigation, EditorBubble, EditorInstance } from "novel"
+import { defaultExtensions } from "@/lib/extensions"
+import { suggestionItems } from "@/components/editor/slash-command"
+import { NodeSelector } from "@/components/editor/bubble/node-selector"
+
+type EditorProps = {
+    initialContent?: JSONContent | null
+    onUpdate?: (props: { editor: EditorInstance }) => void
+    onCreate?: (props: { editor: EditorInstance }) => void
+    contentKey?: string
+    className?: string
+}
+
+export default function Editor({ initialContent, onUpdate, onCreate, contentKey, className }: EditorProps) {
+    const [openNode, setOpenNode] = useState<boolean>(false)
+
+    return (
+        <EditorRoot>
+            <EditorContent
+                key={contentKey}
+                initialContent={initialContent || undefined}
+                extensions={defaultExtensions}
+                className={className || "relative min-h-[600px] w-full transition-all duration-200 "}
+                editorProps={{
+                    handleDOMEvents: {
+                        keydown: (_view, event) => handleCommandNavigation(event),
+                    },
+                    attributes: {
+                        class: "py-12 prose prose-base dark:prose-invert focus:outline-none max-w-full min-h-[500px] prose-headings:font-semibold prose-h1:text-xl prose-h2:text-lg prose-h3:text-base prose-p:text-sm prose-p:leading-relaxed prose-p:mb-3 "
+                    },
+                }}
+                onUpdate={onUpdate}
+                onCreate={onCreate}
+            >
+                <EditorCommand className="z-50 h-auto max-h-[330px] overflow-y-auto bg-white dark:bg-gray-900 px-1 py-2  transition-all">
+                    <EditorCommandEmpty className="px-2 text-gray-500 dark:text-gray-400">No results</EditorCommandEmpty>
+                    <EditorCommandList>
+                        {suggestionItems.map((item) => (
+                            <EditorCommandItem
+                                value={item.title}
+                                onCommand={(val) => item.command && item.command(val)}
+                                className="flex w-full items-center space-x-3 rounded-md px-3 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-800 aria-selected:bg-blue-50 dark:aria-selected:bg-blue-900 cursor-pointer transition-colors"
+                                key={item.title}
+                            >
+                                <div className="flex h-10 w-10 items-center justify-center bg-white dark:bg-gray-800">
+                                    {item.icon}
+                                </div>
+                                <div>
+                                    <p className="font-medium text-gray-900 dark:text-gray-100">{item.title}</p>
+                                    <p className="text-xs text-gray-500 dark:text-gray-400">{item.description}</p>
+                                </div>
+                            </EditorCommandItem>
+                        ))}
+                    </EditorCommandList>
+                </EditorCommand>
+
+                <EditorBubble
+                    tippyOptions={{
+                        placement: "bottom-start",
+                    }}
+                    className="flex w-fit max-w-[90vw] overflow-hidden rounded border border-muted bg-background shadow-md"
+                >
+                    <NodeSelector open={openNode} onOpenChange={setOpenNode} />
+                </EditorBubble>
+            </EditorContent>
+        </EditorRoot>
+    )
+}
