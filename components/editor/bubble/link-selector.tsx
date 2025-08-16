@@ -9,6 +9,7 @@ import {useEditor} from "novel";
 export function isValidUrl(url: string): boolean {
     try {
         new URL(url)
+        return true
     } catch {
         return false
     }
@@ -27,7 +28,7 @@ export function getUrlFromString(str: string){
 
 interface LinkSelectorProps {
     open: boolean;
-    onOpenChange;
+    onOpenChange: (open: boolean) => void;
 }
 
 export const LinkSelector = ({open, onOpenChange }: LinkSelectorProps) => {
@@ -74,7 +75,7 @@ export const LinkSelector = ({open, onOpenChange }: LinkSelectorProps) => {
                     {editor.getAttributes("link").href ? (
                         <Button
                             size={"icon"}
-                            varian={"outline"}
+                            variant={"outline"}
                             type={"button"}
                             className={"flex h-8 items-center rounded-sm p-1 text-red-600 transition-all hover:bg-red-100 dark:hover:bg-red-800"}
                             onClick={() => {
