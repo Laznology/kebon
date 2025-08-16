@@ -6,6 +6,7 @@ import { suggestionItems } from "@/components/editor/slash-command"
 import { NodeSelector } from "@/components/editor/bubble/node-selector"
 import { TextButtons} from "@/components/editor/bubble/text-buttons";
 import {ColorSelector} from "@/components/editor/bubble/color-selector";
+import { LinkSelector} from "@/components/editor/bubble/link-selector";
 
 type EditorProps = {
     initialContent?: JSONContent | null
@@ -18,6 +19,7 @@ type EditorProps = {
 export default function Editor({ initialContent, onUpdate, onCreate, contentKey, className }: EditorProps) {
     const [openNode, setOpenNode] = useState<boolean>(false)
     const [openColor, setOpenColor] = useState<boolean>(false)
+    const [openLink, setOpenLink] = useState<boolean>(false)
 
     return (
         <EditorRoot>
@@ -65,6 +67,7 @@ export default function Editor({ initialContent, onUpdate, onCreate, contentKey,
                     }}
                     className="flex w-fit max-w-[90vw] overflow-hidden rounded border border-muted bg-background shadow-md"
                 >
+                    <LinkSelector open={openLink} onOpenChange={setOpenLink} />
                     <NodeSelector open={openNode} onOpenChange={setOpenNode} />
                     <TextButtons />
                     <ColorSelector open={openColor} onOpenChange={setOpenColor} />
