@@ -16,20 +16,20 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Enable pnpm
+    - name: Enable npm
       run: corepack enable
 
     - name: Set up Node.js
       uses: actions/setup-node@v4
       with:
         node-version: '18'
-        cache: 'pnpm'
+        cache: 'npm'
 
     - name: Install dependencies
-      run: pnpm install
+      run: npm install
 
     - name: Run lint
-      run: pnpm lint
+      run: npm lint
 
     - name: Build project
-      run: pnpm build
+      run: npm build

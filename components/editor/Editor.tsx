@@ -5,6 +5,7 @@ import { defaultExtensions } from "@/lib/extensions"
 import { suggestionItems } from "@/components/editor/slash-command"
 import { NodeSelector } from "@/components/editor/bubble/node-selector"
 import { TextButtons} from "@/components/editor/bubble/text-buttons";
+import {ColorSelector} from "@/components/editor/bubble/color-selector";
 
 type EditorProps = {
     initialContent?: JSONContent | null
@@ -16,6 +17,7 @@ type EditorProps = {
 
 export default function Editor({ initialContent, onUpdate, onCreate, contentKey, className }: EditorProps) {
     const [openNode, setOpenNode] = useState<boolean>(false)
+    const [openColor, setOpenColor] = useState<boolean>(false)
 
     return (
         <EditorRoot>
@@ -65,6 +67,7 @@ export default function Editor({ initialContent, onUpdate, onCreate, contentKey,
                 >
                     <NodeSelector open={openNode} onOpenChange={setOpenNode} />
                     <TextButtons />
+                    <ColorSelector open={openColor} onOpenChange={setOpenColor} />
                 </EditorBubble>
             </EditorContent>
         </EditorRoot>
