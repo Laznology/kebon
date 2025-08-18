@@ -4,7 +4,8 @@ CREATE TABLE "public"."User" (
     "email" TEXT NOT NULL,
     "name" TEXT,
     "emailVerified" TIMESTAMP(3),
-    "password" TEXT NOT NULL,
+    "image" TEXT,
+    "password" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "deletedAt" TIMESTAMP(3),
@@ -13,44 +14,40 @@ CREATE TABLE "public"."User" (
 );
 
 -- CreateTable
-CREATE TABLE "public"."VerificationRequest" (
-    "id" TEXT NOT NULL,
+CREATE TABLE "public"."VerificationToken" (
     "identifier" TEXT NOT NULL,
     "token" TEXT NOT NULL,
     "expires" TIMESTAMP(3) NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "VerificationRequest_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "VerificationToken_pkey" PRIMARY KEY ("identifier","token")
 );
 
 -- CreateTable
 CREATE TABLE "public"."Account" (
-    "id" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
-    "providerType" TEXT NOT NULL,
-    "providerId" TEXT NOT NULL,
+    "type" TEXT NOT NULL,
+    "provider" TEXT NOT NULL,
     "providerAccountId" TEXT NOT NULL,
-    "refreshToken" TEXT,
-    "accessToken" TEXT,
-    "accessTokenExpires" TIMESTAMP(3),
+    "refresh_token" TEXT,
+    "access_token" TEXT,
+    "expires_at" INTEGER,
+    "token_type" TEXT,
+    "scope" TEXT,
+    "id_token" TEXT,
+    "session_state" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "Account_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "Account_pkey" PRIMARY KEY ("provider","providerAccountId")
 );
 
 -- CreateTable
 CREATE TABLE "public"."Session" (
-    "id" TEXT NOT NULL,
+    "sessionToken" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
     "expires" TIMESTAMP(3) NOT NULL,
-    "sessionToken" TEXT NOT NULL,
-    "accessToken" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
-
-    CONSTRAINT "Session_pkey" PRIMARY KEY ("id")
+    "updatedAt" TIMESTAMP(3) NOT NULL
 );
 
 -- CreateTable
@@ -90,19 +87,7 @@ CREATE UNIQUE INDEX "User_name_key" ON "public"."User"("name");
 CREATE INDEX "User_deletedAt_idx" ON "public"."User"("deletedAt");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "VerificationRequest_token_key" ON "public"."VerificationRequest"("token");
-
--- CreateIndex
-CREATE UNIQUE INDEX "VerificationRequest_identifier_token_key" ON "public"."VerificationRequest"("identifier", "token");
-
--- CreateIndex
-CREATE UNIQUE INDEX "Account_providerId_providerAccountId_key" ON "public"."Account"("providerId", "providerAccountId");
-
--- CreateIndex
 CREATE UNIQUE INDEX "Session_sessionToken_key" ON "public"."Session"("sessionToken");
-
--- CreateIndex
-CREATE UNIQUE INDEX "Session_accessToken_key" ON "public"."Session"("accessToken");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Page_slug_key" ON "public"."Page"("slug");
@@ -114,10 +99,10 @@ CREATE INDEX "Page_deletedAt_authorId_title_idx" ON "public"."Page"("deletedAt",
 CREATE INDEX "PageVersion_pageId_deletedAt_idx" ON "public"."PageVersion"("pageId", "deletedAt");
 
 -- AddForeignKey
-ALTER TABLE "public"."Account" ADD CONSTRAINT "Account_userId_fkey" FOREIGN KEY ("userId") REFERENCES "public"."User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "public"."Account" ADD CONSTRAINT "Account_userId_fkey" FOREIGN KEY ("userId") REFERENCES "public"."User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "public"."Session" ADD CONSTRAINT "Session_userId_fkey" FOREIGN KEY ("userId") REFERENCES "public"."User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "public"."Session" ADD CONSTRAINT "Session_userId_fkey" FOREIGN KEY ("userId") REFERENCES "public"."User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "public"."Page" ADD CONSTRAINT "Page_authorId_fkey" FOREIGN KEY ("authorId") REFERENCES "public"."User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
