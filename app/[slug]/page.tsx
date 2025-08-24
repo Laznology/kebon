@@ -3,6 +3,8 @@ import { Document } from "@/types/document"
 import { JSONContent } from "novel"
 import Editor from '@/components/editor/Editor'
 import { useState, useEffect, useRef, useCallback } from "react"
+import DocsLayout from "@/components/DocsLayout"
+import { TableOfContents } from "@mantine/core"
 
 
 
@@ -202,13 +204,39 @@ export default function EditPage({ params }: { params: Promise<{ slug: string }>
             </div>
         </div>
     )
+
+    const ToC = () => {
+        return (
+            <TableOfContents
+                variant="light"
+                color="blue"
+                size="sm"
+                radius="sm"
+                scrollSpyOptions={{
+                    selector: 'h1, h2, h3, h4, h5 ,h6',
+                    getDepth: (element) => Number(element.getAttribute('data-order')),
+                    getValue: (element) => element.getAttribute('data-heading') || '',
+                }}
+                initialData={[
+                    { id: '1', value: 'Heading 1', depth: 1 },
+                    { id: '2', value: 'Heading 2', depth: 2 },
+                    { id: '3', value: 'Heading 3', depth: 3 },
+                ]}
+                getControlProps={({ data }) => ({
+                    onClick: () => data.getNode().scrollIntoView(),
+                    children: data.value
+                })}
+            />
+        )
+
+    }
     
     return (
-        <div className="container mx-auto max-w-4xl p-6">
-            <div className="bg-white dark:bg-gray-900 ">
+        <DocsLayout toc={<ToC />}>
+            <div className="bg-white dark:bg-gray-900 flex flex-col">
                 <div className="flex items-start justify-between mb-6">
                     <div className="flex-1">
-                        <h1 className="text-2xl md:text-4xl font-bold mb-3 text-gray-900 dark:text-gray-100">{data?.title}</h1>
+                        <span className="text-2xl md:text-4xl font-bold mb-3 text-gray-900 dark:text-gray-100">{data?.title}</span>
                         {data?.author && (
                             <div className="flex items-center gap-2 mb-2">
                                 <div className="w-6 h-6 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-xs font-semibold">
@@ -279,6 +307,6 @@ export default function EditPage({ params }: { params: Promise<{ slug: string }>
                     />
                 </article>
             </div>
-        </div>
+        </DocsLayout>
     )
 }

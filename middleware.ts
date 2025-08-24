@@ -17,13 +17,5 @@ export async function  middleware(request: NextRequest) {
         }
         return NextResponse.next()
     }
-
-    if (pathname.startsWith('/dashboard') || pathname.startsWith('/editor')) {
-        if (!token){
-            const loginUrl = new URL('/signin', request.url)
-            return NextResponse.redirect(loginUrl)
-        }
-    }
-
     return NextResponse.next()
 }

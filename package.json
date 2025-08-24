@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev ",
+    "dev": "next dev --turbopack",
     "build": "next build",
     "start": "prisma migrate deploy && next start",
     "lint": "next lint"
@@ -15,6 +15,7 @@
     "@next/codemod": "15.4.2-canary.29",
     "@prisma/client": "^6.13.0",
     "@prisma/extension-accelerate": "^2.0.2",
+    "@radix-ui/react-accordion": "^1.2.12",
     "@radix-ui/react-popover": "^1.1.14",
     "@radix-ui/react-scroll-area": "^1.2.10",
     "@radix-ui/react-slot": "^1.2.3",
