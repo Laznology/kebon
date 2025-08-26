@@ -49,8 +49,8 @@ export const TextButtons = () => {
                         item.command(editor);
                     }}
                     >
-                    <Button size={"icon"} className={"rounded-none"}>
-                        <item.icon className={cn("h-4 w-4", {"text-blue-500" : item.isActive(editor)})} />
+                    <Button variant="ghost" className="rounded-none h-8 px-2 hover:bg-accent">
+                        <item.icon className={cn("h-3 w-3", {"text-blue-500" : item.isActive(editor)})} />
                     </Button>
                 </EditorBubbleItem>
             ))}

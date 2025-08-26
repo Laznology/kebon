@@ -140,6 +140,21 @@ body {
   }
 }
 
+/* Bubble Menu Styling */
+.editor-bubble-menu {
+  @apply flex items-center bg-popover border border-border rounded-md shadow-lg;
+  z-index: 9999;
+}
+
+.editor-bubble-menu button {
+  @apply border-none rounded-none first:rounded-l-md last:rounded-r-md;
+}
+
+/* Ensure popover content has proper z-index */
+[data-radix-popper-content-wrapper] {
+  z-index: 9999 !important;
+}
+
 .drag-handle {
   position: fixed;
   opacity: 1;

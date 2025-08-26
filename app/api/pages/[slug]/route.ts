@@ -25,6 +25,16 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ slu
         const body = await request.json();
         const { title, content } = body;
 
+        if (!content || typeof content !== 'object') {
+            return NextResponse.json({ error: 'Invalid content' }, { status: 400 });
+        }
+
+        // optional: log presence of marks for debugging
+        try {
+            const marksFound = JSON.stringify(content).includes('marks')
+            if (marksFound) console.info(`Saving content with marks for page ${slug}`)
+        } catch {}
+
         const updatedPage = await prisma.page.update({
             where: { slug },
             data: { title, content },

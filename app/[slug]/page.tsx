@@ -5,10 +5,16 @@ import Editor from '@/components/editor/Editor'
 import { useState, useEffect, useRef, useCallback } from "react"
 import DocsLayout from "@/components/DocsLayout"
 import { TableOfContents } from "@mantine/core"
-
+import { generateTocFromContent} from "@/lib/generateToc";
 
 
 type saveStatus = 'saved' | 'saving' | 'error' | 'unsaved'
+
+type TocItem = {
+    id: string;
+    value: string;
+    depth: number;
+}
 
 
 
@@ -18,100 +24,15 @@ export default function EditPage({ params }: { params: Promise<{ slug: string }>
     const [loading, setLoading] = useState<boolean>(true);
     const [saveStatus, setSaveStatus] = useState<saveStatus>('saved') 
     const [slug, setSlug] = useState<string>('')
+    const [tocItems, setTocItems] = useState<TocItem[]>([])
     
     const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null)
     const lastContentRef = useRef<string>('')
     const initialLoadRef = useRef<boolean>(true)
 
-
-    const convertBlocksToJSONContent = (blocks: { type: string; data: { text: string; level?: number }}[]) => {
-        if (!blocks || blocks.length === 0) {
-            return {
-                type: "doc",
-                content: [{
-                    type: "paragraph",
-                    content: []
-                }]
-            };
-        }
-        
-        return {
-            type: "doc",
-            content: blocks.map((block) => {
-                switch (block.type) {
-                    case 'paragraph':
-                        return {
-                            type: "paragraph",
-                            content: block.data.text ? [{
-                                type: "text",
-                                text: block.data.text,
-                            }] : []
-                        }
-                    case 'header':
-                        return {
-                            type: "heading",
-                            attrs: { level: block.data.level || 1 },
-                            content: block.data.text ? [{
-                                type: "text",
-                                text: block.data.text,
-                            }] : []
-                        }
-                    case 'list':
-                        return {
-                            type: "bulletList",
-                            content: []
-                        }
-                    default:
-                        return {
-                            type: "paragraph",
-                            content: block.data.text ? [{
-                                type: "text",
-                                text: block.data.text,
-                            }] : [],
-                        }
-                }
-            }),
-        }
-    }
-
-    const convertJSONContentToBlocks = (content: JSONContent) => {
-        if (!content.content || !Array.isArray(content.content)) return []
-
-        return content.content.map((block) => {
-            if (block.type === 'heading') {
-                return {
-                    type: "header",
-                    data: {
-                        text: block.content?.[0]?.text || "",
-                        level: block.attrs?.level || 1,
-                    },
-                };
-            }
-            if (block.type === 'bulletList') {
-                const items = block.content?.map(item => 
-                    item.content?.[0]?.content?.[0]?.text || ""
-                ).filter(Boolean) || [];
-                return {
-                    type: "list",
-                    data: {
-                        items: items,
-                    },
-                };
-            }
-            return {
-                type: block.type === 'paragraph' ? 'paragraph' : block.type || "paragraph",
-                data: {
-                    text: block.content?.[0]?.text || "",
-                },
-            };
-        });
-    };
-
     const autoSave = useCallback(async (content: JSONContent, title: string) => {
         if (!slug || initialLoadRef.current) return;
-
-        const blocks = convertJSONContentToBlocks(content)
-        const contentString = JSON.stringify(blocks)
+        const contentString = JSON.stringify(content)
 
         if (contentString === lastContentRef.current) return;
         try {
@@ -123,13 +44,14 @@ export default function EditPage({ params }: { params: Promise<{ slug: string }>
                 },
                 body: JSON.stringify({
                     title,
-                    content: { blocks },
+                    content,
                 }),
-            });
+            })
+
             if (!response.ok) {
                 throw new Error("Failed to save")
             }
-            lastContentRef.current = contentString
+                lastContentRef.current = contentString
             setSaveStatus('saved')
         } catch (error) {
             console.error('Auto-save Error', error)
@@ -155,15 +77,18 @@ export default function EditPage({ params }: { params: Promise<{ slug: string }>
                 const currentSlug = resolvedParams.slug
                 setSlug(currentSlug)
                 const response = await fetch(`/api/pages/${currentSlug}`)
+
                 if(!response.ok) throw new Error("Failed to fetch")
 
                     
                 const jsonDoc = await response.json()
                 setData(jsonDoc)
+                const generatedToc = generateTocFromContent(jsonDoc.content)
+                setTocItems(generatedToc)
 
                 let initialContent: JSONContent | undefined
                 if (jsonDoc.content && Array.isArray(jsonDoc.content.blocks)) {
-                    initialContent = convertBlocksToJSONContent(jsonDoc.content.blocks)
+                    initialContent = jsonDoc.content.blocks
                 } else if (jsonDoc.content) {
                     initialContent = jsonDoc.content
                 } else {
@@ -180,7 +105,7 @@ export default function EditPage({ params }: { params: Promise<{ slug: string }>
                 
                 setInitialContent(initialContent || null)
                 if (initialContent) {
-                    lastContentRef.current = JSON.stringify(convertJSONContentToBlocks(initialContent));
+                    lastContentRef.current = JSON.stringify(initialContent);
                 }
             } catch (error) {
                 console.error('Error fetching data', error)
@@ -205,34 +130,62 @@ export default function EditPage({ params }: { params: Promise<{ slug: string }>
         </div>
     )
 
-    const ToC = () => {
+    const ToC = ({ items }: { items: TocItem[] }) => {
+        const reinitializeRef = useRef(() => {});
+
+        useEffect(() => {
+            const timer = setTimeout(() => {
+                reinitializeRef.current()
+            }, 500)
+            return () => clearTimeout(timer)
+        }, [items])
+
+
+        if (items.length === 0) {
+            return (
+                <div className="text-sm text-gray-500 dark:text-gray-400 p-4">
+                    No headings found
+                </div>
+            );
+        }
+
         return (
             <TableOfContents
                 variant="light"
                 color="blue"
                 size="sm"
                 radius="sm"
+                reinitializeRef={reinitializeRef}
+                initialData={items}
                 scrollSpyOptions={{
-                    selector: 'h1, h2, h3, h4, h5 ,h6',
-                    getDepth: (element) => Number(element.getAttribute('data-order')),
-                    getValue: (element) => element.getAttribute('data-heading') || '',
+                    selector: '[data-heading-id]',
+                    getDepth: (element) => Number(element.getAttribute('data-depth')),
+                    getValue: (element) => element.getAttribute('data-heading-text') || '',
                 }}
-                initialData={[
-                    { id: '1', value: 'Heading 1', depth: 1 },
-                    { id: '2', value: 'Heading 2', depth: 2 },
-                    { id: '3', value: 'Heading 3', depth: 3 },
-                ]}
-                getControlProps={({ data }) => ({
-                    onClick: () => data.getNode().scrollIntoView(),
+                getControlProps={({ data, active }) => ({
+                    onClick: () => {
+                        const element = document.querySelector(`[data-heading-id="${data.id}"]`);
+                        if (element) {
+                            element.scrollIntoView({ 
+                                behavior: 'smooth', 
+                                block: 'start',
+                                inline: 'nearest' 
+                            });
+                        }
+                    },
+                    style: {
+                        color: active ? 'var(--mantine-color-blue-6)' : 'var(--mantine-color-gray-6)',
+                        fontWeight: active ? 600 : 400,
+                    },
                     children: data.value
                 })}
             />
         )
-
     }
     
+    
     return (
-        <DocsLayout toc={<ToC />}>
+        <DocsLayout toc={<ToC items={tocItems} />}>
             <div className="bg-white dark:bg-gray-900 flex flex-col">
                 <div className="flex items-start justify-between mb-6">
                     <div className="flex-1">
@@ -293,6 +246,9 @@ export default function EditPage({ params }: { params: Promise<{ slug: string }>
 
                             const content = editor.getJSON()
                             setInitialContent(content)
+
+                            const newToc = generateTocFromContent(content)
+                            setTocItems(newToc)
 
                             if (data?.title) {
                                 debounceAutoSave(content, data.title)

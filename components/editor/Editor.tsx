@@ -27,6 +27,7 @@ export default function Editor({ initialContent, onUpdate, onCreate, contentKey,
     return (
         <EditorRoot>
             <EditorContent
+                immediatelyRender={false}
                 editable={!!session}
                 key={contentKey}
                 initialContent={initialContent || undefined}
@@ -67,9 +68,10 @@ export default function Editor({ initialContent, onUpdate, onCreate, contentKey,
 
                 <EditorBubble
                     tippyOptions={{
-                        placement: "bottom-start",
+                        placement: "top-start",
+                        zIndex: 9999
                     }}
-                    className="flex w-auto overflow-hidden rounded border border-muted bg-background shadow-md"
+                    className="flex w-fit overflow-visible rounded border border-border bg-popover shadow-xl z-[9999]"
                 >
                     <LinkSelector open={openLink} onOpenChange={setOpenLink} />
                     <NodeSelector open={openNode} onOpenChange={setOpenNode} />

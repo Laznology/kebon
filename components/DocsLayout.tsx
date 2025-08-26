@@ -22,7 +22,7 @@ export default function DocsLayout({ children, toc }: DocsLayoutProps) {
                 </button>
             </nav>
 
-            <div className={`absolute bg-black/20 border rounded h-auto mx-1 w-full px-1 transition-all ease-in-out duration-100 ${isOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'} `}>
+            <div className={`absolute bg-black/20 border rounded h-auto mx-1 left-0 right-0 px-1 transition-all ease-in-out duration-100 ${isOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'} `}>
                 <div>
                     Menu 1
                 </div>
@@ -31,11 +31,11 @@ export default function DocsLayout({ children, toc }: DocsLayoutProps) {
                 </div>
             </div>
 
-            <div className={"flex flex-col md:flex-row gap-2"}>
+            <div className={"flex flex-col md:flex-row gap-4"}>
                 <aside className={"hidden md:block border-r h-full w-full max-w-64"}>
                     <NavigationMenu />
                 </aside>
-                <main className={"gorw-1 w-full"}>
+                <main className={"grpw-1 w-full"}>
                     {children}
                 </main>
                 <aside className={"px-4 hidden md:block h-full border-l w-full max-w-64"}>
