@@ -23,6 +23,7 @@ import {
 } from "novel";
 
 import { slashCommand } from "@/components/editor/slash-command";
+import { CustomHeading } from "@/lib/custom-heading";
 
 import { cx } from "class-variance-authority";
 import { common, createLowlight } from "lowlight";
@@ -115,12 +116,7 @@ const starterKit = StarterKit.configure({
       class: cx("leading-7 mb-4"),
     },
   },
-  heading: {
-    HTMLAttributes: {
-      class: cx("scroll-m-20 tracking-tight font-semibold"),
-    },
-    levels: [1, 2, 3, 4, 5, 6],
-  },
+  heading: false, 
 });
 
 const codeBlockLowlight = CodeBlockLowlight.configure({
@@ -154,6 +150,7 @@ const characterCount = CharacterCount.configure();
 
 export const defaultExtensions = [
   starterKit,
+  CustomHeading, 
   placeholder,
   tiptapLink,
   tiptapImage,

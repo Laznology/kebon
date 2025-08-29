@@ -48,14 +48,14 @@ export const LinkSelector = ({open, onOpenChange }: LinkSelectorProps) => {
             <PopoverTrigger asChild>
                 <Button
                     variant={"ghost"}
-                    className={"gap-2 rounded-none border-none"}
+                    className={"gap-1 rounded-none h-8 px-2 hover:bg-accent"}
                 >
-                <p className={"text-base"}>↗</p>
+                <p className={"text-sm"}>↗</p>
                     <p className={cn("underline decoration-stone-400 underline-offset-4",
                         {"text-blue-400" : editor.isActive("link")})}></p>
                 </Button>
             </PopoverTrigger>
-            <PopoverContent align={"start"} className={"w-60 p-0"} alignOffset={10}>
+            <PopoverContent align={"start"} className={"w-60 p-1 bg-popover border  shadow-md"} alignOffset={10}>
                 <form onSubmit={e => {
                     const target = e.currentTarget as HTMLFormElement
                     e.preventDefault()
@@ -63,13 +63,13 @@ export const LinkSelector = ({open, onOpenChange }: LinkSelectorProps) => {
                     const url = getUrlFromString(input.value)
                     if (url) {editor?.chain().focus().setLink({ href: url }).run()}
                 }}
-                    className={"flex p-1"}
+                    className={"flex p-1 gap-2 items-center"}
                 >
                 <Input
                     ref={inputRef}
                     type='text'
                     placeholder='Paste a link'
-                    className='flex-1 bg-background p-1 text-sm outline-none'
+                    className='flex-1 p-1 text-sm focus:outline-none foucs:ring-0 foucs:ring-offset-0'
                     defaultValue={editor.getAttributes("link").href}
                 />
                     {editor.getAttributes("link").href ? (

@@ -95,28 +95,30 @@ export const ColorSelector = ({ open, onOpenChange }: ColorSelectorProps) => {
     const { editor } = useEditor()
     if (!editor) return null
 
+    console.log("ColorSelector rendering:", { open, editor: !!editor })
+
     const activeColorItem = TEXT_COLORS.find(({ color }) => editor.isActive("textStyle", { color }))
     const activeHightlightItem = HIGHLIGHT_COLORS.find(({ color }) => editor.isActive("highlight", { color }))
 
     return (
         <Popover modal={true} open={open} onOpenChange={onOpenChange}>
             <PopoverTrigger asChild>
-                <Button className='gap-2 rounded-none' variant='ghost'>
+                <Button className='gap-1 rounded-none h-8 px-2 hover:bg-accent' variant='ghost'>
           <span
-              className='rounded-sm px-1'
+              className='rounded-sm px-1 text-xs'
               style={{
                   color: activeColorItem?.color,
                   backgroundColor: activeHightlightItem?.color,
               }}>
             A
           </span>
-                    <ChevronDown className='h-4 w-4' />
+                    <ChevronDown className='h-3 w-3' />
                 </Button>
             </PopoverTrigger>
 
             <PopoverContent
                 sideOffset={5}
-                className='my-1 flex max-h-80 w-48 flex-col overflow-hidden overflow-y-auto rounded border p-1 shadow-xl '
+                className='my-1 flex max-h-80 w-48 flex-col overflow-hidden overflow-y-auto rounded border border-border bg-popover p-1 shadow-xl z-[9999]'
                 align='start'>
                 <div className='flex flex-col'>
                     <div className='my-1 px-2 text-sm font-semibold text-muted-foreground'>Color</div>

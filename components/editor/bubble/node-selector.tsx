@@ -42,7 +42,7 @@ const items: SelectorItem[] = [
         isActive: (editor) => !!editor?.isActive("heading", { level: 1 })
     },
     {
-        name: "Headign 2",
+        name: "Heading 2",
         icon: Heading2,
         command: (editor) => editor?.chain().focus().toggleHeading({ level: 2 }).run(),
         isActive: (editor) => !!editor?.isActive("heading", { level: 2 })
@@ -97,15 +97,13 @@ export const NodeSelector = ({ open, onOpenChange }: NodeSelectorProps) => {
 
     return(
         <Popover modal={true} open={open} onOpenChange={onOpenChange}>
-            <PopoverTrigger asChild
-                className="gap-2 flex rounded-none border-none hover:bg-accent focus:ring-0"
-            >
-                <Button variant="ghost" size="icon" className="gap-2">
+            <PopoverTrigger asChild>
+                <Button variant="ghost" className="gap-2 rounded-none border-none hover:bg-accent focus:ring-0 h-8 px-2 text-sm">
                     {activeItem.name}
-                    <ChevronDown className="w-4 aspect-square" />
+                    <ChevronDown className="w-3 h-3" />
                 </Button>
             </PopoverTrigger>
-            <PopoverContent sideOffset={5} align="start" className="w-48 p-1">
+            <PopoverContent sideOffset={5} align="start" className="w-48 p-1 bg-popover border border-border shadow-md z-[9999]">
                 {items.map((item, index) => (
                     <EditorBubbleItem key={index}
                         onSelect={(editor) => {

@@ -7,6 +7,7 @@ import { NodeSelector } from "@/components/editor/bubble/node-selector"
 import { TextButtons} from "@/components/editor/bubble/text-buttons";
 import {ColorSelector} from "@/components/editor/bubble/color-selector";
 import { LinkSelector} from "@/components/editor/bubble/link-selector";
+import { useSession } from 'next-auth/react'
 
 type EditorProps = {
     initialContent?: JSONContent | null
@@ -21,9 +22,13 @@ export default function Editor({ initialContent, onUpdate, onCreate, contentKey,
     const [openColor, setOpenColor] = useState<boolean>(false)
     const [openLink, setOpenLink] = useState<boolean>(false)
 
+    const { data: session } = useSession()
+
     return (
         <EditorRoot>
             <EditorContent
+                immediatelyRender={false}
+                editable={!!session}
                 key={contentKey}
                 initialContent={initialContent || undefined}
                 extensions={defaultExtensions}
@@ -63,9 +68,10 @@ export default function Editor({ initialContent, onUpdate, onCreate, contentKey,
 
                 <EditorBubble
                     tippyOptions={{
-                        placement: "bottom-start",
+                        placement: "top-start",
+                        zIndex: 9999
                     }}
-                    className="flex w-fit max-w-[90vw] overflow-hidden rounded border border-muted bg-background shadow-md"
+                    className="flex w-fit overflow-visible rounded border border-border bg-popover shadow-xl z-[9999]"
                 >
                     <LinkSelector open={openLink} onOpenChange={setOpenLink} />
                     <NodeSelector open={openNode} onOpenChange={setOpenNode} />
