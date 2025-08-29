@@ -15,7 +15,7 @@ export const CustomHeading = Heading.extend({
         'data-heading-id': id,
         'data-depth': level,
         'data-heading-text': content,
-        class: cx("scroll-m-20 tracking-tight font-semibold"),
+        class: cx("tracking-tight font-bold"),
       },
       0,
     ];

@@ -66,7 +66,7 @@ const taskList = TaskList.configure({
 });
 const taskItem = TaskItem.configure({
   HTMLAttributes: {
-    class: cx("flex gap-2 items-start my-4"),
+    class: cx("flex gap-2 items-start"),
   },
   nested: true,
 });
@@ -90,7 +90,7 @@ const starterKit = StarterKit.configure({
   },
   listItem: {
     HTMLAttributes: {
-      class: cx("leading-normal mb-1"),
+      class: cx("leading-normal"),
     },
   },
   blockquote: {
@@ -113,7 +113,7 @@ const starterKit = StarterKit.configure({
   gapcursor: false,
   paragraph: {
     HTMLAttributes: {
-      class: cx("leading-7 mb-4"),
+      class: cx("leading-7"),
     },
   },
   heading: false, 

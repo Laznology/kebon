@@ -38,7 +38,7 @@ export default function Editor({ initialContent, onUpdate, onCreate, contentKey,
                         keydown: (_view, event) => handleCommandNavigation(event),
                     },
                     attributes: {
-                        class: "py-12 prose prose-base dark:prose-invert focus:outline-none max-w-full min-h-[500px] prose-headings:font-semibold prose-h1:text-xl prose-h2:text-lg prose-h3:text-base prose-p:text-sm prose-p:leading-relaxed prose-p:mb-3 "
+                        class: "py-12 prose prose-base dark:prose-invert focus:outline-none max-w-full min-h-[500px]"
                     },
                 }}
                 onUpdate={onUpdate}

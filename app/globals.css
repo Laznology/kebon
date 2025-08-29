@@ -150,7 +150,34 @@ body {
   @apply border-none rounded-none first:rounded-l-md last:rounded-r-md;
 }
 
-/* Ensure popover content has proper z-index */
+/* Custom Editor Spacing - Notion Style */
+.prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
+  margin-top: 0.5rem !important;
+  margin-bottom: 0.25rem !important;
+  line-height: 1.2 !important;
+}
+
+.prose p {
+  margin-top: 0 !important;
+  margin-bottom: 0.25rem !important;
+  line-height: 1.5 !important;
+}
+
+.prose h1 {
+  font-size: 2rem !important;
+  font-weight: 700 !important;
+}
+
+.prose h2 {
+  font-size: 1.5rem !important;
+  font-weight: 600 !important;
+}
+
+.prose h3 {
+  font-size: 1.125rem !important; 
+  font-weight: 600 !important;
+}
+
 [data-radix-popper-content-wrapper] {
   z-index: 9999 !important;
 }
