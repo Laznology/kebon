@@ -1,0 +1,12 @@
+@baseUrl = http://localhost:3000/api
+
+GET {{baseUrl}}/settings/allow-register
+Content-Type: application/json
+###
+
+PUT {{baseUrl}}/settings/allow-register
+Content-Type: application/json
+
+{
+  "allowRegister": true
+}

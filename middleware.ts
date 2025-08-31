@@ -9,7 +9,7 @@ export async function  middleware(request: NextRequest) {
         pathname === '/' ||
         pathname.startsWith('/docs') ||
         pathname.startsWith('/signin') ||
-        pathname.startsWith('/register')
+        pathname.startsWith('/signup')
     ) {
         if (token && (pathname.startsWith('/signin'))){
             const homeUrl = new URL('/', request.url)

@@ -92,4 +92,9 @@ model PageVersion {
   @@index([pageId, deletedAt])
 }
 
+model AppSettings {
+  id            Int     @id @default(autoincrement())
+  allowRegister Boolean @default(true)
+}
+
 
