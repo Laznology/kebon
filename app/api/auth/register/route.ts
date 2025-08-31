@@ -1,32 +1,43 @@
-import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
-import crypto from "crypto";
+import { NextResponse, NextRequest } from "next/server";
+import { prisma } from "@/lib/prisma";
+import bcrypt from "bcryptjs";
 
-const prisma = new PrismaClient();
+export async function POST(request: NextRequest) { 
+  const body = await request.json()
+  const { email, password, confirmPassword } = body as { email?: string; password?: string; confirmPassword?: string; }
 
-export async function POST(req: Request) {
-  try {
-    const { email, password } = await req.json();
-
-    if (!email || !password) {
-      return NextResponse.json({ error: "Email and password are required" }, { status: 400 });
-    }
-
-    const hashedPassword = crypto
-      .createHash("sha256")
-      .update(password)
-      .digest("hex");
-
-    const user = await prisma.user.create({
-      data: {
-        email,
-        password: hashedPassword,
-      },
-    });
-
-    return NextResponse.json(user, { status: 201 });
-  } catch (error) {
-    console.error("Error during user registration:", error);
-    return NextResponse.json({ error: "User creation failed" }, { status: 500 });
+  if (!email || !password || !confirmPassword) { 
+    return NextResponse.json(
+      { message: "Please provide email, password, and confirmPassword." },
+      { status: 400 }
+    )
   }
+
+  if (password !== confirmPassword) { 
+    return NextResponse.json(
+      { message: "Passwords Confirmation do not match." },
+      { status: 400 }
+    )
+  }
+
+  const userExist = await prisma.user.findUnique({
+    where: { email }
+  })
+
+  if (userExist) {
+    return NextResponse.json(
+      { message: "Email already registered" },
+      { status: 409 }
+    )
+  }
+
+  const hashedPass = await bcrypt.hash(password, 10)
+  await prisma.user.create({
+    data: {
+      email, 
+      password: hashedPass,
+    }
+  })
+  
+  return NextResponse.json({ message: "User created" }, { status: 201 })
 }
