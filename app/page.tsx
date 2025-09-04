@@ -1,5 +1,8 @@
+"use client"
 import Image from "next/image";
 import Link from "next/link";
+import { signOut } from "next-auth/react";
+import {Button} from "@/components/ui/button";
 
 export default function Page() {
   return (
@@ -33,13 +36,14 @@ export default function Page() {
                 </footer>
               </blockquote>
 
-              <div className="mt-6">
+              <div className="flex gap-4 justify-center items-center">
                 <Link
                   href="/introduction"
                   className="inline-block rounded-md px-5 py-2 text-sm font-medium no-underline bg-slate-900 text-white hover:opacity-90"
                 >
                   Soon
                 </Link>
+                  <Button onClick={ () => signOut()}>Sign Out</Button>
               </div>
             </article>
           </div>
