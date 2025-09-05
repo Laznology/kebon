@@ -34,7 +34,7 @@ export default function Header() {
                 {/* Dropdown */}
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <Button variant="outline">Theme</Button>
+                        <Button variant="outline" className="text-primary">Theme</Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent className="w-40" align="end">
                         <DropdownMenuLabel>Pilih Tema</DropdownMenuLabel>

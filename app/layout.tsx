@@ -35,7 +35,7 @@ export default function RootLayout({
         <link rel="icon" href="/Kebon.ico" type="image/x-icon" />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} !text-primary !bg-background antialiased`}
       >
         <SessionProvider>
           <MantineProvider>
