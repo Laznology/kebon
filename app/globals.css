@@ -1,7 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-
 @plugin "@tailwindcss/typography";
 @custom-variant dark (&:where(.dark, .dark *));
 
@@ -42,7 +41,7 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
-  
+
   /* Accent colors for light mode */
   --accent-blue: #3b82f6;
   --accent-red: #ef4444;
@@ -121,7 +120,7 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
-  
+
   /* Accent colors for dark mode */
   --accent-blue: #60a5fa;
   --accent-red: #f87171;
@@ -133,19 +132,19 @@
 @layer base {
 
   .border-light-semantic { border-color: var(--border-light); }
-  
+
   .text-blue { color: var(--accent-blue); }
   .text-green { color: var(--accent-green); }
   .text-red { color: var(--accent-red); }
   .text-yellow { color: var(--accent-yellow); }
   .text-orange { color: var(--accent-orange); }
-  
+
   .bg-blue { background-color: var(--accent-blue); }
   .bg-green { background-color: var(--accent-green); }
   .bg-red { background-color: var(--accent-red); }
   .bg-yellow { background-color: var(--accent-yellow); }
   .bg-orange { background-color: var(--accent-orange); }
-  
+
   .shadow-semantic { box-shadow: 0 1px 3px var(--shadow); }
 }
 
@@ -231,5 +230,14 @@
   &.hide {
     opacity: 0;
     pointer-events: none;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
   }
 }
