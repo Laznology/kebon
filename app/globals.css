@@ -1,8 +1,9 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-@custom-variant dark (&:is(.dark *));
+
 @plugin "@tailwindcss/typography";
+@custom-variant dark (&:where(.dark, .dark *));
 
 :root {
   --background-light: #ffffff;
@@ -42,22 +43,6 @@
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
 }
-
-:where(.light, .light *) {
-  --background: var(--background-light);
-  --foreground: var(--foreground-light);
-}
-
-:where(.dark, .dark *) {
-  --background: var(--background-dark);
-  --foreground: var(--foreground-dark);
-}
-
-body {
-  transition: background 0.3s, color 0.3s;
-}
-
-
 
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
@@ -132,12 +117,22 @@ body {
 }
 
 @layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
+
+  .border-light-semantic { border-color: var(--border-light); }
+  
+  .text-blue { color: var(--accent-blue); }
+  .text-green { color: var(--accent-green); }
+  .text-red { color: var(--accent-red); }
+  .text-yellow { color: var(--accent-yellow); }
+  .text-orange { color: var(--accent-orange); }
+  
+  .bg-blue { background-color: var(--accent-blue); }
+  .bg-green { background-color: var(--accent-green); }
+  .bg-red { background-color: var(--accent-red); }
+  .bg-yellow { background-color: var(--accent-yellow); }
+  .bg-orange { background-color: var(--accent-orange); }
+  
+  .shadow-semantic { box-shadow: 0 1px 3px var(--shadow); }
 }
 
 /* Bubble Menu Styling */

@@ -6,7 +6,7 @@ import {Button} from "@/components/ui/button";
 
 export default function Page() {
   return (
-    <div className="min-h-screen flex items-center bg-white">
+    <div className="flex items-center bg-background">
       <div className="container mx-auto px-6 lg:px-12">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center justify-center">
           <div className="flex justify-center ">
