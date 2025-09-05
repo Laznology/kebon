@@ -27,7 +27,6 @@ export default function Editor({ initialContent, onUpdate, onCreate, contentKey,
     return (
         <EditorRoot>
             <EditorContent
-                immediatelyRender={false}
                 editable={!!session}
                 key={contentKey}
                 initialContent={initialContent || undefined}

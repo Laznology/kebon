@@ -23,7 +23,7 @@ export default function Page() {
           </div>
 
           <div>
-            <article className="prose prose-lg max-w-none">
+            <article className="prose prose-lg max-w-none dark:prose-invert">
               <h1>Digital Garden</h1>
               <p className="lead">
                 Koleksi catatan, eksperimen, dan pemikiran yang tumbuh dari waktu ke waktu —
@@ -31,7 +31,7 @@ export default function Page() {
               </p>
               <blockquote>
                 Tbh, I still have no idea with this quote yet :3
-                <footer className="mt-0 text-right text-sm text-slate-500">
+                <footer className="mt-0 text-right text-sm text-secondary">
                   — Pemilik Kebun
                 </footer>
               </blockquote>
@@ -39,7 +39,7 @@ export default function Page() {
               <div className="flex gap-4 justify-center items-center">
                 <Link
                   href="/introduction"
-                  className="inline-block rounded-md px-5 py-2 text-sm font-medium no-underline bg-slate-900 text-white hover:opacity-90"
+                  className="inline-block rounded-md px-5 py-2 text-sm font-medium no-underline btn-primary hover:opacity-90"
                 >
                   Soon
                 </Link>

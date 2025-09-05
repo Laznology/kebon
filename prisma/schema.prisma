@@ -68,7 +68,7 @@ model Page {
   title       String
   slug        String        @unique
   published   Boolean       @default(false)
-  image       String
+  image       String?
   content     Json?
   authorId    String
   createdAt   DateTime      @default(now())

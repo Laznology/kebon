@@ -50,7 +50,7 @@ export const TextButtons = () => {
                     }}
                     >
                     <Button variant="ghost" className="rounded-none h-8 px-2 hover:bg-accent">
-                        <item.icon className={cn("h-3 w-3", {"text-blue-500" : item.isActive(editor)})} />
+                        <item.icon className={cn("h-3 w-3", {"text-blue" : item.isActive(editor)})} />
                     </Button>
                 </EditorBubbleItem>
             ))}

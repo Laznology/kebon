@@ -1,8 +1,7 @@
 "use client"
 import { useTheme } from "next-themes"
-import { useRouter } from "next/navigation"
 import Image from "next/image"
-import Link from "next/link"
+
 import {
     DropdownMenu,
     DropdownMenuTrigger,
@@ -15,8 +14,7 @@ import { Button } from "@/components/ui/button"
 import { Moon, Sun, Monitor } from "lucide-react"
 
 export default function Header() {
-    const { theme, setTheme } = useTheme()
-    const router = useRouter()
+    const { setTheme } = useTheme()
 
     return (
         <nav className="bg-background border-b">

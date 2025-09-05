@@ -159,7 +159,7 @@ export const ColorSelector = ({ open, onOpenChange }: ColorSelectorProps) => {
                             className='flex cursor-pointer items-center justify-between px-2 py-1 text-sm hover:bg-accent'>
                             <div className='flex items-center gap-2'>
                                 <div
-                                    className='rounded-sm border px-2 py-px font-medium text-white'
+                                    className='rounded-sm border px-2 py-px font-medium text-primary'
                                     style={{ backgroundColor: color }}>
                                     A
                                 </div>

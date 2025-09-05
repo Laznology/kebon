@@ -42,6 +42,13 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+  
+  /* Accent colors for light mode */
+  --accent-blue: #3b82f6;
+  --accent-red: #ef4444;
+  --accent-green: #22c55e;
+  --accent-yellow: #eab308;
+  --accent-orange: #f97316;
 }
 
 @theme inline {
@@ -114,6 +121,13 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+  
+  /* Accent colors for dark mode */
+  --accent-blue: #60a5fa;
+  --accent-red: #f87171;
+  --accent-green: #4ade80;
+  --accent-yellow: #fbbf24;
+  --accent-orange: #fb923c;
 }
 
 @layer base {
@@ -150,12 +164,23 @@
   margin-top: 0.5rem !important;
   margin-bottom: 0.25rem !important;
   line-height: 1.2 !important;
+  color: var(--color-foreground) !important;
 }
 
 .prose p {
   margin-top: 0 !important;
   margin-bottom: 0.25rem !important;
   line-height: 1.5 !important;
+  color: var(--color-foreground) !important;
+}
+
+.prose blockquote {
+  color: var(--color-muted-foreground) !important;
+  border-left-color: var(--color-border) !important;
+}
+
+.prose {
+  color: var(--color-foreground) !important;
 }
 
 .prose h1 {

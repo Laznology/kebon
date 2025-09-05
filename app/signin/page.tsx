@@ -51,7 +51,7 @@ export default function SignIn() {
                     router.refresh()
                 }
             }
-        } catch (error) {
+        } catch  {
             toast.error("Sign is failed")
             setLoading(false)
         }

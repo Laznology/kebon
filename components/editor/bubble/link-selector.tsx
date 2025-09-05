@@ -52,7 +52,7 @@ export const LinkSelector = ({open, onOpenChange }: LinkSelectorProps) => {
                 >
                 <p className={"text-sm"}>↗</p>
                     <p className={cn("underline decoration-stone-400 underline-offset-4",
-                        {"text-blue-400" : editor.isActive("link")})}></p>
+                        {"text-blue" : editor.isActive("link")})}></p>
                 </Button>
             </PopoverTrigger>
             <PopoverContent align={"start"} className={"w-60 p-1 bg-popover border  shadow-md"} alignOffset={10}>
@@ -77,7 +77,7 @@ export const LinkSelector = ({open, onOpenChange }: LinkSelectorProps) => {
                             size={"icon"}
                             variant={"outline"}
                             type={"button"}
-                            className={"flex h-8 items-center rounded-sm p-1 text-red-600 transition-all hover:bg-red-100 dark:hover:bg-red-800"}
+                            className={"flex h-8 items-center rounded-sm p-1 text-red transition-all hover:bg-red"}
                             onClick={() => {
                                 editor?.chain().focus().unsetLink().run()
                             }}

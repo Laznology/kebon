@@ -16,7 +16,7 @@ export default function DocsLayout({ children, toc }: DocsLayoutProps) {
             <nav className={"w-full flex justify-between relative"}>
                 <span className={"font-semibold text-2xl"}>Kebon.</span>
                 <button onClick={() => setIsOpen(!isOpen)}
-                    className={"block md:hidden border rounded p-2 bg-blue-300 text-white shadow"}
+                    className={"block md:hidden border rounded p-2 bg-blue text-primary shadow"}
                 >
                     {isOpen ? "Close" : "Open"}
                 </button>

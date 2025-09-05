@@ -27,6 +27,7 @@ async function main() {
     data: {
       title: 'page 1',
       slug: 'page-1',
+      image: null,
       published: true,
       content: {
         blocks: [
@@ -41,6 +42,7 @@ async function main() {
     data: {
       title: 'page 2',
       slug: 'page-2',
+      image: null,
       published: false,
       content: {
         blocks: [
@@ -55,6 +57,7 @@ async function main() {
     data: {
       title: 'page 3',
       slug: 'page-3',
+      image: null,
       published: true,
       content: {
         blocks: [
