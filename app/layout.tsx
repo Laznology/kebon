@@ -3,10 +3,13 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Provider from "./proivder";
 import SessionProvider from "@/components/SessionProvider";
-import '@mantine/core/styles.css';
-import { ColorSchemeScript, MantineProvider, mantineHtmlProps } from '@mantine/core';
+import "@mantine/core/styles.css";
+import {
+  ColorSchemeScript,
+  MantineProvider,
+  mantineHtmlProps,
+} from "@mantine/core";
 import { Toaster } from "@/components/ui/sonner";
-import Header from "@/components/Header";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,18 +34,19 @@ export default function RootLayout({
   return (
     <html lang="en" {...mantineHtmlProps}>
       <head>
-        <ColorSchemeScript />
+        <ColorSchemeScript defaultColorScheme={"auto"} />
         <link rel="icon" href="/Kebon.ico" type="image/x-icon" />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} !text-primary !bg-background antialiased`}
       >
         <SessionProvider>
-          <MantineProvider>
-            <Provider>
-                <Header />
-                {children}
-            </Provider>
+          <MantineProvider
+            defaultColorScheme={"auto"}
+            withGlobalClasses={true}
+            withCssVariables={true}
+          >
+            <Provider>{children}</Provider>
             <Toaster richColors />
           </MantineProvider>
         </SessionProvider>

@@ -133,7 +133,10 @@ export default function EditPage({
       <div className="flex justify-center items-center h-screen">
         <div className="flex items-center gap-3">
           <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-300"></div>
-          <span className="text-lg text-gray-600 dark:text-gray-400">
+          <span
+            className="text-lg"
+            style={{ color: "rgb(var(--muted-foreground))" }}
+          >
             Loading editor...
           </span>
         </div>
@@ -152,7 +155,10 @@ export default function EditPage({
 
     if (items.length === 0) {
       return (
-        <div className="text-sm text-gray-500 dark:text-gray-400 p-4">
+        <div
+          className="text-sm p-4"
+          style={{ color: "rgb(var(--muted-foreground))" }}
+        >
           No headings found
         </div>
       );
@@ -188,7 +194,7 @@ export default function EditPage({
           style: {
             color: active
               ? "var(--mantine-color-blue-6)"
-              : "var(--mantine-color-gray-6)",
+              : "rgb(var(--muted-foreground))",
             fontWeight: active ? 600 : 400,
           },
           children: data.value,
@@ -202,7 +208,10 @@ export default function EditPage({
       <div className="flex flex-col">
         <div className="flex items-start justify-between mb-6">
           <div className="flex-1">
-            <span className="text-2xl md:text-4xl font-bold mb-3 text-gray-900 dark:text-gray-100">
+            <span
+              className="text-2xl md:text-4xl font-bold mb-3"
+              style={{ color: "rgb(var(--foreground))" }}
+            >
               {data?.title}
             </span>
             {data?.author && (
@@ -212,7 +221,10 @@ export default function EditPage({
                     .charAt(0)
                     .toUpperCase()}
                 </div>
-                <span className="text-sm text-gray-600 dark:text-gray-400">
+                <span
+                  className="text-sm"
+                  style={{ color: "rgb(var(--muted-foreground))" }}
+                >
                   {data.author.name || data.author.email}
                 </span>
               </div>
@@ -222,9 +234,7 @@ export default function EditPage({
             <div className="flex items-center gap-3">
               <span
                 className={`px-3 py-1 rounded-full text-xs font-medium ${
-                  data?.published
-                    ? "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300"
-                    : "bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300"
+                  data?.published ? "status-published" : "status-draft"
                 }`}
               >
                 {data?.published ? "Published" : "Draft"}
@@ -232,12 +242,12 @@ export default function EditPage({
               <div
                 className={`px-3 py-1 rounded-full text-xs font-medium ${
                   saveStatus === "saved"
-                    ? "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300"
+                    ? "status-saved"
                     : saveStatus === "saving"
-                    ? "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300"
+                    ? "status-saving"
                     : saveStatus === "unsaved"
-                    ? "bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300"
-                    : "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300"
+                    ? "status-unsaved"
+                    : "status-error"
                 }`}
               >
                 {saveStatus === "saved"
@@ -251,7 +261,14 @@ export default function EditPage({
             </div>
           </div>
         </div>
-        <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400 border-t border-gray-100 dark:border-gray-800 pt-4">
+        <div
+          className="flex items-center gap-4 text-xs pt-4"
+          style={{
+            color: "rgb(var(--muted-foreground))",
+            borderTopColor: "rgb(var(--border))",
+            borderTopWidth: "1px",
+          }}
+        >
           <div className="flex items-center gap-1">
             <span>
               Last updated:{" "}
