@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Card, TextInput, Text, Title, Group } from "@mantine/core";
+import { Button, Card, TextInput, Text, Title } from "@mantine/core";
 import { getSession, signIn } from "next-auth/react";
 import { notifications } from "@mantine/notifications";
 import { useRouter } from "next/navigation";
