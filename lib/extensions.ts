@@ -19,7 +19,7 @@ import {
   UpdatedImage,
   UploadImagesPlugin,
   Youtube,
-  StarterKit
+  StarterKit,
 } from "novel";
 
 import { slashCommand } from "@/components/editor/slash-command";
@@ -116,7 +116,7 @@ const starterKit = StarterKit.configure({
       class: cx("leading-7"),
     },
   },
-  heading: false, 
+  heading: false,
 });
 
 const codeBlockLowlight = CodeBlockLowlight.configure({
@@ -150,7 +150,7 @@ const characterCount = CharacterCount.configure();
 
 export const defaultExtensions = [
   starterKit,
-  CustomHeading, 
+  CustomHeading,
   placeholder,
   tiptapLink,
   tiptapImage,

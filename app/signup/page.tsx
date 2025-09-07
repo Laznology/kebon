@@ -24,7 +24,7 @@ export default function SignupPage() {
   const [passwordConfirmation, setPasswordConfirmation] = useState<string>("");
   const [isAllowRegister, setIsAllowRegister] = useState<boolean>(false);
   const { data, loading } = useFetch<{ allowRegister: boolean }>(
-    "/api/settings/allow-register"
+    "/api/settings/allow-register",
   );
 
   useEffect(() => {

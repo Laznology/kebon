@@ -1,8 +1,8 @@
-"use client"
+"use client";
 import Image from "next/image";
 import Link from "next/link";
 import { signOut } from "next-auth/react";
-import {Button} from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 
 export default function Page() {
   return (
@@ -26,8 +26,9 @@ export default function Page() {
             <article className="prose prose-lg max-w-none dark:prose-invert">
               <h1>Digital Garden</h1>
               <p className="lead">
-                Koleksi catatan, eksperimen, dan pemikiran yang tumbuh dari waktu ke waktu —
-                bukan artikel publish-once, melainkan sesuatu yang terus dirawat.
+                Koleksi catatan, eksperimen, dan pemikiran yang tumbuh dari
+                waktu ke waktu — bukan artikel publish-once, melainkan sesuatu
+                yang terus dirawat.
               </p>
               <blockquote>
                 Tbh, I still have no idea with this quote yet :3
@@ -43,7 +44,7 @@ export default function Page() {
                 >
                   Soon
                 </Link>
-                  <Button onClick={ () => signOut()}>Sign Out</Button>
+                <Button onClick={() => signOut()}>Sign Out</Button>
               </div>
             </article>
           </div>

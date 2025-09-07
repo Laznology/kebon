@@ -21,7 +21,7 @@ export default function EditPage({
   params: Promise<{ slug: string }>;
 }) {
   const [initialContent, setInitialContent] = useState<JSONContent | null>(
-    null
+    null,
   );
   const [data, setData] = useState<Document | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -62,7 +62,7 @@ export default function EditPage({
         setSaveStatus("error");
       }
     },
-    [slug]
+    [slug],
   );
 
   const debounceAutoSave = useCallback(
@@ -76,7 +76,7 @@ export default function EditPage({
         autoSave(content, title);
       }, 2000);
     },
-    [autoSave]
+    [autoSave],
   );
 
   useEffect(() => {
@@ -181,7 +181,7 @@ export default function EditPage({
         getControlProps={({ data, active }) => ({
           onClick: () => {
             const element = document.querySelector(
-              `[data-heading-id="${data.id}"]`
+              `[data-heading-id="${data.id}"]`,
             );
             if (element) {
               element.scrollIntoView({
@@ -244,19 +244,19 @@ export default function EditPage({
                   saveStatus === "saved"
                     ? "status-saved"
                     : saveStatus === "saving"
-                    ? "status-saving"
-                    : saveStatus === "unsaved"
-                    ? "status-unsaved"
-                    : "status-error"
+                      ? "status-saving"
+                      : saveStatus === "unsaved"
+                        ? "status-unsaved"
+                        : "status-error"
                 }`}
               >
                 {saveStatus === "saved"
                   ? "Saved"
                   : saveStatus === "saving"
-                  ? "Saving..."
-                  : saveStatus === "unsaved"
-                  ? "Unsaved"
-                  : "Error"}
+                    ? "Saving..."
+                    : saveStatus === "unsaved"
+                      ? "Unsaved"
+                      : "Error"}
               </div>
             </div>
           </div>

@@ -1,20 +1,20 @@
-import { Heading } from '@tiptap/extension-heading'
+import { Heading } from "@tiptap/extension-heading";
 import { cx } from "class-variance-authority";
 
 export const CustomHeading = Heading.extend({
   renderHTML({ node, HTMLAttributes }) {
     const level = node.attrs.level;
-    const content = node.textContent || '';
-    const id = `heading-${content.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${Date.now()}`;
-    
+    const content = node.textContent || "";
+    const id = `heading-${content.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-${Date.now()}`;
+
     return [
       `h${level}`,
       {
         ...HTMLAttributes,
         id: id,
-        'data-heading-id': id,
-        'data-depth': level,
-        'data-heading-text': content,
+        "data-heading-id": id,
+        "data-depth": level,
+        "data-heading-text": content,
         class: cx("tracking-tight font-bold"),
       },
       0,
