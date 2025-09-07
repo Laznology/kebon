@@ -5,7 +5,7 @@ import {
   useComputedColorScheme,
 } from "@mantine/core";
 import { useEffect, useState } from "react";
-import { MoonIcon, CloudSunRain } from "lucide-react";
+import { Icon } from "@iconify/react";
 
 export function ThemeToggle() {
   const { setColorScheme } = useMantineColorScheme();
@@ -23,8 +23,8 @@ export function ThemeToggle() {
       onChange={() =>
         setColorScheme(computedColorScheme === "light" ? "dark" : "light")
       }
-      offLabel={<MoonIcon />}
-      onLabel={<CloudSunRain />}
+      offLabel={<Icon icon="mdi:weather-night" width={16} height={16} />}
+      onLabel={<Icon icon="mdi:weather-sunny" width={16} height={16} />}
     />
   );
 }

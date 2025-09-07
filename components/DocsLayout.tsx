@@ -1,58 +1,149 @@
 "use client";
-
-import { useState } from "react";
+import { ReactNode } from "react";
+import {
+  AppShell,
+  Burger,
+  Group,
+  Paper,
+  ScrollArea,
+  Title,
+  Divider,
+  Box,
+  Modal,
+  Kbd,
+} from "@mantine/core";
 import React from "react";
-import NavigationMenu from "./NavigationMenu";
-import { Divider, TextInput, ScrollArea } from "@mantine/core";
+import {
+  getHotkeyHandler,
+  useDisclosure,
+  useHotkeys,
+  useMediaQuery,
+} from "@mantine/hooks";
+import { Icon } from "@iconify/react";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import NavigationMenu from "@/components/NavigationMenu";
 
 type DocsLayoutProps = {
   children: React.ReactNode;
-  toc: React.ReactNode;
+  toc: ReactNode;
 };
 
 export default function DocsLayout({ children, toc }: DocsLayoutProps) {
-  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [mobileNavOpened, { toggle: toggleMobileNav }] = useDisclosure(false);
+  const [tocOpened, { toggle: toggleToc }] = useDisclosure(false);
+  const [opened, { open, close }] = useDisclosure(false);
+  const isMobile = useMediaQuery("(max-width: 768px)");
+
+  useHotkeys([["mod+/", () => open()]]);
+
   return (
-    <div className={"space-y-6"}>
-      <nav className={"w-full flex justify-between relative"}>
-        <button
-          onClick={() => setIsOpen(!isOpen)}
-          className={
-            "block md:hidden border rounded p-2 bg-blue text-primary shadow"
-          }
-        >
-          {isOpen ? "Close" : "Open"}
-        </button>
-      </nav>
-
-      <div
-        className={`absolute bg-black/20 border rounded h-auto mx-1 left-0 right-0 px-1 transition-all ease-in-out duration-100 ${
-          isOpen ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4"
-        } `}
-      >
-        <div>Menu 1</div>
-        <div>menu 2</div>
-      </div>
-
-      <div className={"flex flex-col md:flex-row gap-4"}>
-        <aside className="min-w-64 border-r space-y-2">
-          <Divider />
-          <h1 className="text-center text-xl md:text-3xl font-bold">Pages</h1>
-          <Divider />
-          <ScrollArea h={250}>
-            <NavigationMenu />
-          </ScrollArea>
-          <ThemeToggle />
-        </aside>
-        <main className={"grpw-1 w-full"}>{children}</main>
-        <aside
-          className={"px-4 hidden md:block h-full border-l w-full max-w-64"}
-        >
-          <span>Table of Contents</span>
-          {toc}
-        </aside>
-      </div>
-    </div>
+    <AppShell
+      header={{ height: { base: 60, md: 60 } }}
+      navbar={{
+        width: { base: 280, md: 300 },
+        breakpoint: "md",
+        collapsed: { mobile: !mobileNavOpened, desktop: false },
+      }}
+      aside={{
+        width: { base: 280, md: 300 },
+        breakpoint: "md",
+        collapsed: { mobile: !tocOpened, desktop: false },
+      }}
+      padding={"md"}
+    >
+      <AppShell.Header>
+        <Group h="100%" px="md" justify="space-between">
+          <Group>
+            <Burger
+              opened={mobileNavOpened}
+              onClick={toggleMobileNav}
+              hiddenFrom={"md"}
+              size={"sm"}
+            />
+            <Icon icon={"mdi:book-open-page-variant"} width={24} height={24} />
+            <Title order={3}>Documentation</Title>
+          </Group>
+          <Group>
+            {isMobile && (
+              <Burger
+                opened={tocOpened}
+                onClick={toggleToc}
+                size={"sm"}
+                aria-label={"Toggle Table of Contents"}
+              />
+            )}
+            <ThemeToggle />
+          </Group>
+        </Group>
+        {isMobile && tocOpened && (
+          <Paper
+            className={"space-y-2"}
+            shadow={"md"}
+            radius={"md"}
+            p={"md"}
+            m={"md"}
+            mt={0}
+            style={{
+              zIndex: 100,
+              position: "absolute",
+              top: "100%",
+              left: "0",
+              right: "0",
+              maxHeight: "50vh",
+              overflow: "auto",
+            }}
+          >
+            <Group>
+              <Icon
+                icon={"mdi:file-document-multiple"}
+                height={16}
+                width={16}
+              />
+              <h6>Table of Contents</h6>
+            </Group>
+            <Divider />
+            <Box>{toc}</Box>
+          </Paper>
+        )}
+      </AppShell.Header>
+      <AppShell.Navbar p={"md"} className={"space-y-4"}>
+        <AppShell.Section>
+          <div
+            onClick={open}
+            className={
+              "flex items-center justify-between gap-3 border rounded-md cursor-pointer py-1 px-1"
+            }
+          >
+            <Group grow align={"center"}>
+              <Icon icon={"line-md:search"} width={16} height={16} />
+              <p>Search...</p>
+            </Group>
+            <div className={"flex items-center justify-center"}>
+              <Kbd>Ctrl</Kbd><span className="font-mono">+</span><Kbd>/</Kbd>
+            </div>
+          </div>
+          <Modal
+            onKeyDown={getHotkeyHandler([["Esc", () => close()]])}
+            opened={opened}
+            onClose={close}
+            title={"Search Pages"}
+            size={"xl"}
+          ></Modal>
+        </AppShell.Section>
+        <Divider />
+        <AppShell.Section grow component={ScrollArea}>
+          <NavigationMenu />
+        </AppShell.Section>
+      </AppShell.Navbar>
+      <AppShell.Aside p={"md"} className={"space-y-3"}>
+        <Group mb={"md"}>
+          <Icon icon={"line-md:list-indented"} width={16} height={16} />
+          <h6>Table of Contents</h6>
+        </Group>
+        <Divider />
+        <ScrollArea>{toc}</ScrollArea>
+      </AppShell.Aside>
+      <AppShell.Main>{children}</AppShell.Main>
+    </AppShell>
   );
 }
