@@ -99,8 +99,6 @@ export const ColorSelector = ({ open, onOpenChange }: ColorSelectorProps) => {
   const { editor } = useEditor();
   if (!editor) return null;
 
-  console.log("ColorSelector rendering:", { open, editor: !!editor });
-
   const activeColorItem = TEXT_COLORS.find(({ color }) =>
     editor.isActive("textStyle", { color }),
   );
