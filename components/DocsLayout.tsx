@@ -119,7 +119,9 @@ export default function DocsLayout({ children, toc }: DocsLayoutProps) {
               <p>Search...</p>
             </Group>
             <div className={"flex items-center justify-center"}>
-              <Kbd>Ctrl</Kbd><span className="font-mono">+</span><Kbd>/</Kbd>
+              <Kbd>Ctrl</Kbd>
+              <span className="font-mono">+</span>
+              <Kbd>/</Kbd>
             </div>
           </div>
           <Modal
