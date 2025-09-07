@@ -67,7 +67,7 @@ export default function SignupPage() {
     } catch (error) {
       console.error("Registration error:", error);
       notifications.show({
-        title: "Error", 
+        title: "Error",
         message: "Registration failed. Please try again.",
         color: "red",
       });
@@ -79,14 +79,16 @@ export default function SignupPage() {
     <div className="flex items-center justify-center min-h-screen">
       {isAllowRegister ? (
         <Card className="w-full max-w-sm" withBorder padding="lg">
-          <Title order={2} mb="xs">Create your account</Title>
+          <Title order={2} mb="xs">
+            Create your account
+          </Title>
           <Text size="sm" c="dimmed" mb="xs">
             Enter your details below to create your account
           </Text>
           <Anchor href="/signin" size="sm" mb="lg">
             Already have an account? Sign In
           </Anchor>
-          
+
           <form onSubmit={handleRegister} className="space-y-4">
             <TextInput
               label="Email"
@@ -96,7 +98,7 @@ export default function SignupPage() {
               placeholder="m@example.com"
               required
             />
-            
+
             <TextInput
               label="Password"
               value={password}
@@ -104,7 +106,7 @@ export default function SignupPage() {
               type="password"
               required
             />
-            
+
             <TextInput
               label="Confirm Password"
               value={passwordConfirmation}
@@ -112,7 +114,7 @@ export default function SignupPage() {
               type="password"
               required
             />
-            
+
             <Button
               type="submit"
               fullWidth

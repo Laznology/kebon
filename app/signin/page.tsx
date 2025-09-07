@@ -66,11 +66,13 @@ export default function SignIn() {
   return (
     <div className={"flex items-center justify-center min-h-screen"}>
       <Card className={"w-full max-w-md"} withBorder padding="lg">
-        <Title order={2} mb="xs">Sign In</Title>
+        <Title order={2} mb="xs">
+          Sign In
+        </Title>
         <Text size="sm" c="dimmed" mb="lg">
           Enter your email and password to access your account
         </Text>
-        
+
         <form onSubmit={handleSignIn} className={"space-y-4"}>
           <TextInput
             label="Email"
@@ -80,7 +82,7 @@ export default function SignIn() {
             disabled={loading}
             type="email"
           />
-          
+
           <TextInput
             label="Password"
             value={password}
@@ -89,7 +91,7 @@ export default function SignIn() {
             disabled={loading}
             type="password"
           />
-          
+
           <Button
             type="submit"
             fullWidth
