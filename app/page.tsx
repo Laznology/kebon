@@ -2,7 +2,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { signOut } from "next-auth/react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@mantine/core";
 
 export default function Page() {
   return (

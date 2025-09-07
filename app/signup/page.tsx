@@ -1,19 +1,8 @@
 "use client";
 import { useFetch } from "@mantine/hooks";
 import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardAction,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { toast } from "sonner";
+import { Button, Card, TextInput, Text, Title, Anchor } from "@mantine/core";
+import { notifications } from "@mantine/notifications";
 import { useRouter } from "next/navigation";
 
 export default function SignupPage() {
@@ -39,7 +28,11 @@ export default function SignupPage() {
 
     try {
       if (password !== passwordConfirmation) {
-        toast.error("Password confirmation do not match");
+        notifications.show({
+          title: "Error",
+          message: "Password confirmation do not match",
+          color: "red",
+        });
         setSignupLoading(false);
         return;
       }
@@ -56,16 +49,28 @@ export default function SignupPage() {
         }),
       });
       if (!response.ok) {
-        toast.error("Register Failed");
+        notifications.show({
+          title: "Error",
+          message: "Register Failed",
+          color: "red",
+        });
         setSignupLoading(false);
         return;
       }
 
-      toast.success("Registration successful! Redirecting to sign in...");
+      notifications.show({
+        title: "Success",
+        message: "Registration successful! Redirecting to sign in...",
+        color: "green",
+      });
       router.push("/signin");
     } catch (error) {
       console.error("Registration error:", error);
-      toast.error("Registration failed. Please try again.");
+      notifications.show({
+        title: "Error", 
+        message: "Registration failed. Please try again.",
+        color: "red",
+      });
       setSignupLoading(false);
     }
   };
@@ -73,77 +78,60 @@ export default function SignupPage() {
   return (
     <div className="flex items-center justify-center min-h-screen">
       {isAllowRegister ? (
-        <Card className="w-full max-w-sm">
-          <CardHeader>
-            <CardTitle>Create your account</CardTitle>
-            <CardDescription>
-              Enter your details below to create your account
-            </CardDescription>
-            <CardAction>
-              <Button variant="link">Sign In</Button>
-            </CardAction>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-col gap-6">
-              <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  type="email"
-                  placeholder="m@example.com"
-                  required
-                />
-              </div>
-              <div className="grid gap-2">
-                <div className="flex items-center">
-                  <Label htmlFor="password">Password</Label>
-                  <a
-                    href="#"
-                    className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
-                  >
-                    Forgot your password?
-                  </a>
-                </div>
-                <Input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
-              </div>
-              <div className="grid gap-2">
-                <div className="flex items-center">
-                  <Label htmlFor="passwordConfirmation">Confirm Password</Label>
-                </div>
-                <Input
-                  id="passwordConfirmation"
-                  type="password"
-                  value={passwordConfirmation}
-                  onChange={(e) => setPasswordConfirmation(e.target.value)}
-                  required
-                />
-              </div>
-            </div>
-          </CardContent>
-          <CardFooter className="flex-col gap-2">
-            <form onSubmit={handleRegister} className="w-full">
-              <Button
-                type="submit"
-                className={`w-full ${signupLoading ? "animate-pulse" : ""}`}
-                disabled={signupLoading}
-              >
-                {signupLoading ? "Loading..." : "Register"}
-              </Button>
-            </form>
-          </CardFooter>
+        <Card className="w-full max-w-sm" withBorder padding="lg">
+          <Title order={2} mb="xs">Create your account</Title>
+          <Text size="sm" c="dimmed" mb="xs">
+            Enter your details below to create your account
+          </Text>
+          <Anchor href="/signin" size="sm" mb="lg">
+            Already have an account? Sign In
+          </Anchor>
+          
+          <form onSubmit={handleRegister} className="space-y-4">
+            <TextInput
+              label="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              type="email"
+              placeholder="m@example.com"
+              required
+            />
+            
+            <TextInput
+              label="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              type="password"
+              required
+            />
+            
+            <TextInput
+              label="Confirm Password"
+              value={passwordConfirmation}
+              onChange={(e) => setPasswordConfirmation(e.target.value)}
+              type="password"
+              required
+            />
+            
+            <Button
+              type="submit"
+              fullWidth
+              disabled={signupLoading}
+              loading={signupLoading}
+              mt="md"
+            >
+              {signupLoading ? "Loading..." : "Register"}
+            </Button>
+          </form>
         </Card>
       ) : loading ? (
-        <Card>Register is disallowed, please contact Administrator.</Card>
+        <Card withBorder padding="lg">
+          <Text>Loading...</Text>
+        </Card>
       ) : (
-        <Card>Loading</Card>
+        <Card withBorder padding="lg">
+          <Text>Register is disallowed, please contact Administrator.</Text>
+        </Card>
       )}
     </div>
   );

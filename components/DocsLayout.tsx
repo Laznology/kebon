@@ -3,8 +3,7 @@
 import { useState } from "react";
 import React from "react";
 import NavigationMenu from "./NavigationMenu";
-import { Separator } from "./ui/separator";
-import { Input } from "@/components/ui/input";
+import { Divider, TextInput, ScrollArea } from "@mantine/core";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
 type DocsLayoutProps = {
@@ -38,15 +37,12 @@ export default function DocsLayout({ children, toc }: DocsLayoutProps) {
 
       <div className={"flex flex-col md:flex-row gap-4"}>
         <aside className="min-w-64 border-r space-y-2">
-          <Separator />
+          <Divider />
           <h1 className="text-center text-xl md:text-3xl font-bold">Pages</h1>
-          <Separator />
-          <Input
-            className={
-              "outline-0 focus:ring-none focus:border-0 focus:outline-0"
-            }
-          />
-          <NavigationMenu />
+          <Divider />
+          <ScrollArea h={250}>
+            <NavigationMenu />
+          </ScrollArea>
           <ThemeToggle />
         </aside>
         <main className={"grpw-1 w-full"}>{children}</main>

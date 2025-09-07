@@ -1,8 +1,7 @@
 "use client";
 import { Page } from "@/types/page";
 import { useFetch } from "@mantine/hooks";
-import { Skeleton } from "@/components/ui/skeleton";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { Skeleton, ScrollArea } from "@mantine/core";
 import Link from "next/link";
 
 export default function NavigationMenu() {
@@ -12,7 +11,7 @@ export default function NavigationMenu() {
     if (loading) {
       return (
         <div className={"flex flex-col md:flex-row gap-4"}>
-          <Skeleton className={"h-8 w-full rounded"} />
+          <Skeleton height={32} radius="md" />
         </div>
       );
     }
@@ -42,5 +41,5 @@ export default function NavigationMenu() {
       );
     }
   };
-  return <ScrollArea className={"h-full w-full"}>{renderContent()}</ScrollArea>;
+  return <ScrollArea h="100%">{renderContent()}</ScrollArea>;
 }

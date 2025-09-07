@@ -4,12 +4,13 @@ import "./globals.css";
 import Provider from "./proivder";
 import SessionProvider from "@/components/SessionProvider";
 import "@mantine/core/styles.css";
+import "@mantine/notifications/styles.css";
 import {
   ColorSchemeScript,
   MantineProvider,
   mantineHtmlProps,
 } from "@mantine/core";
-import { Toaster } from "@/components/ui/sonner";
+import { Notifications } from "@mantine/notifications";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -47,7 +48,7 @@ export default function RootLayout({
             withCssVariables={true}
           >
             <Provider>{children}</Provider>
-            <Toaster richColors />
+            <Notifications />
           </MantineProvider>
         </SessionProvider>
       </body>

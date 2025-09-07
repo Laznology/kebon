@@ -1,18 +1,8 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
+import { Button, Card, TextInput, Text, Title, Group } from "@mantine/core";
 import { getSession, signIn } from "next-auth/react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { toast } from "sonner";
+import { notifications } from "@mantine/notifications";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 
@@ -26,7 +16,11 @@ export default function SignIn() {
     e.preventDefault();
     try {
       if (!email || !password) {
-        toast.error("Please fill in all fields");
+        notifications.show({
+          title: "Error",
+          message: "Please fill in all fields",
+          color: "red",
+        });
         setLoading(false);
         return null;
       }
@@ -38,13 +32,21 @@ export default function SignIn() {
       });
 
       if (result?.error) {
-        toast.error("Incorrect email or password");
+        notifications.show({
+          title: "Error",
+          message: "Incorrect email or password",
+          color: "red",
+        });
         setLoading(false);
         return null;
       }
 
       if (result?.ok) {
-        toast.success("Successfully logged in");
+        notifications.show({
+          title: "Success",
+          message: "Successfully logged in",
+          color: "green",
+        });
         const session = await getSession();
         if (session) {
           router.push("/");
@@ -52,57 +54,52 @@ export default function SignIn() {
         }
       }
     } catch {
-      toast.error("Sign is failed");
+      notifications.show({
+        title: "Error",
+        message: "Sign in failed",
+        color: "red",
+      });
       setLoading(false);
     }
   };
 
   return (
     <div className={"flex items-center justify-center min-h-screen"}>
-      <Card className={"w-full max-w-md"}>
-        <CardHeader>
-          <CardTitle>Sign In</CardTitle>
-          <CardDescription>
-            Enter your email and password to access your account
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSignIn} className={"space-y-4"}>
-            <div className={"space-y-2"}>
-              <Label htmlFor={"email"}>Email</Label>
-              <Input
-                id="email"
-                name="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                disabled={loading}
-              />
-            </div>
-            <div className={"space-y-2"}>
-              <Label htmlFor={"password"}>Password</Label>
-              <Input
-                id="password"
-                name="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                disabled={loading}
-                type="password"
-              />
-            </div>
-          </form>
-        </CardContent>
-        <CardFooter>
+      <Card className={"w-full max-w-md"} withBorder padding="lg">
+        <Title order={2} mb="xs">Sign In</Title>
+        <Text size="sm" c="dimmed" mb="lg">
+          Enter your email and password to access your account
+        </Text>
+        
+        <form onSubmit={handleSignIn} className={"space-y-4"}>
+          <TextInput
+            label="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            disabled={loading}
+            type="email"
+          />
+          
+          <TextInput
+            label="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            disabled={loading}
+            type="password"
+          />
+          
           <Button
             type="submit"
-            className={`w-full ${loading ? "animate-pulse" : ""}`}
+            fullWidth
             disabled={loading}
-            onClick={handleSignIn}
+            loading={loading}
+            mt="md"
           >
             {loading ? "Signing in..." : "Sign in"}
           </Button>
-        </CardFooter>
+        </form>
       </Card>
     </div>
   );
