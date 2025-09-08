@@ -22,13 +22,20 @@ import {
 import { Icon } from "@iconify/react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import NavigationMenu from "@/components/NavigationMenu";
+import SearchModal from "@/components/search-modal";
+import type { Document } from "@/types/document";
 
 type DocsLayoutProps = {
   children: React.ReactNode;
   toc: ReactNode;
+  documents: Document[];
 };
 
-export default function DocsLayout({ children, toc }: DocsLayoutProps) {
+export default function DocsLayout({
+  children,
+  toc,
+  documents,
+}: DocsLayoutProps) {
   const [mobileNavOpened, { toggle: toggleMobileNav }] = useDisclosure(false);
   const [tocOpened, { toggle: toggleToc }] = useDisclosure(false);
   const [opened, { open, close }] = useDisclosure(false);
@@ -124,13 +131,7 @@ export default function DocsLayout({ children, toc }: DocsLayoutProps) {
               <Kbd>/</Kbd>
             </div>
           </div>
-          <Modal
-            onKeyDown={getHotkeyHandler([["Esc", () => close()]])}
-            opened={opened}
-            onClose={close}
-            title={"Search Pages"}
-            size={"xl"}
-          ></Modal>
+          <SearchModal opened={opened} onClose={close} documents={documents} />
         </AppShell.Section>
         <Divider />
         <AppShell.Section grow component={ScrollArea}>

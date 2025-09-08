@@ -18,7 +18,8 @@ export function ThemeToggle() {
   if (!mounted) return null;
 
   return (
-    <Switch color="dark.4"
+    <Switch
+      color="dark.4"
       checked={computedColorScheme === "dark"}
       onChange={() =>
         setColorScheme(computedColorScheme === "light" ? "dark" : "light")

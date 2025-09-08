@@ -3,6 +3,7 @@ import { TableOfContents } from "@mantine/core";
 import DocsLayout from "@/components/DocsLayout";
 import { DocumentProvider, useDocument } from "@/app/[slug]/document-provider";
 import { useEffect, useRef } from "react";
+import { useAllDocuments } from "@/hooks/useAllDocuments";
 
 const TocComponent = () => {
   const { tocItems } = useDocument();
@@ -149,9 +150,10 @@ export default function EditPageLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const { documents } = useAllDocuments();
   return (
     <DocumentProvider>
-      <DocsLayout toc={<TocComponent />}>
+      <DocsLayout toc={<TocComponent />} documents={documents}>
         <DocumentHeader />
         {children}
       </DocsLayout>
