@@ -1,5 +1,5 @@
 "use client";
-import { Skeleton, ScrollArea } from "@mantine/core";
+import { ScrollArea } from "@mantine/core";
 import Link from "next/link";
 import { useAllDocuments } from "@/hooks/useAllDocuments";
 

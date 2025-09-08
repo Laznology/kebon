@@ -14,7 +14,6 @@ import {
 } from "@mantine/core";
 import React from "react";
 import {
-  getHotkeyHandler,
   useDisclosure,
   useHotkeys,
   useMediaQuery,
