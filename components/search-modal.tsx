@@ -108,7 +108,7 @@ export default function SearchModal({
           rightSection={
             <ActionIcon
               onClick={() => {
-                setSearchQuery("");
+                clearSearch();
               }}
             >
               <Icon icon={"mdi:close"} />
@@ -126,7 +126,8 @@ export default function SearchModal({
                 <Stack gap="sm">
                   <Text size="sm" c={"dimmed"}>
                     Found {results.length} result
-                    {results.length !== 1 ? "s" : ""} for "{searchQuery}"
+                    {results.length !== 1 ? "s" : "&quot;&quot;"} for &quot;
+                    {searchQuery}&quot;
                   </Text>
                   {results.map((result) => (
                     <SearchResultItem
