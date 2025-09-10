@@ -19,11 +19,16 @@ import SearchModal from "@/components/search-modal";
 import NavigationMenu from "@/components/NavigationMenu";
 import { useAllDocuments } from "@/hooks/useAllDocuments";
 import Image from "next/image";
+import { useHotkeys } from "@mantine/hooks";
 
 export default function Page() {
   const [opened, { open, close }] = useDisclosure(false);
   const [mobileNavOpened, { toggle: toggleMobileNav }] = useDisclosure(false);
   const { documents } = useAllDocuments();
+  useHotkeys(
+    [['ctrl+/', () => open()]]
+  )
+
   return (
     <AppShell
       header={{ height: { base: 60, md: 60 } }}
