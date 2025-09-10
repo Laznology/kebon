@@ -1,10 +1,11 @@
 "use client";
 
-import { Button, Card, TextInput, Text, Title } from "@mantine/core";
+import { Button, Card, TextInput, Text, Title, Divider } from "@mantine/core";
 import { getSession, signIn } from "next-auth/react";
 import { notifications } from "@mantine/notifications";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
+import { Icon } from "@iconify/react";
 
 export default function SignIn() {
   const router = useRouter();
@@ -101,6 +102,8 @@ export default function SignIn() {
           >
             {loading ? "Signing in..." : "Sign in"}
           </Button>
+            <Divider label={"Or Sign In with"} labelPosition={"center"} my={"xs"}/>
+          <Button fullWidth variant={"filled"} color={"dark"} leftSection={<Icon icon={"mdi:github"} width={20} height={20} />} onClick={() => signIn('github', { callbackUrl: "/" })}>Sign In with GitHub</Button>
         </form>
       </Card>
     </div>
