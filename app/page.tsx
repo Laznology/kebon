@@ -1,55 +1,101 @@
 "use client";
-import Image from "next/image";
-import Link from "next/link";
+import {
+  Button,
+  Divider,
+  Group,
+  Kbd,
+  ScrollArea,
+  Text,
+  Title,
+} from "@mantine/core";
+import AddPageButton from "@/components/add-page-button";
 import { signOut } from "next-auth/react";
-import { Button } from "@mantine/core";
+import { AppShell, Burger } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
+import { Icon } from "@iconify/react";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import React from "react";
+import SearchModal from "@/components/search-modal";
+import NavigationMenu from "@/components/NavigationMenu";
+import { useAllDocuments } from "@/hooks/useAllDocuments";
+import Image from "next/image";
 
 export default function Page() {
+  const [opened, { open, close }] = useDisclosure(false);
+  const [mobileNavOpened, { toggle: toggleMobileNav }] = useDisclosure(false);
+  const { documents } = useAllDocuments();
   return (
-    <div className="flex items-center bg-background">
-      <div className="container mx-auto px-6 lg:px-12">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center justify-center">
-          <div className="flex justify-center ">
-            <div className="w-64 h-64 sm:w-80 sm:h-80 lg:w-96 lg:h-96 rounded-md overflow-hidden shadow-sm">
-              <Image
-                src="/Kebon%20Webp.webp"
-                alt="Logo digital garden — daun dan pena"
-                width={800}
-                height={800}
-                className="object-cover w-full h-full"
-                priority
-              />
+    <AppShell
+      header={{ height: { base: 60, md: 60 } }}
+      navbar={{
+        width: { base: 280, md: 300 },
+        breakpoint: "md",
+        collapsed: { mobile: !mobileNavOpened, desktop: false },
+      }}
+      padding={"md"}
+    >
+      <AppShell.Header>
+        <Group h="100%" px="md" justify="space-between">
+          <Group>
+            <Burger
+              opened={mobileNavOpened}
+              onClick={toggleMobileNav}
+              hiddenFrom={"md"}
+              size={"sm"}
+            />
+            <Icon icon={"mdi:book-open-page-variant"} width={24} height={24} />
+            <Title order={3}>Documentation</Title>
+          </Group>
+          <Group>
+            <ThemeToggle />
+          </Group>
+        </Group>
+      </AppShell.Header>
+      <AppShell.Navbar p={"md"} className={"space-y-4"}>
+        <AppShell.Section>
+          <div
+            onClick={open}
+            className={
+              "flex items-center justify-between gap-3 border rounded-md cursor-pointer py-1 px-1"
+            }
+          >
+            <Group grow align={"center"}>
+              <Icon icon={"line-md:search"} width={16} height={16} />
+              <p>Search...</p>
+            </Group>
+            <div className={"flex items-center justify-center"}>
+              <Kbd>Ctrl</Kbd>
+              <span className="font-mono">+</span>
+              <Kbd>/</Kbd>
             </div>
           </div>
-
-          <div>
-            <article className="prose prose-lg max-w-none dark:prose-invert">
-              <h1>Digital Garden</h1>
-              <p className="lead">
-                Koleksi catatan, eksperimen, dan pemikiran yang tumbuh dari
-                waktu ke waktu — bukan artikel publish-once, melainkan sesuatu
-                yang terus dirawat.
-              </p>
-              <blockquote>
-                Tbh, I still have no idea with this quote yet :3
-                <footer className="mt-0 text-right text-sm text-secondary">
-                  — Pemilik Kebun
-                </footer>
-              </blockquote>
-
-              <div className="flex gap-4 justify-center items-center">
-                <Link
-                  href="/introduction"
-                  className="inline-block rounded-md px-5 py-2 text-sm font-medium no-underline btn-primary hover:opacity-90"
-                >
-                  Soon
-                </Link>
-                <Button onClick={() => signOut()}>Sign Out</Button>
-              </div>
-            </article>
-          </div>
+          <SearchModal opened={opened} onClose={close} documents={documents} />
+        </AppShell.Section>
+        <Divider />
+        <AppShell.Section grow component={ScrollArea}>
+          <NavigationMenu />
+        </AppShell.Section>
+      </AppShell.Navbar>
+      <AppShell.Main className={"h-screen flex items-center justify-center"}>
+        <div className={"space-y-6"}>
+          <Image
+            src={"/Kebon.ico"}
+            width={400}
+            height={400}
+            className={"object-cover"}
+            alt={"Logo"}
+          />
+          <Text className={"text-center"} c={"dimmed"}>
+            Where idea goes to blow up XD
+          </Text>
+          <Group gap={"xl"} justify={"center"} grow>
+            <AddPageButton />
+            <Button onClick={() => signOut()} color={"red"} variant={"filled"}>
+              Sign Out
+            </Button>
+          </Group>
         </div>
-      </div>
-    </div>
+      </AppShell.Main>
+    </AppShell>
   );
 }

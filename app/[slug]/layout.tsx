@@ -68,7 +68,7 @@ const DocumentHeader = () => {
       <div className="flex items-start justify-between mb-6">
         <div className="flex-1">
           <span
-            className="text-2xl md:text-4xl font-bold mb-3"
+            className="text-3xl md:text-4xl font-bold mb-3"
             style={{ color: "rgb(var(--foreground))" }}
           >
             {document?.title}

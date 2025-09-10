@@ -164,7 +164,7 @@ body {
 .editor-bubble-menu {
   display: flex;
   align-items: center;
-  background-color: rgb(var(--popover));
+  background-color: rgb(var(--background));
   border: 1px solid rgb(var(--border));
   border-radius: 0.375rem;
   box-shadow:
@@ -191,7 +191,7 @@ body {
 [data-radix-popper-content-wrapper] {
   z-index: 9999 !important;
 }
-P .drag-handle {
+.drag-handle {
   position: fixed;
   opacity: 1;
   transition: opacity ease-in 0.2s;

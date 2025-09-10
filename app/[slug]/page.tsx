@@ -1,4 +1,3 @@
-// app/docs/[slug]/page.tsx
 "use client";
 
 import Editor from "@/components/editor/Editor";
@@ -15,15 +14,12 @@ export default function EditPage({
   const initialLoadRef = useRef(true);
   const resolvedParams = use(params);
 
-  // Efek ini akan berjalan saat slug berubah, memicu pengambilan data baru
   useEffect(() => {
     fetchDocument(resolvedParams.slug).then(() => {
-      // Setelah fetch pertama selesai, izinkan update konten
       initialLoadRef.current = false;
     });
   }, [resolvedParams.slug, fetchDocument]);
 
-  // Tampilkan loading spinner dari context
   if (loading) {
     return (
       <div className="flex justify-center items-center h-[600px]">
@@ -37,7 +33,6 @@ export default function EditPage({
     );
   }
 
-  // Jika konten berhasil dimuat, tampilkan editor
   if (initialContent) {
     return (
       <div className="rounded-xl">
