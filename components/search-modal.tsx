@@ -115,6 +115,7 @@ export default function SearchModal({
             </ActionIcon>
           }
           autoFocus
+          data-autofocus
           size="md"
         />
         {isSearching && (
