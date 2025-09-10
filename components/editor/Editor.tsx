@@ -105,7 +105,7 @@ export default function Editor({
             placement: "top-start",
             zIndex: 9999,
           }}
-          className="flex w-fit overflow-visible rounded border border-border bg-popover shadow-xl z-[9999]"
+          className="flex w-fit overflow-visible rounded border border-border bg-background shadow-xl z-[9999]"
         >
           <LinkSelector open={openLink} onOpenChange={setOpenLink} />
           <NodeSelector open={openNode} onOpenChange={setOpenNode} />
