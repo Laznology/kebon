@@ -9,15 +9,10 @@ import {
   Title,
   Divider,
   Box,
-  Modal,
   Kbd,
 } from "@mantine/core";
 import React from "react";
-import {
-  useDisclosure,
-  useHotkeys,
-  useMediaQuery,
-} from "@mantine/hooks";
+import { useDisclosure, useHotkeys, useMediaQuery } from "@mantine/hooks";
 import { Icon } from "@iconify/react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import NavigationMenu from "@/components/NavigationMenu";
