@@ -39,12 +39,20 @@ export default function Editor({
   const [openColor, setOpenColor] = useState<boolean>(false);
   const [openLink, setOpenLink] = useState<boolean>(false);
 
-  const { data: session } = useSession();
+  const { status } = useSession();
 
+  if (status === "loading") {
+    return (
+      <div className="flex justify-center items-center h-[600px]">
+        <div className="border-b-2 border-gray-400 h-6 w-6 animate-spin" />
+        <span>Loading...</span>
+      </div>
+    );
+  }
   return (
     <EditorRoot>
       <EditorContent
-        editable={!!session}
+        editable={status === "authenticated"}
         key={contentKey}
         initialContent={initialContent || undefined}
         extensions={defaultExtensions}
