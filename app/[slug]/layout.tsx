@@ -1,11 +1,12 @@
 "use client";
-import { TableOfContents, Group, Text, Title, Badge } from "@mantine/core";
+import { TableOfContents, Group, Text, TextInput } from "@mantine/core";
 import DocsLayout from "@/components/DocsLayout";
 import { DocumentProvider, useDocument } from "@/app/[slug]/document-provider";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useAllDocuments } from "@/hooks/useAllDocuments";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Icon } from "@iconify/react";
+import { useSession } from "next-auth/react";
 
 const TocComponent = () => {
   const { tocItems } = useDocument();
@@ -62,12 +63,47 @@ const TocComponent = () => {
 };
 
 const DocumentHeader = () => {
-  const { document, saveStatus } = useDocument();
+  const { document } = useDocument();
+  const [title, setTitle] = useState("");
   const pathname = usePathname();
-  if (!document) {
-    return null;
-  }
+  const { status } = useSession();
+  const router = useRouter()
 
+  const slug = pathname.split("/").pop();
+  useEffect(() => {
+    if (document?.title) {
+      setTitle(document.title);
+    }
+  }, [document?.title]);
+
+  
+  const lastSentTitleRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!slug) return;
+    const next = title.trim();
+    const current = (document?.title || "").trim();
+    if (!next || next === current || next === lastSentTitleRef.current) return;
+
+    const handler = setTimeout(async () => {
+      const response = await fetch(`/api/pages/${document?.slug ?? slug}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ title: next }),
+      });
+
+      if (response.ok) {
+        lastSentTitleRef.current = next;
+        const data = await response.json();
+        if (data.slug && data.slug !== slug) {
+          router.replace(`${data.slug}`);
+        }
+      }
+    }, 1000);
+
+    return () => clearTimeout(handler);
+  }, [title, slug, document?.title, router]);
   return (
     <div className="flex flex-col">
       <div className="flex items-start justify-between mb-6">
@@ -77,13 +113,28 @@ const DocumentHeader = () => {
               Docs
             </Text>
             <Icon icon="mdi:chevron-right" width={16} height={16} />
-            <Text size="xs" c="dimmed" className="font-mono">
-              {(pathname || "/").replace(/^\//, "") || "home"}
+            <Text size="xs" c="dimmed">
+              {document?.title}
             </Text>
           </Group>
-          <Title order={1} className="leading-tight mb-2">
-            {document?.title}
-          </Title>
+          <TextInput
+            disabled={status !== "authenticated"}
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            variant="unstyled"
+            styles={{
+              input: {
+                fontSize: "2rem",
+                fontWeight: 600,
+                lineHeight: 1,
+                opacity: 1,
+                color: "black",
+                background: "none",
+                cursor: "text",
+                width: "fit-content",
+              },
+            }}
+          />
           {document?.author && (
             <Group gap={8} className="mb-2" align="center">
               <div className="w-6 h-6 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-xs font-semibold">
@@ -96,36 +147,6 @@ const DocumentHeader = () => {
               </Text>
             </Group>
           )}
-        </div>
-        <div className="flex flex-col items-end gap-2 min-w-[220px]">
-          <Group gap={8}>
-            <Badge
-              color={document?.published ? "green" : "yellow"}
-              variant="light"
-            >
-              {document?.published ? "Published" : "Draft"}
-            </Badge>
-            <Badge
-              color={
-                saveStatus === "saved"
-                  ? "teal"
-                  : saveStatus === "saving"
-                    ? "blue"
-                    : saveStatus === "unsaved"
-                      ? "orange"
-                      : "red"
-              }
-              variant="light"
-            >
-              {saveStatus === "saved"
-                ? "Saved"
-                : saveStatus === "saving"
-                  ? "Saving..."
-                  : saveStatus === "unsaved"
-                    ? "Unsaved"
-                    : "Error"}
-            </Badge>
-          </Group>
         </div>
       </div>
       <div

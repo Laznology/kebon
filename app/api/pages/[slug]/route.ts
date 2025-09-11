@@ -25,36 +25,66 @@ export async function GET(
   }
 }
 
+function slugify(text: string) {
+  return text
+    .toString()
+    .normalize("NFKD")
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, "-")
+    .replace(/[^\w\-]+/g, "")
+    .replace(/\-\-+/g, "-");
+}
+
 export async function PUT(
-  request: NextRequest,
+  req: Request,
   context: { params: Promise<{ slug: string }> },
 ) {
+  const { slug } = await context.params
+  const body = (await req.json()) as {
+    title?: string;
+    content?: string;
+    published?: boolean;
+  };
+
+  if (
+    !body ||
+    (!("title" in body) && !("content" in body) && !("published" in body))
+  ) {
+    return NextResponse.json(
+      { error: "No valid fields to update" },
+      { status: 400 },
+    );
+  }
+
+  const data: any = {};
+  if (typeof body.title === "string") {
+    data.title = body.title;
+    data.slug = slugify(body.title);
+  }
+  if (typeof body.content === "string") {
+    data.content = body.content;
+  }
+  if (typeof body.published === "boolean") {
+    data.published = body.published;
+  }
+  data.updatedAt = new Date();
+
   try {
-    const { slug } = await context.params;
-    const body = await request.json();
-    const { title, content } = body;
-
-    if (!content || typeof content !== "object") {
-      return NextResponse.json({ error: "Invalid content" }, { status: 400 });
-    }
-
-    // optional: log presence of marks for debugging
-    try {
-      const marksFound = JSON.stringify(content).includes("marks");
-      if (marksFound)
-        console.info(`Saving content with marks for page ${slug}`);
-    } catch {}
-
-    const updatedPage = await prisma.page.update({
+    const updated = await prisma.page.update({
       where: { slug },
-      data: { title, content },
+      data,
+      select: {
+        title: true,
+        slug: true,
+      },
     });
 
-    return NextResponse.json(updatedPage);
-  } catch (error) {
-    console.error("PUT Error:", error);
+    return NextResponse.json(updated);
+  } catch (err) {
+    console.error(err);
     return NextResponse.json(
-      { error: "Internal Server Error" },
+      { error: "Failed to update document" },
       { status: 500 },
     );
   }
