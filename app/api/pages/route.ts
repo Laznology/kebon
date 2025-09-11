@@ -6,10 +6,11 @@ import authOptions from "@/lib/auth";
 export async function GET() {
   try {
     const pages = await prisma.page.findMany({
+      where: {
+        isDeleted: false,
+      },
       include: {
-        author: {
-          select: { name: true },
-        },
+        author: true,
       },
     });
     return NextResponse.json(pages);

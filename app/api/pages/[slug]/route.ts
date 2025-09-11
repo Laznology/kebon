@@ -38,14 +38,18 @@ function slugify(text: string) {
 
 export async function PUT(
   req: Request,
-  context: { params: Promise<{ slug: string }> },
+  { params }: { params: Promise<{ slug: string }> },
 ) {
-  const { slug } = await context.params
+  const { slug } = await params;
   const body = (await req.json()) as {
     title?: string;
     content?: string;
     published?: boolean;
   };
+  let newSlug = body.title;
+  if (body.title) {
+    newSlug = slugify(body?.title || "");
+  }
 
   if (
     !body ||
@@ -57,23 +61,10 @@ export async function PUT(
     );
   }
 
-  const data: any = {};
-  if (typeof body.title === "string") {
-    data.title = body.title;
-    data.slug = slugify(body.title);
-  }
-  if (typeof body.content === "string") {
-    data.content = body.content;
-  }
-  if (typeof body.published === "boolean") {
-    data.published = body.published;
-  }
-  data.updatedAt = new Date();
-
   try {
     const updated = await prisma.page.update({
       where: { slug },
-      data,
+      data: { ...body, slug: newSlug, updatedAt: new Date() },
       select: {
         title: true,
         slug: true,
@@ -88,4 +79,18 @@ export async function PUT(
       { status: 500 },
     );
   }
+}
+
+export async function DELETE(
+  _request: Request,
+  { params }: { params: Promise<{ slug: string }> },
+) {
+  const { slug } = await params;
+  await prisma.page.update({
+    where: { slug },
+    data: {
+      isDeleted: true,
+    },
+  });
+  return NextResponse.json({ success: true });
 }

@@ -103,7 +103,7 @@ const DocumentHeader = () => {
     }, 1000);
 
     return () => clearTimeout(handler);
-  }, [title, slug, document?.title, router]);
+  }, [title, slug, document?.title, document?.slug, router]);
   return (
     <div className="flex flex-col">
       <div className="flex items-start justify-between mb-6">
