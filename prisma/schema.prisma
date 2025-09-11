@@ -16,12 +16,12 @@ model User {
   password          String?
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @default(now()) @updatedAt
-  deletedAt         DateTime?
+  isDeleted         Boolean   @default(false)
   pages             Page[]
   accounts          Account[]
   sessions          Session[]
 
-  @@index([deletedAt])
+  @@index([isDeleted])
 }
 
 model VerificationToken {
@@ -73,11 +73,11 @@ model Page {
   authorId    String
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @default(now()) @updatedAt
-  deletedAt   DateTime?
+  isDeleted   Boolean       @default(false)
   author      User          @relation(fields: [authorId], references: [id])
   pageVersion PageVersion[]
 
-  @@index([deletedAt, authorId, title])
+  @@index([isDeleted, authorId, title])
 }
 
 model PageVersion {
@@ -86,10 +86,10 @@ model PageVersion {
   pageId    String
   createdAt DateTime  @default(now())
   updatedAt DateTime  @default(now()) @updatedAt
-  deletedAt DateTime?
+  isDeleted Boolean   @default(false)
   page      Page      @relation(fields: [pageId], references: [id])
 
-  @@index([pageId, deletedAt])
+  @@index([pageId, isDeleted])
 }
 
 model AppSettings {
