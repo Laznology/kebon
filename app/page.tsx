@@ -18,10 +18,10 @@ import { Icon } from "@iconify/react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import React from "react";
 import SearchModal from "@/components/search-modal";
-import NavigationMenu from "@/components/NavigationMenu";
 import { useAllDocuments } from "@/hooks/useAllDocuments";
 import Image from "next/image";
 import { useHotkeys } from "@mantine/hooks";
+import NavigationMenu from "@/components/navigation-menu";
 
 export default function Page() {
   const [opened, { open, close }] = useDisclosure(false);
@@ -80,8 +80,8 @@ export default function Page() {
           <SearchModal opened={opened} onClose={close} documents={documents} />
         </AppShell.Section>
         <Divider />
-        <AppShell.Section grow component={ScrollArea}>
-
+        <AppShell.Section grow >
+          <NavigationMenu />
         </AppShell.Section>
         {status === "authenticated" && (
           <AppShell.Section>
