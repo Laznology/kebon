@@ -4,12 +4,14 @@ import {
   Divider,
   Group,
   Kbd,
+  NavLink,
+  Popover,
   ScrollArea,
   Text,
   Title,
 } from "@mantine/core";
 import AddPageButton from "@/components/add-page-button";
-import { signOut } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import { AppShell, Burger } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { Icon } from "@iconify/react";
@@ -25,6 +27,7 @@ export default function Page() {
   const [opened, { open, close }] = useDisclosure(false);
   const [mobileNavOpened, { toggle: toggleMobileNav }] = useDisclosure(false);
   const { documents } = useAllDocuments();
+  const { data: session, status } = useSession()
   useHotkeys(
     [['ctrl+/', () => open()]]
   )
@@ -78,8 +81,58 @@ export default function Page() {
         </AppShell.Section>
         <Divider />
         <AppShell.Section grow component={ScrollArea}>
-          <NavigationMenu />
+
         </AppShell.Section>
+        {status === "authenticated" && (
+          <AppShell.Section>
+            <Group
+              justify={"space-between"}
+              gap={"md"}
+              className="border border-secondary p-2 rounded-lg"
+            >
+              <div>
+                <Text size={"sm"} fw={600} c={"dark"} className={""}>
+                  {session?.user.name}
+                </Text>
+                <Text size={"xs"} fw={600} c={"dimmed"}>
+                  {session?.user.email}
+                </Text>
+              </div>
+              <div>
+                <Popover
+                  floatingStrategy={"fixed"}
+                  position="top"
+                  width={150}
+                  trapFocus
+                  withArrow
+                  shadow="md"
+                >
+                  <Popover.Target>
+                    <Button
+                      variant={"light"}
+                      className={"fond-bold"}
+                      color={"gray"}
+                      size={"xs"}
+                    >
+                      <Icon
+                        icon={"line-md:chevron-up-square"}
+                        width={16}
+                        height={16}
+                      />
+                    </Button>
+                  </Popover.Target>
+                  <Popover.Dropdown style={{ padding: 2 }}>
+                    <NavLink
+                      href={"/settings"}
+                      label="Settings"
+                      leftSection={<Icon icon="mdi:gear" />}
+                    />
+                  </Popover.Dropdown>
+                </Popover>
+              </div>
+            </Group>
+          </AppShell.Section>
+        )}
       </AppShell.Navbar>
       <AppShell.Main className={"h-screen flex items-center justify-center"}>
         <div className={"space-y-6"}>
