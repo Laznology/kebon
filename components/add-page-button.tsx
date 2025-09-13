@@ -5,6 +5,7 @@ import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Icon } from "@iconify/react";
 
 export default function AddPageButton() {
   const [opened, { open, close }] = useDisclosure(false);
@@ -48,9 +49,7 @@ export default function AddPageButton() {
         message: "Page created successfully",
         color: "green",
       });
-      router.push(`/${slug}`)
-
-
+      router.push(`/${slug}`);
     } catch (err) {
       notifications.show({
         title: "Error occurred",
@@ -63,7 +62,12 @@ export default function AddPageButton() {
   };
   return (
     <>
-      <Button onClick={open} variant="filled">
+      <Button
+        leftSection={<Icon icon={"line-md:plus"} width={18} height={18}/>}
+        fullWidth={true}
+        onClick={open}
+        variant="filled"
+      >
         Add New Page
       </Button>
 
