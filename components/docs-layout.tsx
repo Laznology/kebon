@@ -20,7 +20,7 @@ import React from "react";
 import { useDisclosure, useHotkeys, useMediaQuery } from "@mantine/hooks";
 import { Icon } from "@iconify/react";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import NavigationMenu from "@/components/NavigationMenu";
+import NavigationMenu from "@/components/navigation-menu";
 import SearchModal from "@/components/search-modal";
 import type { Document } from "@/types/document";
 import { usePathname } from "next/navigation";

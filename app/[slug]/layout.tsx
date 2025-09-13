@@ -1,6 +1,6 @@
 "use client";
 import { TableOfContents, Group, Text, TextInput } from "@mantine/core";
-import DocsLayout from "@/components/DocsLayout";
+import DocsLayout from "@/components/docs-layout";
 import { DocumentProvider, useDocument } from "@/app/[slug]/document-provider";
 import { useEffect, useRef, useState } from "react";
 import { useAllDocuments } from "@/hooks/useAllDocuments";
