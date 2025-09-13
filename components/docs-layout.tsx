@@ -88,7 +88,7 @@ export default function DocsLayout({
                 width={22}
                 height={22}
               />
-              <Title order={4}>Docs</Title>
+              <Title order={4}>Kebon.</Title>
             </Group>
             {!isMobile && (
               <Text c="dimmed" size="sm" className="hidden md:block">

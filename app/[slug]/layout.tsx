@@ -109,7 +109,7 @@ const DocumentHeader = () => {
         <div className="flex-1">
           <Group gap={8} mb={6} align="center">
             <Text size="xs" c="dimmed">
-              Docs
+              Page
             </Text>
             <Icon icon="mdi:chevron-right" width={16} height={16} />
             <Text size="xs" c="dimmed">
@@ -127,7 +127,7 @@ const DocumentHeader = () => {
                 fontWeight: 600,
                 lineHeight: 1,
                 opacity: 1,
-                color: "black",
+                color: "var(--text-foreground)",
                 background: "none",
                 cursor: "text",
                 width: "fit-content",
@@ -152,7 +152,7 @@ const DocumentHeader = () => {
         className="flex items-center gap-4 text-xs pt-4"
         style={{
           color: "rgb(var(--muted-foreground))",
-          borderTopColor: "rgb(var(--border))",
+          borderTopColor: "var(--border)",
           borderTopWidth: "1px",
         }}
       >
