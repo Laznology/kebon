@@ -3,16 +3,24 @@ import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import authOptions from "@/lib/auth";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const { searchParams } = new URL(request.url);
+  const limitParam = searchParams.get("limit")
+  const published = searchParams.get("published") ? searchParams.get("published") === "true" : undefined;
+  const limit = limitParam ? parseInt(limitParam, 10) : undefined
   try {
     const pages = await prisma.page.findMany({
       where: {
         isDeleted: false,
+        published: published
       },
+      take: limit,
       select: {
         id: true,
         title: true,
-        slug: true
+        slug: true,
+        createdAt: true,
+        published: published
       },
     });
     return NextResponse.json(pages);
@@ -39,6 +47,13 @@ export async function POST(request: NextRequest) {
     .trim()
     .replace(/[^a-z0-9\s-]/g, "")
     .replace(/\s+/g, "-");
+
+  const existing = await prisma.page.findUnique({
+    where: { slug }
+  })
+  if(existing) {
+    return NextResponse.json({ message: "Slug already exists" });
+  }
   const page = await prisma.page.create({
     data: {
       title,
