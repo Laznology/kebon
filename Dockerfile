@@ -40,6 +40,11 @@ RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
 COPY --from=builder /app/public ./public
+# Copy Prisma schema for runtime migrate/generate
+COPY --from=builder /app/prisma ./prisma
+
+# Ensure prisma CLI is available at runtime (from builder's node_modules)
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules ./node_modules
 
 # Automatically leverage output traces to reduce image size
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
@@ -52,5 +57,8 @@ EXPOSE 3000
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
+COPY --chown=nextjs:nodejs docker-entrypoint.sh ./docker-entrypoint.sh
+RUN chmod +x ./docker-entrypoint.sh
+
 # server.js is created by next build from the standalone output
-CMD ["node", "server.js"]
+CMD ["./docker-entrypoint.sh"]

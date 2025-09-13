@@ -1,0 +1,53 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: kebon_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: kebon
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runner
+    container_name: kebon_web
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/kebon
+      NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL}
+      NODE_ENV: production
+    ports:
+      - "3000:3000"
+
+    # Optional: automatic rebuild/sync during development with Compose v2.22+
+    # Run with: docker compose watch
+    develop:
+      watch:
+        - path: package.json
+          action: rebuild
+        - path: pnpm-lock.yaml
+          action: rebuild
+        - path: .
+          target: /app
+          action: sync+restart
+
+volumes:
+  db_data:
+
