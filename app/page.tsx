@@ -6,7 +6,6 @@ import {
   Kbd,
   NavLink,
   Popover,
-  ScrollArea,
   Text,
   Title,
 } from "@mantine/core";
@@ -27,10 +26,8 @@ export default function Page() {
   const [opened, { open, close }] = useDisclosure(false);
   const [mobileNavOpened, { toggle: toggleMobileNav }] = useDisclosure(false);
   const { documents } = useAllDocuments();
-  const { data: session, status } = useSession()
-  useHotkeys(
-    [['ctrl+/', () => open()]]
-  )
+  const { data: session, status } = useSession();
+  useHotkeys([["ctrl+/", () => open()]]);
 
   return (
     <AppShell
@@ -80,7 +77,7 @@ export default function Page() {
           <SearchModal opened={opened} onClose={close} documents={documents} />
         </AppShell.Section>
         <Divider />
-        <AppShell.Section grow >
+        <AppShell.Section grow>
           <NavigationMenu />
         </AppShell.Section>
         {status === "authenticated" && (

@@ -102,8 +102,20 @@ export default function SignIn() {
           >
             {loading ? "Signing in..." : "Sign in"}
           </Button>
-            <Divider label={"Or Sign In with"} labelPosition={"center"} my={"xs"}/>
-          <Button fullWidth variant={"filled"} color={"dark"} leftSection={<Icon icon={"mdi:github"} width={20} height={20} />} onClick={() => signIn('github', { callbackUrl: "/" })}>Sign In with GitHub</Button>
+          <Divider
+            label={"Or Sign In with"}
+            labelPosition={"center"}
+            my={"xs"}
+          />
+          <Button
+            fullWidth
+            variant={"filled"}
+            color={"dark"}
+            leftSection={<Icon icon={"mdi:github"} width={20} height={20} />}
+            onClick={() => signIn("github", { callbackUrl: "/" })}
+          >
+            Sign In with GitHub
+          </Button>
         </form>
       </Card>
     </div>

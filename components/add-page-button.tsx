@@ -63,7 +63,7 @@ export default function AddPageButton() {
   return (
     <>
       <Button
-        leftSection={<Icon icon={"line-md:plus"} width={18} height={18}/>}
+        leftSection={<Icon icon={"line-md:plus"} width={18} height={18} />}
         fullWidth={true}
         onClick={open}
         variant="filled"

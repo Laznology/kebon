@@ -1,14 +1,14 @@
 "use client";
 import { useFetch } from "@mantine/hooks";
-import { Group, Stack, Alert, Skeleton, Text, Badge, ScrollArea } from "@mantine/core";
+import { Group, Stack, Alert, Skeleton, Text, ScrollArea } from "@mantine/core";
 import Link from "next/link";
 import { NavLink } from "@mantine/core";
 import { usePathname } from "next/navigation";
-import { AlertCircle, Clock, FileText } from "lucide-react";
+import { AlertCircle, FileText } from "lucide-react";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import "dayjs/locale/id";
-import { Icon } from "@iconify/react"
+import { Icon } from "@iconify/react";
 
 dayjs.extend(relativeTime);
 dayjs.locale("id");

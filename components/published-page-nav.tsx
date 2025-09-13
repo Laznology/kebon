@@ -1,14 +1,6 @@
 "use client";
 import { useFetch } from "@mantine/hooks";
-import {
-  Group,
-  Stack,
-  Alert,
-  Skeleton,
-  Text,
-  Badge,
-  ScrollArea,
-} from "@mantine/core";
+import { Group, Stack, Alert, Skeleton, Text, ScrollArea } from "@mantine/core";
 import Link from "next/link";
 import { NavLink } from "@mantine/core";
 import { usePathname } from "next/navigation";
@@ -35,14 +27,14 @@ export default function PublishedPageNav() {
   );
 
   const pathname = usePathname();
-    useEffect(() => {
-      const handlePagePublished = () => {
-        refetch(); 
-      };
-      window.addEventListener("pagePublished", handlePagePublished);
-      return () =>
-        window.removeEventListener("pagePublished", handlePagePublished); 
-    }, [refetch]);
+  useEffect(() => {
+    const handlePagePublished = () => {
+      refetch();
+    };
+    window.addEventListener("pagePublished", handlePagePublished);
+    return () =>
+      window.removeEventListener("pagePublished", handlePagePublished);
+  }, [refetch]);
 
   return (
     <NavLink

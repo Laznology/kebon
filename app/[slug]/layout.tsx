@@ -67,7 +67,7 @@ const DocumentHeader = () => {
   const [title, setTitle] = useState("");
   const pathname = usePathname();
   const { status } = useSession();
-  const router = useRouter()
+  const router = useRouter();
 
   const slug = pathname.split("/").pop();
   useEffect(() => {
@@ -76,7 +76,6 @@ const DocumentHeader = () => {
     }
   }, [document?.title]);
 
-  
   const lastSentTitleRef = useRef<string | null>(null);
   useEffect(() => {
     if (!slug) return;

@@ -1,6 +1,6 @@
 "use client";
 import AddPageButton from "@/components/add-page-button";
-import { Box, Divider, Menu, ScrollArea, Stack } from "@mantine/core";
+import { Box, Divider } from "@mantine/core";
 import RecentPageNav from "@/components/recent-page-nav";
 import PublishedPageNav from "./published-page-nav";
 import DraftPageNav from "./draft-page-nav";

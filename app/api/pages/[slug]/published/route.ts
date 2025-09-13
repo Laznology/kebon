@@ -19,11 +19,11 @@ export async function PATCH(
     );
   }
   try {
-    const page = await prisma.page.update({
+    await prisma.page.update({
       where: { slug },
       data: { published },
     });
-    return NextResponse.json({ success: true}, {status: 200});
+    return NextResponse.json({ success: true }, { status: 200 });
   } catch {
     return NextResponse.json({ error: "Page Not Found" }, { status: 404 });
   }
