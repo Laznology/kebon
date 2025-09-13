@@ -9,8 +9,10 @@ export async function GET() {
       where: {
         isDeleted: false,
       },
-      include: {
-        author: true,
+      select: {
+        id: true,
+        title: true,
+        slug: true
       },
     });
     return NextResponse.json(pages);
@@ -26,18 +28,24 @@ export async function POST(request: NextRequest) {
   }
 
   const { title } = await request.json();
+  const defaultContent = {
+    "type": "doc",
+    "content": [
+    ]
+  }
 
   const slug = title
     .toLowerCase()
     .trim()
     .replace(/[^a-z0-9\s-]/g, "")
     .replace(/\s+/g, "-");
-  await prisma.page.create({
+  const page = await prisma.page.create({
     data: {
       title,
       slug,
+      content: defaultContent,
       authorId: session.user.id,
     },
   });
-  return NextResponse.json({ success: true }, { status: 201 });
+  return NextResponse.json(page, { status: 201 });
 }

@@ -4,12 +4,13 @@ import { useForm } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function AddPageButton() {
   const [opened, { open, close }] = useDisclosure(false);
   const [loading, setLoading] = useState<boolean>(false);
   const form = useForm({
-    mode: "uncontrolled",
+    mode: "controlled",
     initialValues: {
       title: "",
     },
@@ -17,6 +18,8 @@ export default function AddPageButton() {
       title: (value) => (value.trim().length > 0 ? null : "Cannot empty"),
     },
   });
+
+  const router = useRouter();
 
   const handleSubmit = async (values: typeof form.values) => {
     setLoading(true);
@@ -28,6 +31,8 @@ export default function AddPageButton() {
       });
 
       const data = await res.json();
+      const title = data.title;
+      const slug = title.trim().toLowerCase().replace(/\s+/g, "-");
 
       if (!res.ok) {
         notifications.show({
@@ -43,6 +48,9 @@ export default function AddPageButton() {
         message: "Page created successfully",
         color: "green",
       });
+      router.push(`/${slug}`)
+
+
     } catch (err) {
       notifications.show({
         title: "Error occurred",
