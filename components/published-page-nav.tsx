@@ -38,7 +38,6 @@ export default function PublishedPageNav() {
 
   return (
     <NavLink
-      component={Group}
       label="Published"
       leftSection={
         <Icon

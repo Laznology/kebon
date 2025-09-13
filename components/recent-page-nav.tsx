@@ -28,7 +28,7 @@ export default function RecentPageNav() {
   return (
     <NavLink
       href="#required-for-focus"
-      label="Draf Pages"
+      label="Recent Pages"
       leftSection={
         <Icon icon={"mdi:clock-outline"} width={16} height={16} stroke={"1"} />
       }

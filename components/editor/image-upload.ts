@@ -5,8 +5,8 @@ const onUpload = (file: File) => {
   const promise = fetch("/api/upload", {
     method: "POST",
     headers: {
-      "content-type": file?.type || "application/octet-stream",
-      "x-vercel-filename": file?.name || "image.png",
+      "content-type": file.type,
+      "x-filename": file.name,
     },
     body: file,
   });
@@ -14,98 +14,71 @@ const onUpload = (file: File) => {
   return new Promise((resolve, reject) => {
     const id = notifications.show({
       loading: true,
-      title: "Uploading image...",
-      message: "Please wait while we upload your image",
-      autoClose: false,
-      withCloseButton: false,
+      title: "Uploading Image ...",
+      message: "Please wait while we uploading",
+      autoClose: true,
+      withCloseButton: true,
     });
 
-    promise
-      .then(async (res) => {
-        try {
-          // Successfully uploaded image
-          if (res.status === 200) {
-            const { url } = (await res.json()) as { url: string };
-            // preload the image
-            const image = new Image();
-            image.src = url;
-            image.onload = () => {
-              notifications.update({
-                id,
-                color: "green",
-                title: "Success",
-                message: "Image uploaded successfully.",
-                loading: false,
-                autoClose: 2000,
-              });
-              resolve(url);
-            };
-            // No blob store configured
-          } else if (res.status === 401) {
-            notifications.update({
-              id,
-              color: "yellow",
-              title: "Warning",
-              message:
-                "`BLOB_READ_WRITE_TOKEN` environment variable not found, reading image locally instead.",
-              loading: false,
-              autoClose: 4000,
-            });
-            resolve(file);
-          } else {
-            throw new Error("Error uploading image. Please try again.");
-          }
-        } catch (error) {
+    promise.then(async (result) => {
+      if (result.ok) {
+        const data = await result.json();
+        console.log("res:", data);
+
+        const { url, width, height, alt } = data;
+
+        const image = new Image();
+        image.src = url;
+        image.height = height;
+        image.width = width;
+        image.alt = alt;
+        image.onload = () => {
           notifications.update({
             id,
-            color: "red",
-            title: "Error",
-            message:
-              error instanceof Error
-                ? error.message
-                : "Error uploading image. Please try again.",
+            color: "green",
+            title: "Success",
+            message: "Image uploaded successfully",
             loading: false,
-            autoClose: 4000,
-          });
-          reject(error);
+            autoClose: 1500,
+          })
+          resolve(url);
         }
+      }
+      else {
+        throw new Error("Error uploading image, please try again")
+      }
+    }).catch((error) => {
+      notifications.update({
+        id,
+        color: "red",
+        title:  "Error",
+        message: error.message,
+        loading: false,
+        autoClose: 3000
       })
-      .catch((error) => {
-        notifications.update({
-          id,
-          color: "red",
-          title: "Error",
-          message:
-            error instanceof Error
-              ? error.message
-              : "Error uploading image. Please try again.",
-          loading: false,
-          autoClose: 4000,
-        });
-        reject(error);
-      });
+      reject(error);
+    });
   });
 };
 
 export const uploadFn = createImageUpload({
   onUpload,
-  validateFn: (file) => {
+  validateFn: (file: File) => {
     if (!file.type.includes("image/")) {
       notifications.show({
         color: "red",
         title: "Error",
-        message: "File type not supported.",
-      });
-      return false;
+        message: "File type not supported"
+      })
     }
-    if (file.size / 1024 / 1024 > 20) {
+    if (file.size/ 1024 / 1024 > 5){
       notifications.show({
         color: "red",
         title: "Error",
-        message: "File size too big (max 20MB).",
-      });
+        message: "File size to big (max 5MB)"
+      })
       return false;
     }
     return true;
-  },
-});
+  }
+})
