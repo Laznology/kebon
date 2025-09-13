@@ -72,8 +72,8 @@ export default function Editor({
         onUpdate={onUpdate}
         onCreate={onCreate}
       >
-        <EditorCommand className="z-50 h-auto max-h-[330px] overflow-y-auto bg-white dark:bg-gray-900 px-1 py-2  transition-all">
-          <EditorCommandEmpty className="px-2 text-gray-500 dark:text-gray-400">
+        <EditorCommand className="z-50 h-auto max-h-[330px] overflow-y-auto bg-background border border-border rounded-md px-1 py-2 shadow-md transition-all">
+          <EditorCommandEmpty className="px-2 text-muted-foreground">
             No results
           </EditorCommandEmpty>
           <EditorCommandList>
@@ -81,17 +81,17 @@ export default function Editor({
               <EditorCommandItem
                 value={item.title}
                 onCommand={(val) => item.command && item.command(val)}
-                className="flex w-full items-center space-x-3 rounded-md px-3 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-800 aria-selected:bg-blue-50 dark:aria-selected:bg-blue-900 cursor-pointer transition-colors"
+                className="flex w-full items-center space-x-3 rounded-md px-3 py-2 text-left text-sm hover:bg-accent text-foreground aria-selected:bg-accent cursor-pointer transition-colors"
                 key={item.title}
               >
-                <div className="flex h-10 w-10 items-center justify-center bg-white dark:bg-gray-800">
+                <div className="flex h-10 w-10 items-center justify-center bg-muted rounded-md">
                   {item.icon}
                 </div>
                 <div>
-                  <p className="font-medium text-gray-900 dark:text-gray-100">
+                  <p className="font-medium text-foreground">
                     {item.title}
                   </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                  <p className="text-xs text-muted-foreground">
                     {item.description}
                   </p>
                 </div>

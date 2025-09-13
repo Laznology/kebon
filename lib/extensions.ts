@@ -101,7 +101,10 @@ const starterKit = StarterKit.configure({
   codeBlock: false,
   code: {
     HTMLAttributes: {
-      class: cx("rounded-md bg-muted px-1.5 py-1 font-mono font-medium"),
+      class: cx(
+        "rounded-md bg-muted px-1.5 py-1 font-mono font-medium text-foreground",
+        "dark:bg-slate-700 dark:text-slate-200"
+      ),
       spellcheck: "false",
     },
   },
@@ -121,6 +124,13 @@ const starterKit = StarterKit.configure({
 
 const codeBlockLowlight = CodeBlockLowlight.configure({
   lowlight: createLowlight(common),
+  HTMLAttributes: {
+    class: cx(
+      "relative rounded-lg bg-slate-800 border border-slate-600 p-4 my-4 overflow-x-auto",
+      "dark:bg-slate-900 dark:border-slate-700",
+      "not-prose"
+    ),
+  },
 });
 
 const youtube = Youtube.configure({

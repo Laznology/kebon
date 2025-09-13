@@ -46,7 +46,6 @@
   --ring: 163 163 163;
 }
 
-/* Global Styles */
 * {
   border-color: rgb(var(--border));
 }
@@ -116,7 +115,6 @@ body {
   color: rgb(248 113 113);
 }
 
-/* Custom Editor Spacing - Notion Style */
 .prose h1,
 .prose h2,
 .prose h3,
@@ -160,17 +158,37 @@ body {
   font-weight: 600 !important;
 }
 
-/* Bubble Menu Styling */
 .editor-bubble-menu {
   display: flex;
   align-items: center;
-  background-color: rgb(var(--background));
-  border: 1px solid rgb(var(--border));
+  background-color: rgb(var(--background)) !important;
+  border: 1px solid rgb(var(--border)) !important;
   border-radius: 0.375rem;
   box-shadow:
     0 10px 15px -3px rgb(0 0 0 / 0.1),
     0 4px 6px -4px rgb(0 0 0 / 0.1);
   z-index: 9999;
+  backdrop-filter: none !important;
+}
+
+[data-tippy-root] .tippy-box,
+.tippy-box,
+.bubble-menu {
+  background-color: rgb(var(--background)) !important;
+  backdrop-filter: none !important;
+}
+
+[data-mantine-color-scheme="dark"] .editor-bubble-menu {
+  background-color: rgb(var(--background)) !important;
+  box-shadow:
+    0 10px 15px -3px rgb(0 0 0 / 0.3),
+    0 4px 6px -4px rgb(0 0 0 / 0.2);
+}
+
+[data-mantine-color-scheme="dark"] [data-tippy-root] .tippy-box,
+[data-mantine-color-scheme="dark"] .tippy-box,
+[data-mantine-color-scheme="dark"] .bubble-menu {
+  background-color: rgb(var(--background)) !important;
 }
 
 .editor-bubble-menu button {
@@ -188,8 +206,159 @@ body {
   border-bottom-right-radius: 0.375rem;
 }
 
+/* Code Block Styling */
+.prose pre {
+  background-color: #1e293b !important;
+  border: 1px solid #334155 !important;
+  border-radius: 0.5rem !important;
+  padding: 1rem !important;
+  margin: 1rem 0 !important;
+  overflow-x: auto !important;
+  position: relative !important;
+}
+
+[data-mantine-color-scheme="dark"] .prose pre {
+  background-color: #0f172a !important;
+  border-color: #1e293b !important;
+}
+
+.prose pre code {
+  background-color: transparent !important;
+  padding: 0 !important;
+  font-size: 0.875rem !important;
+  line-height: 1.5 !important;
+  color: #e2e8f0 !important;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace !important;
+}
+
+/* Add terminal-like header to code blocks */
+.prose pre::before {
+  content: '';
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2rem;
+  background: linear-gradient(90deg, #334155 0%, #475569 100%);
+  border-radius: 0.5rem 0.5rem 0 0;
+  border-bottom: 1px solid #64748b;
+}
+
+[data-mantine-color-scheme="dark"] .prose pre::before {
+  background: linear-gradient(90deg, #1e293b 0%, #334155 100%);
+  border-bottom-color: #475569;
+}
+
+.prose pre code {
+  padding-top: 2.5rem !important;
+  display: block !important;
+}
+
+/* Syntax highlighting for code blocks */
+.prose pre .hljs-keyword,
+.prose pre .hljs-built_in {
+  color: #60a5fa !important;
+  font-weight: 600 !important;
+}
+
+.prose pre .hljs-string {
+  color: #34d399 !important;
+}
+
+.prose pre .hljs-number {
+  color: #fbbf24 !important;
+}
+
+.prose pre .hljs-comment {
+  color: #9ca3af !important;
+  font-style: italic !important;
+}
+
+.prose pre .hljs-function {
+  color: #a78bfa !important;
+}
+
+.prose pre .hljs-variable {
+  color: #f87171 !important;
+}
+
+.prose pre .hljs-title {
+  color: #60a5fa !important;
+  font-weight: 600 !important;
+}
+
+.prose pre .hljs-attr {
+  color: #fbbf24 !important;
+}
+
+.prose pre .hljs-tag {
+  color: #f87171 !important;
+}
+
+.prose pre .hljs-type {
+  color: #a78bfa !important;
+}
+
+.prose pre .hljs-literal {
+  color: #fb7185 !important;
+}
+
+.prose pre .hljs-selector-id,
+.prose pre .hljs-selector-class {
+  color: #34d399 !important;
+}
+
+/* Inline code styling */
+.prose code:not(pre code) {
+  background-color: rgb(var(--muted)) !important;
+  color: rgb(var(--foreground)) !important;
+  padding: 0.125rem 0.375rem !important;
+  border-radius: 0.25rem !important;
+  font-size: 0.875em !important;
+}
+
+[data-mantine-color-scheme="dark"] .prose code:not(pre code) {
+  background-color: #374151 !important;
+  color: #e5e7eb !important;
+}
+
 [data-radix-popper-content-wrapper] {
   z-index: 9999 !important;
+}
+
+/* Slash Command Menu Styling */
+.ProseMirror .suggestion-dropdown {
+  background-color: rgb(var(--background)) !important;
+  border: 1px solid rgb(var(--border)) !important;
+  border-radius: 0.5rem !important;
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1) !important;
+}
+
+[data-mantine-color-scheme="dark"] .ProseMirror .suggestion-dropdown {
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.3), 0 4px 6px -4px rgb(0 0 0 / 0.2) !important;
+}
+
+.ProseMirror .suggestion-dropdown .suggestion-item {
+  color: rgb(var(--foreground)) !important;
+}
+
+.ProseMirror .suggestion-dropdown .suggestion-item:hover,
+.ProseMirror .suggestion-dropdown .suggestion-item.is-selected {
+  background-color: rgb(var(--accent)) !important;
+}
+
+.ProseMirror .suggestion-dropdown .suggestion-item .suggestion-item-icon {
+  background-color: rgb(var(--muted)) !important;
+  color: rgb(var(--foreground)) !important;
+}
+
+.ProseMirror .suggestion-dropdown .suggestion-item .suggestion-item-title {
+  color: rgb(var(--foreground)) !important;
+}
+
+.ProseMirror .suggestion-dropdown .suggestion-item .suggestion-item-description {
+  color: rgb(var(--muted-foreground)) !important;
 }
 .drag-handle {
   position: fixed;
