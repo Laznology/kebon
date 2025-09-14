@@ -1,5 +1,5 @@
 "use client";
-import { Button, Modal, TextInput } from "@mantine/core";
+import { Button, Modal, Select, TextInput } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
@@ -14,6 +14,7 @@ export default function AddPageButton() {
     mode: "controlled",
     initialValues: {
       title: "",
+      published: "false",
     },
     validate: {
       title: (value) => (value.trim().length > 0 ? null : "Cannot empty"),
@@ -25,10 +26,14 @@ export default function AddPageButton() {
   const handleSubmit = async (values: typeof form.values) => {
     setLoading(true);
     try {
+      const payload = {
+        title: values.title,
+        published: values.published === "true",
+      }
       const res = await fetch("/api/pages", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(values),
+        body: JSON.stringify(payload),
       });
 
       const data = await res.json();
@@ -72,11 +77,20 @@ export default function AddPageButton() {
       </Button>
 
       <Modal opened={opened} onClose={close} title="Add New Page">
-        <form onSubmit={form.onSubmit(handleSubmit)}>
+        <form onSubmit={form.onSubmit(handleSubmit)} className="space-y-2">
           <TextInput
             {...form.getInputProps("title")}
             label="Title"
             placeholder="Enter page title"
+          />
+          <Select
+            label={"Status"}
+            {...form.getInputProps("published")}
+            data={[
+              { value: "true", label: "Published"},
+              { value: "false", label: "Draft"},
+            ]}
+            defaultValue={form.values.published}
           />
           <Button
             loaderProps={{ type: "dots " }}
