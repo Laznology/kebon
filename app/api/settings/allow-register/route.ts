@@ -1,12 +1,13 @@
 import { NextResponse, NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
-
-export async function GET() {
-  const settings = await prisma.appSettings.findFirst();
-  return NextResponse.json(settings);
-}
+import { getServerSession } from "next-auth";
+import authOptions from "@/lib/auth";
 
 export async function PUT(request: NextRequest) {
+  const session = await getServerSession(authOptions);
+  if (!session) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
   const body = await request.json();
   const { allowRegister } = body;
   if (allowRegister === "undefined") {

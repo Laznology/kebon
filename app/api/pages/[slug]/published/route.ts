@@ -23,7 +23,7 @@ export async function PATCH(
       where: { slug },
       data: { published },
     });
-    return NextResponse.json({ success: true }, { status: 200 });
+    return NextResponse.json({ success: true}, {status: 200});
   } catch {
     return NextResponse.json({ error: "Page Not Found" }, { status: 404 });
   }

@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
         title: true,
         slug: true,
         createdAt: true,
-        published: published,
+        published: true,
       },
     });
     return NextResponse.json(pages);
@@ -34,10 +34,10 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions);
   if (!session || !session.user || !session.user.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { title } = await request.json();
+  const { title, published } = await request.json();
   const defaultContent = {
     type: "doc",
     content: [],
@@ -59,6 +59,7 @@ export async function POST(request: NextRequest) {
     data: {
       title,
       slug,
+      published,
       content: defaultContent,
       authorId: session.user.id,
     },
