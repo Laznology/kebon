@@ -28,6 +28,7 @@ interface ResponseAPI {
   title: string;
   slug: string;
   createdAt: string;
+  published: boolean;
 }
 
 export default function DraftPageNav() {
@@ -104,7 +105,7 @@ export default function DraftPageNav() {
                                 headers: {
                                   "Content-Type": "application/json",
                                 },
-                                body: JSON.stringify({ published: true }),
+                                body: JSON.stringify({ published: !page.published }),
                               },
                             );
                             if (!response.ok) {
@@ -120,7 +121,7 @@ export default function DraftPageNav() {
                               message: "Page published successfully",
                               color: "green",
                             });
-                            refetch();
+                            await refetch();
                             window.dispatchEvent(
                               new CustomEvent("pagePublished"),
                             );
@@ -133,7 +134,7 @@ export default function DraftPageNav() {
                           }
                         }}
                       >
-                        Publish
+                        {page.published ? "Unpublish" : "Publish"}
                       </Button>
                     </Menu.Dropdown>
                   </Menu>
