@@ -130,7 +130,11 @@ const DocumentHeader = () => {
                 color: "var(--text-foreground)",
                 background: "none",
                 cursor: "text",
-                width: "fit-content",
+                width: "100%",
+                maxWidth: "100%",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
               },
             }}
           />

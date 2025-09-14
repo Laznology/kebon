@@ -90,11 +90,6 @@ export default function DocsLayout({
               />
               <Title order={4}>Kebon.</Title>
             </Group>
-            {!isMobile && (
-              <Text c="dimmed" size="sm" className="hidden md:block">
-                {currentSlug || "Home"}
-              </Text>
-            )}
           </Group>
           <Group gap="sm" align="center">
             {isMobile && (
@@ -120,8 +115,6 @@ export default function DocsLayout({
               zIndex: 100,
               position: "absolute",
               top: "100%",
-              left: "0",
-              right: "0",
               maxHeight: "50vh",
               overflow: "auto",
             }}
@@ -211,18 +204,20 @@ export default function DocsLayout({
           </AppShell.Section>
         )}
       </AppShell.Navbar>
-      <AppShell.Aside p={"md"} className={"space-y-3"}>
-        <Group mb={"md"} wrap="nowrap">
-          <Icon icon={"line-md:list-indented"} width={16} height={16} />
-          <h6>Table of Contents</h6>
-        </Group>
-        <Divider />
-        <ScrollArea style={{ maxHeight: "calc(100vh - 140px)" }}>
-          {toc}
-        </ScrollArea>
-      </AppShell.Aside>
-      <AppShell.Main>
-        <div className="mx-auto w-full" style={{ maxWidth: 980 }}>
+      {!isMobile && (
+        <AppShell.Aside p={"md"} className={"space-y-3"}>
+          <Group mb={"md"} wrap="nowrap">
+        <Icon icon={"line-md:list-indented"} width={16} height={16} />
+        <h6>Table of Contents</h6>
+          </Group>
+          <Divider />
+          <ScrollArea style={{ maxHeight: "calc(100vh - 140px)" }}>
+        {toc}
+          </ScrollArea>
+        </AppShell.Aside>
+      )}
+      <AppShell.Main style={{ overflow: "hidden" }}>
+        <div className="mx-auto w-full max-w-none md:max-w-[768px] px-2 md:px-0 min-w-0">
           {children}
         </div>
       </AppShell.Main>
