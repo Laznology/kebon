@@ -9,9 +9,11 @@ import {
   ListOrdered,
   Text,
   TextQuote,
+  Link,
 } from "lucide-react";
 import { Command, createSuggestionItems, renderItems } from "novel";
 import { uploadFn } from "./image-upload";
+import { showImageUrlDialog } from "@/lib/image-dialog-utils";
 
 export const suggestionItems = createSuggestionItems([
   {
@@ -138,6 +140,24 @@ export const suggestionItems = createSuggestionItems([
         }
       };
       input.click();
+    },
+  },
+  {
+    title: "Image from URL",
+    description: "Embed an image from an external link.",
+    searchTerms: ["photo", "picture", "media", "url", "link", "external"],
+    icon: <Link size={18} />,
+    command: async ({ editor, range }) => {
+      editor.chain().focus().deleteRange(range).run();
+      
+      const result = await showImageUrlDialog(editor);
+      if (result) {
+        editor.chain().focus().setImage({ 
+          src: result.url,
+          alt: result.alt,
+          title: result.title
+        }).run();
+      }
     },
   },
 ]);

@@ -24,6 +24,7 @@ import {
 
 import { slashCommand } from "@/components/editor/slash-command";
 import { CustomHeading } from "@/lib/custom-heading";
+import { showImageUrlDialog } from "@/lib/image-dialog-utils";
 
 import { cx } from "class-variance-authority";
 import { common, createLowlight } from "lowlight";
@@ -48,8 +49,9 @@ const tiptapImage = TiptapImage.extend({
   },
 }).configure({
   allowBase64: true,
+  inline: false,
   HTMLAttributes: {
-    class: cx("rounded-lg border border-muted"),
+    class: cx("rounded-lg border border-muted max-w-full h-auto"),
   },
 });
 
@@ -158,6 +160,20 @@ const mathematics = Mathematics.configure({
 
 const characterCount = CharacterCount.configure();
 
+const customKeymap = CustomKeymap.configure({
+  "Mod-Shift-i": async ({ editor }: { editor: any }) => {
+    const result = await showImageUrlDialog();
+    if (result) {
+      editor.chain().focus().setImage({ 
+        src: result.url,
+        alt: result.alt,
+        title: result.title
+      }).run();
+    }
+    return true;
+  },
+});
+
 export const defaultExtensions = [
   starterKit,
   CustomHeading,
@@ -178,7 +194,7 @@ export const defaultExtensions = [
   HighlightExtension,
   TextStyle,
   Color,
-  CustomKeymap,
+  customKeymap,
   GlobalDragHandle,
   slashCommand,
 ];
