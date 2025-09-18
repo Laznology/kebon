@@ -72,7 +72,7 @@ export default function Editor({
         onUpdate={onUpdate}
         onCreate={onCreate}
       >
-        <EditorCommand className="z-50 h-auto max-h-[330px] overflow-y-auto bg-background border border-border rounded-md px-1 py-2 shadow-md transition-all">
+        <EditorCommand className="z-50 h-auto max-h-[330px] overflow-y-auto bg-[hsl(var(--background))] border border-border rounded-md px-1 py-2 shadow-md transition-all">
           <EditorCommandEmpty className="px-2 text-muted-foreground">
             No results
           </EditorCommandEmpty>
@@ -105,7 +105,7 @@ export default function Editor({
             placement: "top-start",
             zIndex: 9999,
           }}
-          className="flex w-fit overflow-visible rounded border border-border bg-background shadow-xl z-[9999]"
+          className="flex w-fit overflow-visible rounded border border-border bg-[hsl(var(--background))] shadow-xl z-[9999]"
         >
           <LinkSelector open={openLink} onOpenChange={setOpenLink} />
           <NodeSelector open={openNode} onOpenChange={setOpenNode} />

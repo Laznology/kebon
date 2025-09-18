@@ -150,7 +150,7 @@ export const suggestionItems = createSuggestionItems([
     command: async ({ editor, range }) => {
       editor.chain().focus().deleteRange(range).run();
       
-      const result = await showImageUrlDialog(editor);
+      const result = await showImageUrlDialog();
       if (result) {
         editor.chain().focus().setImage({ 
           src: result.url,

@@ -28,6 +28,7 @@ import { showImageUrlDialog } from "@/lib/image-dialog-utils";
 
 import { cx } from "class-variance-authority";
 import { common, createLowlight } from "lowlight";
+import { Editor } from "@tiptap/core";
 
 const aiHighlight = AIHighlight;
 const placeholder = Placeholder;
@@ -161,7 +162,7 @@ const mathematics = Mathematics.configure({
 const characterCount = CharacterCount.configure();
 
 const customKeymap = CustomKeymap.configure({
-  "Mod-Shift-i": async ({ editor }: { editor: any }) => {
+  "Mod-Shift-i": async ({ editor }: { editor: Editor }) => {
     const result = await showImageUrlDialog();
     if (result) {
       editor.chain().focus().setImage({ 

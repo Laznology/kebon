@@ -1,5 +1,5 @@
 "use client";
-import { ReactNode, useMemo } from "react";
+import { ReactNode } from "react";
 import {
   AppShell,
   Burger,
@@ -23,7 +23,6 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import NavigationMenu from "@/components/navigation-menu";
 import SearchModal from "@/components/search-modal";
 import type { Document } from "@/types/document";
-import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 
 type DocsLayoutProps = {
@@ -41,14 +40,8 @@ export default function DocsLayout({
   const [tocOpened, { toggle: toggleToc }] = useDisclosure(false);
   const [opened, { open, close }] = useDisclosure(false);
   const isMobile = useMediaQuery("(max-width: 768px)");
-  const pathname = usePathname();
   const { data: session, status } = useSession();
 
-  const currentSlug = useMemo(() => {
-    if (!pathname) return "";
-    const clean = pathname.replace(/^\//, "");
-    return clean;
-  }, [pathname]);
 
   useHotkeys([["mod+/", () => open()]]);
 
