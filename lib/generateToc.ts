@@ -1,4 +1,4 @@
-import { JSONContent } from "novel";
+import { JSONContent } from "@tiptap/react";
 type TocItem = {
   id: string;
   value: string;

@@ -1,4 +1,4 @@
-import { JSONContent } from "novel";
+import { JSONContent } from "@tiptap/react";
 
 export interface BaseDocument {
   id: string;

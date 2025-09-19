@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/popover";
 import { Input } from "@/components/ui/input";
 import { useRef, useEffect } from "react";
-import { useEditor } from "novel";
+import { Editor as TiptapEditor } from "@tiptap/react";
 
 export function isValidUrl(url: string): boolean {
   try {
@@ -33,11 +33,11 @@ export function getUrlFromString(str: string) {
 interface LinkSelectorProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  editor?: TiptapEditor | null;
 }
 
-export const LinkSelector = ({ open, onOpenChange }: LinkSelectorProps) => {
+export const LinkSelector = ({ open, onOpenChange, editor }: LinkSelectorProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
-  const { editor } = useEditor();
 
   useEffect(() => {
     if (inputRef.current) {

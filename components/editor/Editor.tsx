@@ -1,118 +1,213 @@
 "use client";
 import React, { useState } from "react";
-import {
-  EditorRoot,
-  EditorContent,
-  JSONContent,
-  EditorCommand,
-  EditorCommandEmpty,
-  EditorCommandItem,
-  EditorCommandList,
-  handleCommandNavigation,
-  EditorBubble,
-  EditorInstance,
-} from "novel";
-import { defaultExtensions } from "@/lib/extensions";
-import { suggestionItems } from "@/components/editor/slash-command";
+import { useEditor, EditorContent } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import { Placeholder } from "@tiptap/extension-placeholder";
+import { Link } from "@tiptap/extension-link";
+import { Image } from "@tiptap/extension-image";
+import { TaskList } from "@tiptap/extension-task-list";
+import { TaskItem } from "@tiptap/extension-task-item";
+import { HorizontalRule } from "@tiptap/extension-horizontal-rule";
+import { Highlight } from "@tiptap/extension-highlight";
+import { Underline } from "@tiptap/extension-underline";
+import { TextStyle } from "@tiptap/extension-text-style";
+import { Color } from "@tiptap/extension-color";
+import { CharacterCount } from "@tiptap/extension-character-count";
+import { CodeBlockLowlight } from "@tiptap/extension-code-block-lowlight";
+import { cx } from "class-variance-authority";
+import { common, createLowlight } from "lowlight";
+import { Markdown } from "tiptap-markdown";
+
 import { NodeSelector } from "@/components/editor/bubble/node-selector";
 import { TextButtons } from "@/components/editor/bubble/text-buttons";
 import { ColorSelector } from "@/components/editor/bubble/color-selector";
 import { LinkSelector } from "@/components/editor/bubble/link-selector";
-import { useSession } from "next-auth/react";
+import { slashCommand } from "@/components/editor/slash-command";
 
 type EditorProps = {
-  initialContent?: JSONContent | null;
-  onUpdate?: (props: { editor: EditorInstance }) => void;
-  onCreate?: (props: { editor: EditorInstance }) => void;
-  contentKey?: string;
   className?: string;
+  slug: string,
+  initialContent: string,
 };
 
-export default function Editor({
-  initialContent,
-  onUpdate,
-  onCreate,
-  contentKey,
-  className,
-}: EditorProps) {
+export default function Editor({ className, initialContent }: EditorProps) {
   const [openNode, setOpenNode] = useState<boolean>(false);
   const [openColor, setOpenColor] = useState<boolean>(false);
   const [openLink, setOpenLink] = useState<boolean>(false);
+  const [showBubbleMenu, setShowBubbleMenu] = useState<boolean>(false);
+  const [bubbleMenuPosition, setBubbleMenuPosition] = useState<{
+    top: number;
+    left: number;
+  }>({ top: 0, left: 0 });
 
-  const { status } = useSession();
+  const editor = useEditor({
+    immediatelyRender: false,
+    extensions: [
+      Markdown,
+      StarterKit.configure({
+        bulletList: {
+          HTMLAttributes: {
+            class: cx("list-disc list-outside leading-normal ml-6"),
+          },
+        },
+        orderedList: {
+          HTMLAttributes: {
+            class: cx("list-decimal list-outside leading-normal ml-6"),
+          },
+        },
+        listItem: {
+          HTMLAttributes: {
+            class: cx("leading-normal"),
+          },
+        },
+        blockquote: {
+          HTMLAttributes: {
+            class: cx("border-l-4 border-primary pl-4"),
+          },
+        },
+        codeBlock: false,
+        code: {
+          HTMLAttributes: {
+            class: cx(
+              "rounded-md bg-muted px-1.5 py-1 font-mono font-medium text-foreground",
+              "dark:bg-slate-700 dark:text-slate-200",
+            ),
+            spellcheck: "false",
+          },
+        },
+        horizontalRule: false,
+        dropcursor: {
+          color: "#DBEAFE",
+          width: 4,
+        },
+        gapcursor: false,
+        paragraph: {
+          HTMLAttributes: {
+            class: cx("leading-7"),
+          },
+        },
+        heading: {
+          HTMLAttributes: {
+            class: cx("tracking-tight font-bold"),
+          },
+          levels: [1, 2, 3, 4, 5, 6],
+        },
+      }),
+      Placeholder.configure({
+        placeholder: "Start typing...",
+      }),
+      Link.configure({
+        HTMLAttributes: {
+          class: cx(
+            "text-muted-foreground underline underline-offset-[3px] hover:text-primary transition-colors cursor-pointer",
+          ),
+        },
+      }),
+      Image.configure({
+        allowBase64: true,
+        inline: false,
+        HTMLAttributes: {
+          class: cx("rounded-lg border border-muted max-w-full h-auto"),
+        },
+      }),
+      TaskList.configure({
+        HTMLAttributes: {
+          class: cx("not-prose pl-2 "),
+        },
+      }),
+      TaskItem.configure({
+        HTMLAttributes: {
+          class: cx("flex gap-2 items-start"),
+        },
+        nested: true,
+      }),
+      HorizontalRule.configure({
+        HTMLAttributes: {
+          class: cx("mt-4 mb-6 border-t border-muted-foreground"),
+        },
+      }),
+      Highlight,
+      Underline,
+      TextStyle,
+      Color,
+      CharacterCount,
+      CodeBlockLowlight.configure({
+        lowlight: createLowlight(common),
+        HTMLAttributes: {
+          class: cx(
+            "relative rounded-lg bg-slate-800 border border-slate-600 p-4 my-4 overflow-x-auto",
+            "dark:bg-slate-900 dark:border-slate-700",
+            "not-prose",
+          ),
+        },
+      }),
+      slashCommand,
+    ],
+    content: initialContent,
+    editorProps: {
+      attributes: {
+        class:
+          "py-12 prose prose-base dark:prose-invert focus:outline-none max-w-full min-h-[500px]",
+      },
+    },
+    onSelectionUpdate: ({ editor }) => {
+      const { from, to } = editor.state.selection;
+      const hasSelection = from !== to;
+      setShowBubbleMenu(hasSelection);
 
-  if (status === "loading") {
-    return (
-      <div className="flex justify-center items-center h-[600px]">
-        <div className="border-b-2 border-gray-400 h-6 w-6 animate-spin" />
-        <span>Loading...</span>
-      </div>
-    );
+      if (hasSelection) {
+        const { view } = editor;
+        const start = view.coordsAtPos(from);
+        const end = view.coordsAtPos(to);
+        const centerX = (start.left + end.right) / 2;
+        const topY = start.top;
+        setBubbleMenuPosition({
+          top: topY - 60,
+          left: centerX,
+        });
+      }
+    },
+  });
+
+  if (!editor) {
+    return null;
   }
-  return (
-    <EditorRoot>
-      <EditorContent
-        editable={status === "authenticated"}
-        key={contentKey}
-        initialContent={initialContent || undefined}
-        extensions={defaultExtensions}
-        className={
-          className ||
-          "relative min-h-[600px] w-full transition-all duration-200 "
-        }
-        editorProps={{
-          handleDOMEvents: {
-            keydown: (_view, event) => handleCommandNavigation(event),
-          },
-          attributes: {
-            class:
-              "py-12 prose prose-base dark:prose-invert focus:outline-none max-w-full min-h-[500px]",
-          },
-        }}
-        onUpdate={onUpdate}
-        onCreate={onCreate}
-      >
-        <EditorCommand className="z-50 h-auto max-h-[330px] overflow-y-auto bg-[hsl(var(--background))] border border-border rounded-md px-1 py-2 shadow-md transition-all">
-          <EditorCommandEmpty className="px-2 text-muted-foreground">
-            No results
-          </EditorCommandEmpty>
-          <EditorCommandList>
-            {suggestionItems.map((item) => (
-              <EditorCommandItem
-                value={item.title}
-                onCommand={(val) => item.command && item.command(val)}
-                className="flex w-full items-center space-x-3 rounded-md px-3 py-2 text-left text-sm hover:bg-accent text-foreground aria-selected:bg-accent cursor-pointer transition-colors"
-                key={item.title}
-              >
-                <div className="flex h-10 w-10 items-center justify-center bg-muted rounded-md">
-                  {item.icon}
-                </div>
-                <div>
-                  <p className="font-medium text-foreground">
-                    {item.title}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    {item.description}
-                  </p>
-                </div>
-              </EditorCommandItem>
-            ))}
-          </EditorCommandList>
-        </EditorCommand>
 
-        <EditorBubble
-          tippyOptions={{
-            placement: "top-start",
-            zIndex: 9999,
+  return (
+    <div
+      className={
+        className ||
+        "relative min-h-[600px] w-full transition-all duration-200 "
+      }
+    >
+      <EditorContent editor={editor} />
+
+      {editor && showBubbleMenu && (
+        <div
+          className="flex w-fit overflow-visible rounded border border-border bg-[hsl(var(--background))] shadow-xl z-[9999] fixed transform -translate-x-1/2"
+          style={{
+            top: `${bubbleMenuPosition.top}px`,
+            left: `${bubbleMenuPosition.left}px`,
           }}
-          className="flex w-fit overflow-visible rounded border border-border bg-[hsl(var(--background))] shadow-xl z-[9999]"
         >
-          <LinkSelector open={openLink} onOpenChange={setOpenLink} />
-          <NodeSelector open={openNode} onOpenChange={setOpenNode} />
-          <TextButtons />
-          <ColorSelector open={openColor} onOpenChange={setOpenColor} />
-        </EditorBubble>
-      </EditorContent>
-    </EditorRoot>
+          <LinkSelector
+            open={openLink}
+            onOpenChange={setOpenLink}
+            editor={editor}
+          />
+          <NodeSelector
+            open={openNode}
+            onOpenChange={setOpenNode}
+            editor={editor}
+          />
+          <TextButtons editor={editor} />
+          <ColorSelector
+            open={openColor}
+            onOpenChange={setOpenColor}
+            editor={editor}
+          />
+        </div>
+      )}
+    </div>
   );
 }

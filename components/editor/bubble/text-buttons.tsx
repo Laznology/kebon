@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { EditorBubbleItem, useEditor } from "novel";
+import { Editor as TiptapEditor } from "@tiptap/react";
 import {
   BoldIcon,
   ItalicIcon,
@@ -10,9 +10,13 @@ import {
 import type { SelectorItem } from "@/components/editor/bubble/node-selector";
 import { Button } from "@/components/ui/button";
 
-export const TextButtons = () => {
-  const { editor } = useEditor();
+interface TextButtonsProps {
+  editor?: TiptapEditor | null;
+}
+
+export const TextButtons = ({ editor }: TextButtonsProps = {}) => {
   if (!editor) return null;
+  
   const items: SelectorItem[] = [
     {
       name: "bold",
@@ -49,21 +53,16 @@ export const TextButtons = () => {
   return (
     <div className="flex">
       {items.map((item, index) => (
-        <EditorBubbleItem
+        <Button
           key={index}
-          onSelect={(editor) => {
-            item.command(editor);
-          }}
+          variant="ghost"
+          className="rounded-none h-8 px-2 hover:bg-accent"
+          onClick={() => item.command(editor)}
         >
-          <Button
-            variant="ghost"
-            className="rounded-none h-8 px-2 hover:bg-accent"
-          >
-            <item.icon
-              className={cn("h-3 w-3", { "text-blue": item.isActive(editor) })}
-            />
-          </Button>
-        </EditorBubbleItem>
+          <item.icon
+            className={cn("h-3 w-3", { "text-blue": item.isActive(editor) })}
+          />
+        </Button>
       ))}
     </div>
   );

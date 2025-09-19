@@ -11,7 +11,7 @@ import {
   CheckSquare,
   type LucideIcon,
 } from "lucide-react";
-import { EditorBubbleItem, useEditor } from "novel";
+import { Editor as TiptapEditor } from "@tiptap/react";
 
 import { Popover } from "@radix-ui/react-popover";
 import { PopoverContent, PopoverTrigger } from "@radix-ui/react-popover";
@@ -20,8 +20,8 @@ import { Button } from "@/components/ui/button";
 export type SelectorItem = {
   name: string;
   icon: LucideIcon;
-  command: (editor: ReturnType<typeof useEditor>["editor"]) => void;
-  isActive: (editor: ReturnType<typeof useEditor>["editor"]) => boolean;
+  command: (editor: TiptapEditor | null) => void;
+  isActive: (editor: TiptapEditor | null) => boolean;
 };
 
 const items: SelectorItem[] = [
@@ -39,21 +39,21 @@ const items: SelectorItem[] = [
     name: "Heading 1",
     icon: Heading1,
     command: (editor) =>
-      editor?.chain().focus().toggleHeading({ level: 1 }).run(),
+      editor?.chain().focus().setNode("heading", { level: 1 }).run(),
     isActive: (editor) => !!editor?.isActive("heading", { level: 1 }),
   },
   {
     name: "Heading 2",
     icon: Heading2,
     command: (editor) =>
-      editor?.chain().focus().toggleHeading({ level: 2 }).run(),
+      editor?.chain().focus().setNode("heading", { level: 2 }).run(),
     isActive: (editor) => !!editor?.isActive("heading", { level: 2 }),
   },
   {
     name: "Heading 3",
     icon: Heading3,
     command: (editor) =>
-      editor?.chain().focus().toggleHeading({ level: 3 }).run(),
+      editor?.chain().focus().setNode("heading", { level: 3 }).run(),
     isActive: (editor) => !!editor?.isActive("heading", { level: 3 }),
   },
   {
@@ -91,10 +91,10 @@ const items: SelectorItem[] = [
 interface NodeSelectorProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  editor?: TiptapEditor | null;
 }
 
-export const NodeSelector = ({ open, onOpenChange }: NodeSelectorProps) => {
-  const { editor } = useEditor();
+export const NodeSelector = ({ open, onOpenChange, editor }: NodeSelectorProps) => {
   if (!editor) return null;
   const activeItem = items.filter((item) => item.isActive(editor)).pop() ?? {
     name: "Multiple",
@@ -117,9 +117,9 @@ export const NodeSelector = ({ open, onOpenChange }: NodeSelectorProps) => {
         className="w-48 p-1 bg-popover border border-border shadow-md z-[9999]"
       >
         {items.map((item, index) => (
-          <EditorBubbleItem
+          <div
             key={index}
-            onSelect={(editor) => {
+            onClick={() => {
               item.command(editor);
               onOpenChange(false);
             }}
@@ -132,7 +132,7 @@ export const NodeSelector = ({ open, onOpenChange }: NodeSelectorProps) => {
               <span>{item.name}</span>
             </div>
             {activeItem.name === item.name && <Check className="h-4 w-4" />}
-          </EditorBubbleItem>
+          </div>
         ))}
       </PopoverContent>
     </Popover>

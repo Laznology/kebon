@@ -1,5 +1,4 @@
-import { JSONContent } from "novel";
-
+import { JSONContent } from "@tiptap/react";
 export function extractPlainText(node: JSONContent): string {
   if (!node) return "";
 

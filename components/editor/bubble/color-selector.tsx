@@ -1,5 +1,5 @@
 import { ChevronDown, Check } from "lucide-react";
-import { EditorBubbleItem, useEditor } from "novel";
+import { Editor as TiptapEditor } from "@tiptap/react";
 import {
   Popover,
   PopoverTrigger,
@@ -93,10 +93,10 @@ const HIGHLIGHT_COLORS: BubbleColorMenuItem[] = [
 interface ColorSelectorProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  editor?: TiptapEditor | null;
 }
 
-export const ColorSelector = ({ open, onOpenChange }: ColorSelectorProps) => {
-  const { editor } = useEditor();
+export const ColorSelector = ({ open, onOpenChange, editor }: ColorSelectorProps) => {
   if (!editor) return null;
 
   const activeColorItem = TEXT_COLORS.find(({ color }) =>
@@ -136,9 +136,9 @@ export const ColorSelector = ({ open, onOpenChange }: ColorSelectorProps) => {
             Color
           </div>
           {TEXT_COLORS.map(({ name, color }, index) => (
-            <EditorBubbleItem
+            <div
               key={index}
-              onSelect={() => {
+              onClick={() => {
                 editor.commands.unsetColor();
                 if (name !== "Default") {
                   editor
@@ -159,7 +159,7 @@ export const ColorSelector = ({ open, onOpenChange }: ColorSelectorProps) => {
                 </div>
                 <span>{name}</span>
               </div>
-            </EditorBubbleItem>
+            </div>
           ))}
         </div>
         <div>
@@ -167,9 +167,9 @@ export const ColorSelector = ({ open, onOpenChange }: ColorSelectorProps) => {
             Background
           </div>
           {HIGHLIGHT_COLORS.map(({ name, color }, index) => (
-            <EditorBubbleItem
+            <div
               key={index}
-              onSelect={() => {
+              onClick={() => {
                 editor.commands.unsetHighlight();
                 if (name !== "Default") {
                   editor.commands.setHighlight({ color });
@@ -189,7 +189,7 @@ export const ColorSelector = ({ open, onOpenChange }: ColorSelectorProps) => {
               {editor.isActive("highlight", { color }) && (
                 <Check className="h-4 w-4" />
               )}
-            </EditorBubbleItem>
+            </div>
           ))}
         </div>
       </PopoverContent>
