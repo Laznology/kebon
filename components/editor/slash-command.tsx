@@ -9,6 +9,7 @@ import {
   Text,
   TextQuote,
   Link,
+  SeparatorHorizontal
 } from "lucide-react";
 import { Extension, Range } from '@tiptap/core';
 import { Suggestion } from '@tiptap/suggestion';
@@ -208,6 +209,14 @@ export const suggestionItems: SuggestionItem[] = [
         .toggleBlockquote()
         .run(),
   },
+  {
+    title: "Separator",
+    description: "",
+    searchTerms: ["horizontal, divider"],
+    icon: <SeparatorHorizontal size={18} />,
+    command: ({ editor }) => editor.chain().focus().setHorizontalRule().run()
+  },
+
   {
     title: "Code",
     description: "Capture a code snippet.",

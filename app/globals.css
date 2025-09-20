@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import '@mantine/spotlight/styles.css';
 
 :root {
   --background: 255 255 255;
@@ -394,3 +395,13 @@ body {
   opacity: 0;
   pointer-events: none;
 }
+
+.tiptap p.is-empty::before {
+  color: #adb5bd;
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+

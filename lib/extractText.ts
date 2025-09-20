@@ -1,5 +1,8 @@
 import { JSONContent } from "@tiptap/react";
-export function extractPlainText(node: JSONContent): string {
+
+type ContentNode = JSONContent | JSONContent[];
+
+export function extractPlainText(node: ContentNode): string {
   if (!node) return "";
 
   if (Array.isArray(node)) {
@@ -17,7 +20,26 @@ export function extractPlainText(node: JSONContent): string {
   return "";
 }
 
-export function extractAndCleanText(content: JSONContent) {
-  const text = extractPlainText(content);
+function stripMarkdown(markdown: string): string {
+  return markdown
+    .replace(/```[\s\S]*?```/g, " ")
+    .replace(/`[^`]*`/g, " ")
+    .replace(/!\[[^\]]*\]\([^)]*\)/g, " ")
+    .replace(/\[([^\]]*)\]\([^)]*\)/g, "$1")
+    .replace(/^#{1,6}\s+/gm, "")
+    .replace(/[*_]{1,3}/g, "")
+    .replace(/>\s?/g, "")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/\r?\n+/g, " ");
+}
+
+export function extractAndCleanText(
+  content: JSONContent | string | null | undefined,
+): string {
+  if (!content) return "";
+
+  const text =
+    typeof content === "string" ? stripMarkdown(content) : extractPlainText(content);
+
   return text.replace(/\s+/g, " ").trim();
 }

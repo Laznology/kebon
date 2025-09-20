@@ -1,96 +1,112 @@
-import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
+import { readMarkdown, writeMarkdown } from "@/lib/content";
 
 export async function GET(
   request: NextRequest,
-  context: { params: Promise<{ slug: string }> },
+  context: { params: Promise<{ slug: string }> } 
 ) {
+  const { slug } = await context.params;
+  if (!slug) {
+    return new NextResponse('Bad Request: slug is required', { status: 400 });
+  }
+
   try {
-    const { slug } = await context.params;
-    const pages = await prisma.page.findUnique({
-      where: { slug },
+    const { frontmatter, content } = await readMarkdown(slug);
+    
+    return NextResponse.json({
+      slug,
+      title: frontmatter.title || slug.replace(/-/g, " "),
+      content,
+      frontmatter,
+      updatedAt: frontmatter.updatedAt || new Date().toISOString(),
+      author: frontmatter.author || null,
     });
-
-    if (!pages) {
-      return NextResponse.json({ error: "Page not found" }, { status: 404 });
-    }
-
-    return NextResponse.json(pages);
-  } catch (error) {
-    console.error("GET Error:", error);
-    return NextResponse.json(
-      { error: "Internal Server Error" },
-      { status: 500 },
-    );
+  } catch {
+    return NextResponse.json({
+      slug,
+      title: slug.replace(/-/g, " "),
+      content: `# ${slug.replace(/-/g, " ")}\n\nStart writing your content here...`,
+      frontmatter: { 
+        title: slug.replace(/-/g, " "),
+        updatedAt: new Date().toISOString()
+      },
+      updatedAt: new Date().toISOString(),
+      author: null,
+    });
   }
 }
 
-function slugify(text: string) {
-  return text
-    .toString()
-    .normalize("NFKD")
-    .toLowerCase()
-    .trim()
-    .replace(/\s+/g, "-")
-    .replace(/[^\w\-]+/g, "")
-    .replace(/\-\-+/g, "-");
+export async function POST(
+  request: NextRequest,
+  context: { params: Promise<{ slug: string }> }
+) {
+  const { slug } = await context.params;
+  if (!slug) {
+    return new NextResponse('Bad Request: slug is required', { status: 400 });
+  }
+
+  try {
+    const body = await request.json();
+    const { content, frontmatter: customFrontmatter } = body;
+    
+    const frontmatter = {
+      title: customFrontmatter?.title || slug.replace(/-/g, " "),
+      updatedAt: new Date().toISOString(),
+      ...customFrontmatter,
+    };
+    
+    await writeMarkdown(slug, frontmatter, content);
+    
+    return NextResponse.json({
+      slug,
+      title: frontmatter.title,
+      content,
+      frontmatter,
+      updatedAt: frontmatter.updatedAt,
+      message: "Document saved successfully"
+    });
+  } catch (error) {
+    console.error("Error saving document:", error);
+    return NextResponse.json(
+      { error: "Failed to save document" },
+      { status: 500 }
+    );
+  }
 }
 
 export async function PUT(
-  req: Request,
-  { params }: { params: Promise<{ slug: string }> },
+  request: NextRequest,
+  context: { params: Promise<{ slug: string }> }
 ) {
-  const { slug } = await params;
-  const body = (await req.json()) as {
-    title?: string;
-    content?: string;
-    published?: boolean;
-  };
-  let newSlug = body.title;
-  if (body.title) {
-    newSlug = slugify(body?.title || "");
-  }
-
-  if (
-    !body ||
-    (!("title" in body) && !("content" in body) && !("published" in body))
-  ) {
-    return NextResponse.json(
-      { error: "No valid fields to update" },
-      { status: 400 },
-    );
+  const { slug } = await context.params;
+  if (!slug) {
+    return new NextResponse('Bad Request: slug is required', { status: 400 });
   }
 
   try {
-    const updated = await prisma.page.update({
-      where: { slug },
-      data: { ...body, slug: newSlug, updatedAt: new Date() },
-      select: {
-        title: true,
-        slug: true,
-      },
+    const body = await request.json();
+    const { content, title, frontmatter: customFrontmatter } = body;
+    
+    const frontmatter = {
+      title: title || slug.replace(/-/g, " "),
+      updatedAt: new Date().toISOString(),
+      ...customFrontmatter,
+    };
+    
+    await writeMarkdown(slug, frontmatter, content);
+    
+    return NextResponse.json({
+      slug,
+      title: frontmatter.title,
+      content,
+      frontmatter,
+      updatedAt: frontmatter.updatedAt,
     });
-
-    return NextResponse.json(updated);
-  } catch (err) {
-    console.error(err);
+  } catch (error) {
+    console.error("Error saving document:", error);
     return NextResponse.json(
-      { error: "Failed to update document" },
-      { status: 500 },
+      { error: "Failed to save document" },
+      { status: 500 }
     );
   }
-}
-
-export async function DELETE(
-  _request: Request,
-  { params }: { params: Promise<{ slug: string }> },
-) {
-  const { slug } = await params;
-  await prisma.page.update({
-    where: { slug },
-    data: {
-      isDeleted: true,
-    },
-  });
-  return NextResponse.json({ success: true });
 }

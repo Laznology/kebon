@@ -9,25 +9,24 @@ import {
   Text,
   Title,
 } from "@mantine/core";
-import AddPageButton from "@/components/add-page-button";
+import {AddPageButton} from "@/components/add-page-button";
 import { signOut, useSession } from "next-auth/react";
 import { AppShell, Burger } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { Icon } from "@iconify/react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import React from "react";
-import SearchModal from "@/components/search-modal";
-import { useAllDocuments } from "@/hooks/useAllDocuments";
 import Image from "next/image";
 import { useHotkeys } from "@mantine/hooks";
 import NavigationMenu from "@/components/navigation-menu";
+import { useAllPages } from "@/hooks/useAllPages";
+import SearchModal, { spotlight } from "@/components/search-modal";
 
 export default function Page() {
-  const [opened, { open, close }] = useDisclosure(false);
   const [mobileNavOpened, { toggle: toggleMobileNav }] = useDisclosure(false);
-  const { documents } = useAllDocuments();
+  const { pages } = useAllPages();
   const { data: session, status } = useSession();
-  useHotkeys([["ctrl+/", () => open()]]);
+  useHotkeys([["ctrl+K", () => spotlight.open()]]);
 
   return (
     <AppShell
@@ -59,7 +58,7 @@ export default function Page() {
       <AppShell.Navbar p={"md"} className={"space-y-4"}>
         <AppShell.Section>
           <div
-            onClick={open}
+            onClick={spotlight.open}
             className={
               "flex items-center justify-between gap-3 border rounded-md cursor-pointer py-1 px-1"
             }
@@ -68,13 +67,13 @@ export default function Page() {
               <Icon icon={"line-md:search"} width={16} height={16} />
               <p>Search...</p>
             </Group>
-            <div className={"flex items-center justify-center"}>
+            <div className={"flex items-center justify-start"}>
               <Kbd>Ctrl</Kbd>
               <span className="font-mono">+</span>
               <Kbd>/</Kbd>
             </div>
           </div>
-          <SearchModal opened={opened} onClose={close} documents={documents} />
+          <SearchModal pages={pages} />
         </AppShell.Section>
         <Divider />
         <AppShell.Section grow>

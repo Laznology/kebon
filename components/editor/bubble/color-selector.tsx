@@ -96,14 +96,18 @@ interface ColorSelectorProps {
   editor?: TiptapEditor | null;
 }
 
-export const ColorSelector = ({ open, onOpenChange, editor }: ColorSelectorProps) => {
+export const ColorSelector = ({
+  open,
+  onOpenChange,
+  editor,
+}: ColorSelectorProps) => {
   if (!editor) return null;
 
   const activeColorItem = TEXT_COLORS.find(({ color }) =>
     editor.isActive("textStyle", { color }),
   );
-  const activeHightlightItem = HIGHLIGHT_COLORS.find(({ color }) =>
-    editor.isActive("highlight", { color }),
+  const activeBackgroundItem = HIGHLIGHT_COLORS.find(({ color }) =>
+    editor.isActive("textStyle", { backgroundColor: color }),
   );
 
   return (
@@ -117,7 +121,7 @@ export const ColorSelector = ({ open, onOpenChange, editor }: ColorSelectorProps
             className="rounded-sm px-1 text-xs"
             style={{
               color: activeColorItem?.color,
-              backgroundColor: activeHightlightItem?.color,
+              backgroundColor: activeBackgroundItem?.color,
             }}
           >
             A
@@ -170,9 +174,9 @@ export const ColorSelector = ({ open, onOpenChange, editor }: ColorSelectorProps
             <div
               key={index}
               onClick={() => {
-                editor.commands.unsetHighlight();
+                editor.commands.unsetBackgroundColor();
                 if (name !== "Default") {
-                  editor.commands.setHighlight({ color });
+                  editor.commands.setBackgroundColor(color);
                 }
               }}
               className="flex cursor-pointer items-center justify-between px-2 py-1 text-sm hover:bg-accent"
@@ -186,7 +190,7 @@ export const ColorSelector = ({ open, onOpenChange, editor }: ColorSelectorProps
                 </div>
                 <span>{name}</span>
               </div>
-              {editor.isActive("highlight", { color }) && (
+              {editor.isActive("highlight", {}) && (
                 <Check className="h-4 w-4" />
               )}
             </div>

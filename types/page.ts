@@ -1,33 +1,24 @@
-import { JSONContent } from "@tiptap/react";
-
 export interface BasePage {
   id: string;
   title: string;
   slug: string;
-  published: boolean;
-  content: JSONContent;
-  createdAt: string;
-  updatedAt: string;
+  content: string;
+  excerpt?: string;
+  tags: string[];
+  created?: string;
+  updated?: string;
 }
 
-export interface PageAuthor {
-  authorId: string | null;
-  author?: {
-    id: string;
-    email: string;
-    name?: string;
-  };
+export interface PageFrontmatter {
+  title?: string;
+  description?: string;
+  tags?: string[];
+  created?: string;
+  updated?: string;
+  status?: 'draft' | 'published';
+  author?: string;
 }
 
-export interface PageVersion {
-  id: string;
-  content: JSONContent | null;
-  pagetId: string;
-  page: Page;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface Page extends BasePage, PageAuthor {
-  pageVersion: PageVersion[];
+export interface Page extends BasePage {
+  frontmatter?: PageFrontmatter;
 }

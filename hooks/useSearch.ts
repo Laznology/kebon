@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import Fuse, { FuseResultMatch, IFuseOptions } from "fuse.js";
-import { type Document } from "@/types/document";
+import { type Page } from "@/types/page";
 import { extractAndCleanText } from "@/lib/extractText";
 
 export type SearchableDocument = {
@@ -21,23 +21,23 @@ const fuseOptions: IFuseOptions<SearchableDocument> = {
   minMatchCharLength: 2,
 };
 
-export function useSearch(documents: Document[] = []) {
+export function useSearch(pages: Page[] = []) {
   const [query, setQuery] = useState("");
 
-  const searchableDocuments = useMemo(() => {
-    return documents.map(
-      (doc): SearchableDocument => ({
-        id: doc.id,
-        title: doc.title,
-        slug: doc.slug,
-        content: doc.content ? extractAndCleanText(doc.content) : "",
+  const searchablePages = useMemo(() => {
+    return pages.map(
+      (page): SearchableDocument => ({
+        id: page.id,
+        title: page.title,
+        slug: page.slug,
+        content: page.content ? extractAndCleanText(page.content) : "",
       }),
     );
-  }, [documents]);
+  }, [pages]);
 
   const fuse = useMemo(() => {
-    return new Fuse(searchableDocuments, fuseOptions);
-  }, [searchableDocuments]);
+    return new Fuse(searchablePages, fuseOptions);
+  }, [searchablePages]);
 
   const results = useMemo(() => {
     if (!query.trim()) return [];

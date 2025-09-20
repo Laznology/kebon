@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import '@mantine/spotlight/styles.css';
 import Provider from "./proivder";
 import SessionProvider from "@/components/SessionProvider";
 import "@mantine/core/styles.css";

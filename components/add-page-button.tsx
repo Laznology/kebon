@@ -1,107 +1,119 @@
-"use client";
-import { Button, Modal, Select, TextInput } from "@mantine/core";
-import { useForm } from "@mantine/form";
-import { useDisclosure } from "@mantine/hooks";
-import { notifications } from "@mantine/notifications";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { Icon } from "@iconify/react";
+'use client';
 
-export default function AddPageButton() {
-  const [opened, { open, close }] = useDisclosure(false);
-  const [loading, setLoading] = useState<boolean>(false);
-  const form = useForm({
-    mode: "controlled",
-    initialValues: {
-      title: "",
-      published: "false",
-    },
-    validate: {
-      title: (value) => (value.trim().length > 0 ? null : "Cannot empty"),
-    },
-  });
+import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { Plus } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
+export function AddPageButton() {
+  const [open, setOpen] = useState(false);
+  const [title, setTitle] = useState('');
+  const [isCreating, setIsCreating] = useState(false);
+  const [error, setError] = useState('');
   const router = useRouter();
 
-  const handleSubmit = async (values: typeof form.values) => {
-    setLoading(true);
+  const handleCreate = async () => {
+    if (!title.trim()) {
+      setError('Title is required');
+      return;
+    }
+
+    setIsCreating(true);
+    setError('');
+
     try {
-      const payload = {
-        title: values.title,
-        published: values.published === "true",
-      }
-      const res = await fetch("/api/pages", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+      const response = await fetch('/api/pages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ title: title.trim() }),
       });
 
-      const data = await res.json();
-      const title = data.title;
-      const slug = title.trim().toLowerCase().replace(/\s+/g, "-");
+      const data = await response.json();
 
-      if (!res.ok) {
-        notifications.show({
-          title: "Error",
-          message: data.error,
-          color: "red",
-        });
-        return;
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to create page');
       }
 
-      notifications.show({
-        title: "Success",
-        message: "Page created successfully",
-        color: "green",
-      });
-      router.push(`/${slug}`);
-    } catch (err) {
-      notifications.show({
-        title: "Error occurred",
-        message: `Error while creating page ${err}`,
-        color: "red",
-      });
+      setTitle('');
+      setOpen(false);
+      
+      router.push(`/${data.slug}`);
+      
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to create page');
     } finally {
-      setLoading(false);
+      setIsCreating(false);
     }
   };
-  return (
-    <>
-      <Button
-        leftSection={<Icon icon={"line-md:plus"} width={18} height={18} />}
-        fullWidth={true}
-        onClick={open}
-        variant="filled"
-      >
-        Add New Page
-      </Button>
 
-      <Modal opened={opened} onClose={close} title="Add New Page">
-        <form onSubmit={form.onSubmit(handleSubmit)} className="space-y-2">
-          <TextInput
-            {...form.getInputProps("title")}
-            label="Title"
-            placeholder="Enter page title"
-          />
-          <Select
-            label={"Status"}
-            {...form.getInputProps("published")}
-            data={[
-              { value: "true", label: "Published"},
-              { value: "false", label: "Draft"},
-            ]}
-            defaultValue={form.values.published}
-          />
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleCreate();
+    }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button variant="default" size="sm" className="gap-2">
+          <Plus className="h-4 w-4" />
+          New Page
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>Create New Page</DialogTitle>
+        </DialogHeader>
+        <div className="grid gap-4 py-4">
+          <div className="space-y-2">
+            <Label htmlFor="title">Page Title</Label>
+            <Input
+              id="title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder="Enter page title..."
+              disabled={isCreating}
+              autoFocus
+            />
+            {error && (
+              <p className="text-sm text-destructive">{error}</p>
+            )}
+            {title && (
+              <p className="text-xs text-muted-foreground">
+                Filename: {title.toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-')}.md
+              </p>
+            )}
+          </div>
+        </div>
+        <div className="flex justify-end gap-2">
           <Button
-            loaderProps={{ type: "dots " }}
-            loading={loading}
-            type="submit"
-            mt="md"
+            variant="outline"
+            onClick={() => setOpen(false)}
+            disabled={isCreating}
           >
-            Submit
+            Cancel
           </Button>
-        </form>
-      </Modal>
-    </>
+          <Button
+            onClick={handleCreate}
+            disabled={isCreating || !title.trim()}
+          >
+            {isCreating ? 'Creating...' : 'Create Page'}
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }

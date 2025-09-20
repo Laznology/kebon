@@ -1,15 +1,15 @@
 "use client";
-import { TableOfContents, Group, Text, TextInput } from "@mantine/core";
+import { Group, Text } from "@mantine/core";
 import DocsLayout from "@/components/docs-layout";
-import { DocumentProvider, useDocument } from "@/app/[slug]/document-provider";
-import { useEffect, useRef, useState } from "react";
-import { useAllDocuments } from "@/hooks/useAllDocuments";
-import { usePathname, useRouter } from "next/navigation";
+import { PageProvider, usePage } from "@/app/[slug]/page-provider";
+import { useEffect, useRef } from "react";
+import { useAllPages } from "@/hooks/useAllPages";
+import { usePathname } from "next/navigation";
 import { Icon } from "@iconify/react";
-import { useSession } from "next-auth/react";
+import { TableOfContents } from "@/components/TableOfContents";
 
 const TocComponent = () => {
-  const { tocItems } = useDocument();
+  const { tocItems } = usePage();
   const reinitializeRef = useRef(() => {});
 
   useEffect(() => {
@@ -19,90 +19,34 @@ const TocComponent = () => {
     return () => clearTimeout(timer);
   }, [tocItems]);
 
-  if (tocItems.length === 0) {
-    return <div className={"text-sm p-4"}>No headings found</div>;
-  }
   return (
-    <TableOfContents
-      variant="light"
-      color="blue"
-      size="sm"
-      radius="sm"
-      minDepthToOffset={0}
-      depthOffset={20}
+    <TableOfContents 
+      tocItems={tocItems} 
       reinitializeRef={reinitializeRef}
-      initialData={tocItems}
-      scrollSpyOptions={{
-        selector: "[data-heading-id]",
-        getDepth: (element) => Number(element.getAttribute("data-depth")),
-        getValue: (element) => element.getAttribute("data-heading-text") || "",
-      }}
-      getControlProps={({ data, active }) => ({
-        onClick: () => {
-          const element = document.querySelector(
-            `[data-heading-id="${data.id}"]`,
-          );
-          if (element) {
-            element.scrollIntoView({
-              behavior: "smooth",
-              block: "start",
-              inline: "nearest",
-            });
-          }
-        },
-        style: {
-          color: active
-            ? "var(--mantine-color-blue-6)"
-            : "rgb(var(--muted-foreground))",
-          fontWeight: active ? 600 : 400,
-        },
-        children: data.value,
-      })}
     />
   );
 };
 
-const DocumentHeader = () => {
-  const { document } = useDocument();
-  const [title, setTitle] = useState("");
+const PageHeader = () => {
+  const { page, loading } = usePage();
   const pathname = usePathname();
-  const { status } = useSession();
-  const router = useRouter();
 
   const slug = pathname.split("/").pop();
-  useEffect(() => {
-    if (document?.title) {
-      setTitle(document.title);
-    }
-  }, [document?.title]);
 
-  const lastSentTitleRef = useRef<string | null>(null);
-  useEffect(() => {
-    if (!slug) return;
-    const next = title.trim();
-    const current = (document?.title || "").trim();
-    if (!next || next === current || next === lastSentTitleRef.current) return;
+  if (loading) {
+    return (
+      <div className="flex flex-col">
+        <div className="animate-pulse">
+          <div className="h-4 bg-gray-300 rounded w-32 mb-2"></div>
+          <div className="h-8 bg-gray-300 rounded w-64 mb-4"></div>
+        </div>
+      </div>
+    );
+  }
 
-    const handler = setTimeout(async () => {
-      const response = await fetch(`/api/pages/${document?.slug ?? slug}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ title: next }),
-      });
+  const title = page?.frontmatter?.title || page?.title || slug?.replace(/-/g, " ") || "Untitled";
+  const tags = page?.frontmatter?.tags || [];
 
-      if (response.ok) {
-        lastSentTitleRef.current = next;
-        const data = await response.json();
-        if (data.slug && data.slug !== slug) {
-          router.replace(`${data.slug}`);
-        }
-      }
-    }, 1000);
-
-    return () => clearTimeout(handler);
-  }, [title, slug, document?.title, document?.slug, router]);
   return (
     <div className="flex flex-col">
       <div className="flex items-start justify-between mb-6">
@@ -113,45 +57,34 @@ const DocumentHeader = () => {
             </Text>
             <Icon icon="mdi:chevron-right" width={16} height={16} />
             <Text size="xs" c="dimmed">
-              {document?.title}
+              {slug}
             </Text>
           </Group>
-          <TextInput
-            disabled={status !== "authenticated"}
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            variant="unstyled"
-            styles={{
-              input: {
-                fontSize: "2rem",
-                fontWeight: 600,
-                lineHeight: 1,
-                opacity: 1,
-                color: "var(--text-foreground)",
-                background: "none",
-                cursor: "text",
-                width: "100%",
-                maxWidth: "100%",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                whiteSpace: "nowrap",
-              },
-            }}
-          />
-          {document?.author && (
-            <Group gap={8} className="mb-2" align="center">
-              <div className="w-6 h-6 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-xs font-semibold">
-                {(document.author.name || document.author.email)
-                  .charAt(0)
-                  .toUpperCase()}
-              </div>
-              <Text size="sm" c="dimmed">
-                {document.author.name || document.author.email}
-              </Text>
+          
+          <Text 
+            size="2rem" 
+            fw={600} 
+            style={{ lineHeight: 1.2 }}
+            className="mb-4"
+          >
+            {title}
+          </Text>
+
+          {Array.isArray(tags) && tags.length > 0 && (
+            <Group gap="xs" mb={4}>
+              {tags.map((tag: string, index: number) => (
+                <div
+                  key={index}
+                  className="px-2 py-1 text-xs rounded-md bg-gray-100/10 text-primary"
+                >
+                  {tag}
+                </div>
+              ))}
             </Group>
           )}
         </div>
       </div>
+      
       <div
         className="flex items-center gap-4 text-xs pt-4"
         style={{
@@ -163,8 +96,8 @@ const DocumentHeader = () => {
         <div className="flex items-center gap-1">
           <span>
             Last updated:{" "}
-            {document?.updatedAt
-              ? new Date(document.updatedAt).toLocaleDateString("en-US", {
+            {page?.updatedAt
+              ? new Date(page.updatedAt).toLocaleDateString("en-US", {
                   year: "numeric",
                   month: "short",
                   day: "numeric",
@@ -182,13 +115,13 @@ export default function EditPageLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { documents } = useAllDocuments();
+  const { pages } = useAllPages();
   return (
-    <DocumentProvider>
-      <DocsLayout toc={<TocComponent />} documents={documents}>
-        <DocumentHeader />
+    <PageProvider>
+      <DocsLayout toc={<TocComponent />} pages={pages}>
+        <PageHeader />
         {children}
       </DocsLayout>
-    </DocumentProvider>
+    </PageProvider>
   );
 }
