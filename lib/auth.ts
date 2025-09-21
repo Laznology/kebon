@@ -1,13 +1,11 @@
 import type { NextAuthOptions } from "next-auth";
 import { getServerSession } from "next-auth";
 import Github from "next-auth/providers/github";
-import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "@/lib/prisma";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 
 export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(prisma),
   providers: [
     Github({
       clientId: process.env.GITHUB_ID || "",
@@ -51,6 +49,18 @@ export const authOptions: NextAuthOptions = {
     signIn: "/signin",
   },
   callbacks: {
+    // @ts-expect-error: NextAuth mengharapkan return type Promise<boolean | string>
+    async signIn({ user, account }) {
+      if (account?.provider === "github") {
+        const allowedEmails = process.env.ALLOWED_EMAILS?.split(",");
+        /**
+         * Memeriksa apakah email pengguna ada di dalam daftar email yang diizinkan.
+         * @returns {boolean} Mengembalikan `true` jika email valid, atau `false` jika tidak.
+         * So it Works 👍🏻
+         */
+        return !!(user.email && allowedEmails?.includes(user.email));
+      }
+    },
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
