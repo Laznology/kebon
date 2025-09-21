@@ -14,7 +14,7 @@ import {
   Popover,
   Button,
   NavLink,
-  Paper
+  Paper,
 } from "@mantine/core";
 import React from "react";
 import { useDisclosure, useHotkeys, useMediaQuery } from "@mantine/hooks";
@@ -32,8 +32,9 @@ type DocsLayoutProps = {
 };
 
 export default function DocsLayout({ children, toc, pages }: DocsLayoutProps) {
-  const [mobileNavOpened, { toggle: toggleMobileNav }] = useDisclosure(false);
-  const [tocOpened, { toggle: toggleToc }] = useDisclosure(false);
+  const [mobileNavOpened, { toggle: toggleMobileNav, close: closeMobileNav }] =
+    useDisclosure(false);
+  const [tocOpened, { toggle: toggleToc, close: closeToc }] = useDisclosure(false);
   const { data: session, status } = useSession();
   const isMobile = useMediaQuery("(max-width: 768px)");
 
@@ -51,7 +52,7 @@ export default function DocsLayout({ children, toc, pages }: DocsLayoutProps) {
         aside={{
           width: { base: 280, md: 280, lg: 280 },
           breakpoint: "md",
-          collapsed: { mobile: !tocOpened, desktop: false },
+          collapsed: { mobile: true, desktop: false },
         }}
         padding="md"
       >
@@ -60,7 +61,10 @@ export default function DocsLayout({ children, toc, pages }: DocsLayoutProps) {
             <Group>
               <Burger
                 opened={mobileNavOpened}
-                onClick={toggleMobileNav}
+                onClick={() => {
+                  closeToc();
+                  toggleMobileNav();
+                }}
                 size="sm"
                 hiddenFrom="md"
               />
@@ -69,6 +73,16 @@ export default function DocsLayout({ children, toc, pages }: DocsLayoutProps) {
               </Title>
             </Group>
             <Group gap="sm">
+              <Burger
+                opened={tocOpened}
+                onClick={() => {
+                  closeMobileNav();
+                  toggleToc();
+                }}
+                size="sm"
+                hiddenFrom="md"
+                aria-label="Toggle table of contents"
+              />
               <ThemeToggle />
             </Group>
           </Group>
@@ -88,15 +102,6 @@ export default function DocsLayout({ children, toc, pages }: DocsLayoutProps) {
                 overflow: "auto",
               }}
             >
-              <Group>
-                <Icon
-                  icon={"mdi:file-document-multiple"}
-                  height={16}
-                  width={16}
-                />
-                <h6>Table of Contents</h6>
-              </Group>
-              <Divider />
               <Box>{toc}</Box>
             </Paper>
           )}
@@ -104,31 +109,27 @@ export default function DocsLayout({ children, toc, pages }: DocsLayoutProps) {
 
         <AppShell.Navbar p="md">
           <AppShell.Section>
-            <TextInput
-              placeholder="Search..."
-              size="sm"
-              leftSection={<Icon icon="mdi:magnify" width={16} height={16} />}
-              rightSection={
-                <div className={"flex items-center justify-center"}>
-                  <Kbd>Ctrl</Kbd>
-                  <span className="font-mono">+</span>
-                  <Kbd>K</Kbd>
-                </div>
-              }
-              styles={{
-                input: { cursor: "pointer" },
-              }}
-              readOnly
-              onClick={spotlight.open}
-              mb="md"
-            />
+          <TextInput
+            size="sm"
+            leftSection={<Icon icon="line-md:search" width={16} height={16} />}
+            placeholder="Search ..."
+            onClick={spotlight.open}
+            rightSectionWidth={100}
+            rightSection={
+              <div className="absolute flex items-center gap-1 pr-1 text-[11px] text-gray-500">
+                <Kbd>Ctrl</Kbd>+<Kbd>/</Kbd>
+              </div>
+            }
+            readOnly
+          />
 
-            <Group justify="space-between" mb="md">
-              <Text fw={600} size="sm">
-                Pages
-              </Text>
-              {session && <AddPageButton />}
-            </Group>
+            <Box mb="md">
+              <AddPageButton />
+            </Box>
+
+            <Text fw={600} size="sm" mb="md">
+              Pages
+            </Text>
           </AppShell.Section>
 
           <Divider />
@@ -195,24 +196,10 @@ export default function DocsLayout({ children, toc, pages }: DocsLayoutProps) {
           )}
         </AppShell.Navbar>
 
-        <AppShell.Main>{children}</AppShell.Main>
+        <AppShell.Main className="mx-auto container">{children}</AppShell.Main>
 
         <AppShell.Aside p="md">
-          <Group justify="space-between" mb="md">
-            <Text fw={600} size="sm">
-              Table of Contents
-            </Text>
-            <Button
-              variant="subtle"
-              size="xs"
-              onClick={toggleToc}
-              hiddenFrom="md"
-            >
-              <Icon icon="mdi:menu" width={16} height={16} />
-            </Button>
-          </Group>
-          <Divider />
-          <Box mt="md">{toc}</Box>
+          <Box>{toc}</Box>
         </AppShell.Aside>
       </AppShell>
 

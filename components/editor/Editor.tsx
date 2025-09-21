@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { Placeholder } from "@tiptap/extension-placeholder";
@@ -21,6 +21,9 @@ import { common, createLowlight } from "lowlight";
 import { Markdown } from "tiptap-markdown";
 import { BackgroundColor } from "@tiptap/extension-text-style";
 
+import { CustomHeading } from "@/lib/custom-heading";
+import { usePage } from "@/app/[slug]/page-provider";
+
 import { NodeSelector } from "@/components/editor/bubble/node-selector";
 import { TextButtons } from "@/components/editor/bubble/text-buttons";
 import { ColorSelector } from "@/components/editor/bubble/color-selector";
@@ -31,7 +34,7 @@ type EditorProps = {
   className?: string;
   slug?: string;
   initialMarkdown?: string;
-  initialFrontmatter?: Record<string, undefined>;
+  initialFrontmatter?: Record<string, unknown>;
 };
 
 export default function Editor({
@@ -40,6 +43,7 @@ export default function Editor({
   initialMarkdown,
   initialFrontmatter,
 }: EditorProps) {
+  const { setSaving, setSaveHandler } = usePage();
   const [openNode, setOpenNode] = useState<boolean>(false);
   const [openColor, setOpenColor] = useState<boolean>(false);
   const [openLink, setOpenLink] = useState<boolean>(false);
@@ -48,7 +52,6 @@ export default function Editor({
     top: number;
     left: number;
   }>({ top: 0, left: 0 });
-  const [, setSaving] = useState<boolean>(false);
 
   const editor = useEditor(
     {
@@ -60,6 +63,7 @@ export default function Editor({
         }),
         Markdown.configure({}),
         StarterKit.configure({
+          heading: false,
           bulletList: {
             HTMLAttributes: {
               class: cx("list-disc list-outside leading-normal ml-6"),
@@ -101,13 +105,8 @@ export default function Editor({
               class: cx("leading-7"),
             },
           },
-          heading: {
-            HTMLAttributes: {
-              class: cx("tracking-tight font-bold"),
-            },
-            levels: [1, 2, 3, 4, 5, 6],
-          },
         }),
+        CustomHeading,
         Placeholder.configure({
           placeholder: "Write something ...",
         }),
@@ -213,7 +212,12 @@ export default function Editor({
       console.error("Save failed:", error);
     }
     setSaving(false);
-  }, [editor, getMarkdown, initialFrontmatter, slug]);
+  }, [editor, getMarkdown, initialFrontmatter, slug, setSaving]);
+
+  useEffect(() => {
+    setSaveHandler(() => handleSave);
+    return () => setSaveHandler(null);
+  }, [handleSave, setSaveHandler]);
 
   React.useEffect(() => {
     const onKey = (e: KeyboardEvent) => {

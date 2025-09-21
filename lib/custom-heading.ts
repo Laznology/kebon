@@ -1,21 +1,32 @@
 import { Heading } from "@tiptap/extension-heading";
 import { cx } from "class-variance-authority";
 
+import { slugifyHeading } from "@/lib/toc";
+
 export const CustomHeading = Heading.extend({
+  addAttributes() {
+    return {
+      ...this.parent?.(),
+      id: {
+        default: null,
+      },
+    };
+  },
+
   renderHTML({ node, HTMLAttributes }) {
     const level = node.attrs.level;
     const content = node.textContent || "";
-    const id = `heading-${content.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-${Date.now()}`;
+    const slug = node.attrs.id || slugifyHeading(content);
 
     return [
       `h${level}`,
       {
         ...HTMLAttributes,
-        id: id,
-        "data-heading-id": id,
+        id: slug,
+        "data-heading-id": slug,
         "data-depth": level,
         "data-heading-text": content,
-        class: cx("tracking-tight font-bold"),
+        class: cx("tracking-tight font-bold", HTMLAttributes?.class),
       },
       0,
     ];

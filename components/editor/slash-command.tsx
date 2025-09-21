@@ -138,7 +138,7 @@ export const suggestionItems: SuggestionItem[] = [
   {
     title: "Heading 1",
     description: "Big section heading.",
-    searchTerms: ["title", "big", "large"],
+    searchTerms: ["title", "big", "large", "heading", "h1"],
     icon: <Heading1 size={18} />,
     command: ({ editor, range }) => {
       editor
@@ -194,38 +194,38 @@ export const suggestionItems: SuggestionItem[] = [
     command: ({ editor, range }) => {
       editor.chain().focus().deleteRange(range).toggleOrderedList().run();
     },
-  },
-  {
+    },
+    {
     title: "Quote",
     description: "Capture a quote.",
     searchTerms: ["blockquote"],
     icon: <TextQuote size={18} />,
     command: ({ editor, range }) =>
       editor
-        .chain()
-        .focus()
-        .deleteRange(range)
-        .toggleNode("paragraph", "paragraph")
-        .toggleBlockquote()
-        .run(),
-  },
-  {
+      .chain()
+      .focus()
+      .deleteRange(range)
+      .toggleNode("paragraph", "paragraph")
+      .toggleBlockquote()
+      .run(),
+    },
+    {
     title: "Separator",
-    description: "",
-    searchTerms: ["horizontal, divider"],
+    description: "Insert a horizontal divider to separate content.",
+    searchTerms: ["horizontal, divider", "separator"],
     icon: <SeparatorHorizontal size={18} />,
     command: ({ editor }) => editor.chain().focus().setHorizontalRule().run()
-  },
+    },
 
-  {
+    {
     title: "Code",
     description: "Capture a code snippet.",
     searchTerms: ["codeblock"],
     icon: <Code size={18} />,
     command: ({ editor, range }) =>
       editor.chain().focus().deleteRange(range).toggleCodeBlock().run(),
-  },
-  {
+    },
+    {
     title: "Image from URL",
     description: "Embed an image from an external link.",
     searchTerms: ["photo", "picture", "media", "url", "link", "external"],

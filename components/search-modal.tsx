@@ -8,6 +8,9 @@ import {
 } from "@mantine/spotlight";
 import { Icon } from "@iconify/react";
 import { Text, Badge, Group, Stack } from "@mantine/core";
+import { useSession } from "next-auth/react";
+
+import { AddPageButton } from "@/components/add-page-button";
 import { useHotkeys } from "@mantine/hooks";
 
 export interface SearchablePage {
@@ -98,8 +101,14 @@ export default function SearchModal({ pages }: SearchModalProps) {
   const router = useRouter();
   const [query, setQuery] = useState("");
   const [searchResults, setSearchResults] = useState<SearchablePage[]>([]);
+  const { data: session } = useSession();
 
-  useHotkeys([['ctrl+K', () => spotlight.open()]]);
+  useHotkeys([
+    ['mod+K', (event) => {
+      event.preventDefault();
+      spotlight.open();
+    }]
+  ]);
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -211,8 +220,25 @@ export default function SearchModal({ pages }: SearchModalProps) {
     >
       <Spotlight.Search
         placeholder="Search pages and content..."
-        leftSection={<Icon icon="mdi:magnify" width={20} height={20} />}
+        leftSection={<Icon icon="mdi:magnify" width={18} height={18} />}
+        leftSectionPointerEvents="none"
+        styles={{
+          input: {
+            paddingLeft: '40px'
+          }
+        }}
       />
+      {session && (
+        <div
+          style={{
+            padding: "0 16px 12px",
+            display: "flex",
+            justifyContent: "flex-start",
+          }}
+        >
+          <AddPageButton />
+        </div>
+      )}
       <Spotlight.ActionsList>
         {actions.length > 0 ? (
           actions.map((action, index) => (

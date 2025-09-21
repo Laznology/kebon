@@ -1,34 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import matter from "gray-matter";
 import path from "path";
 import fs from "fs/promises";
-
-const CONTENT_DIR = path.join(process.cwd(), 'content', 'posts')
+import matter from "gray-matter";
+import { readAllPages } from "@/lib/content";
 
 export async function GET() {
   try {
-    const files = await fs.readdir(CONTENT_DIR)
-    const markdownFiles = files.filter((file) => file.endsWith('.md'))
-    const pages = await Promise.all(
-      markdownFiles.map(async (file) => {
-        const slug = file.replace(/\.md$/,"")
-        const filePath = path.join(CONTENT_DIR, file)
-        const content = await fs.readFile(filePath, 'utf-8')
-        const  { data: frontmatter, content: markdownContent } = matter(content)
-        
-        return {
-          id: slug,
-          slug,
-          title: frontmatter.title || slug.replace(/-/g, " "),
-          content: markdownContent,
-          excerpt: markdownContent.slice(0, 200),
-          tags: frontmatter.tags || [],
-          created: frontmatter.created,
-          updated: frontmatter.updated
-        }
-      })
-    )
-    return NextResponse.json(pages)
+    const pages = await readAllPages();
+    return NextResponse.json(pages);
   } catch {
     return NextResponse.json(
       { error: "Failed to fetch pages" },

@@ -72,7 +72,7 @@ export function AddPageButton() {
           New Page
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[425px] bg-[rgb(var(--background))]">
         <DialogHeader>
           <DialogTitle>Create New Page</DialogTitle>
         </DialogHeader>
