@@ -10,8 +10,7 @@ import type { CurrentPage } from "@/app/[slug]/page-provider";
 import { readMarkdown } from "@/lib/content";
 import type { Metadata } from "next";
 
-type PageProps = { params: Record<string, never>; };
-export async function generateMetadata(_: PageProps): Promise<Metadata> {
+export async function generateMetadata(): Promise<Metadata> {
   const page = await readMarkdown("index").catch(() => null);
 
   const title =

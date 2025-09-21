@@ -3,8 +3,6 @@ import { generateTocFromMarkdown } from "@/lib/toc";
 import { readAllPages, readMarkdown, resolveUpdatedAt } from "@/lib/content";
 import type { CurrentPage } from "@/app/[slug]/page-provider";
 
-import type { Metadata } from "next";
-
 export async function generateMetadata({
   params,
 }: {
