@@ -83,7 +83,7 @@ const CommandList = forwardRef<CommandListRef, CommandListProps>((props, ref) =>
   }));
 
   return (
-    <div className="z-50 h-auto max-h-[330px] overflow-y-auto bg-[hsl(var(--background))] border border-border rounded-md px-1 py-2 shadow-md transition-all">
+    <div className="z-50 h-auto max-h-[330px] overflow-y-auto bg-[rgb(var(--background))] border border-border rounded-md px-1 py-2 shadow-md transition-all">
       {props.items.length ? (
         props.items.map((item, index) => (
           <button
