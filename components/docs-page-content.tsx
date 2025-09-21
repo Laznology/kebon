@@ -1,6 +1,6 @@
 "use client";
 
-import Editor from "@/components/editor/Editor";
+import Editor from "@/components/editor/editor";
 import { usePage } from "@/app/[slug]/page-provider";
 
 export default function DocsPageContent() {

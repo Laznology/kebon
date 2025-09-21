@@ -109,7 +109,7 @@ export default function Editor({
         }),
         CustomHeading,
         Placeholder.configure({
-          placeholder: "Write something ...",
+          placeholder: 'Ketik "/" untuk command, atau tulis saja',
         }),
         Link.configure({
           HTMLAttributes: {

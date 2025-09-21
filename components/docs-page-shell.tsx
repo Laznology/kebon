@@ -107,8 +107,6 @@ const PageHeader = () => {
         className="flex items-center gap-4 text-xs pt-4"
         style={{
           color: "rgb(var(--muted-foreground))",
-          borderTopColor: "var(--border)",
-          borderTopWidth: "1px",
         }}
       >
         <div className="flex items-center gap-1">

@@ -2,7 +2,7 @@ import { Icon } from "@iconify/react";
 import { Group, Text } from "@mantine/core";
 import { TableOfContents as MantineTableOfContents } from "@mantine/core";
 import classes from "./TableOfContents.module.css";
-
+import cx from 'clsx'; 
 interface TocItem {
   id: string;
   value: string;
@@ -40,17 +40,14 @@ export function TableOfContents({ tocItems, reinitializeRef }: TableOfContentsPr
         depthOffset={16}
         reinitializeRef={reinitializeRef}
         initialData={tocItems}
-        classNames={{
-          root: classes.root,
-          control: classes.control,
-        }}
         scrollSpyOptions={{
           selector: "[data-heading-id]",
           getDepth: (element) => Number(element.getAttribute("data-depth")),
           getValue: (element) => element.getAttribute("data-heading-text") || "",
         }}
         getControlProps={({ data, active }) => ({
-          onClick: () => {
+          onClick: (event) => {
+            event.preventDefault();
             const element = document.querySelector(
               `[data-heading-id="${data.id}"]`,
             );
@@ -62,10 +59,11 @@ export function TableOfContents({ tocItems, reinitializeRef }: TableOfContentsPr
               });
             }
           },
-          className: `${classes.link} ${active ? classes.linkActive : ""}`,
+          className: cx(classes.link, { [classes.linkActive]: active }),
           children: data.value,
         })}
       />
     </div>
   );
 }
+
