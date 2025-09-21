@@ -7,6 +7,24 @@ import {
 } from "@/lib/content";
 import { generateTocFromMarkdown } from "@/lib/toc";
 import type { CurrentPage } from "@/app/[slug]/page-provider";
+import { readMarkdown } from "@/lib/content";
+import type { Metadata } from "next";
+
+type PageProps = { params: Record<string, never>; };
+export async function generateMetadata(_: PageProps): Promise<Metadata> {
+  const page = await readMarkdown("index").catch(() => null);
+
+  const title =
+    typeof page?.frontmatter?.title === "string"
+      ? page.frontmatter.title
+      : "Kebon Docs";
+  const description =
+    typeof page?.frontmatter?.description === "string"
+      ? page.frontmatter.description
+      : "Documentation home.";
+
+  return { title, description };
+}
 
 export default async function Page() {
   const slug = "index";

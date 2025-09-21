@@ -3,12 +3,34 @@ import { generateTocFromMarkdown } from "@/lib/toc";
 import { readAllPages, readMarkdown, resolveUpdatedAt } from "@/lib/content";
 import type { CurrentPage } from "@/app/[slug]/page-provider";
 
+import type { Metadata } from "next";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await params;
+  const page = await readMarkdown(slug).catch(() => null);
+  const title =
+    typeof page?.frontmatter.title === "string"
+      ? page.frontmatter.title
+      : slug.replace(/-/g, "");
+  const description =
+    typeof page?.frontmatter.description === "string"
+      ? page.frontmatter.description
+      : `${title}`;
+  return {
+    title,
+    description,
+  };
+}
 export default async function EditPageLayout({
   children,
   params,
 }: {
   children: React.ReactNode;
- params: Promise<{ slug: string }>;
+  params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
 
