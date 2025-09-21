@@ -29,6 +29,7 @@ import { TextButtons } from "@/components/editor/bubble/text-buttons";
 import { ColorSelector } from "@/components/editor/bubble/color-selector";
 import { LinkSelector } from "@/components/editor/bubble/link-selector";
 import { slashCommand } from "./slash-command";
+import { notifications } from "@mantine/notifications";
 
 type EditorProps = {
   className?: string;
@@ -199,7 +200,7 @@ export default function Editor({
     setSaving(true);
     const md = getMarkdown() ?? "";
     try {
-      await fetch(`/api/pages/${slug}`, {
+      const response = await fetch(`/api/pages/${slug}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -208,6 +209,13 @@ export default function Editor({
           message: `edit: ${slug}.md via TipTap`,
         }),
       });
+      if (!response.ok) {
+        notifications.show({
+          title: "Save Failed",
+          message: "There was an error saving the page.",
+          color: "red",
+        });
+      }
     } catch (error) {
       console.error("Save failed:", error);
     }
