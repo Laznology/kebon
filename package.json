@@ -5,10 +5,14 @@
   "packageManager": "pnpm@10.15.1",
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "next build",
-    "start": "prisma migrate deploy && next start",
+    "build": "prisma generate && next build",
+    "postbuild": "prisma migrate deploy",
+    "start": "next start",
     "lint": "next lint",
-    "format": "prettier . --write"
+    "format": "prettier . --write",
+    "db:migrate": "prisma migrate deploy",
+    "db:generate": "prisma generate",
+    "db:seed": "node prisma/seed.js"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.10.0",
@@ -17,6 +21,7 @@
     "@mantine/hooks": "^8.2.2",
     "@mantine/notifications": "^8.2.8",
     "@mantine/spotlight": "^8.3.1",
+    "@next-auth/prisma-adapter": "^1.0.7",
     "@prisma/client": "^6.16.1",
     "@radix-ui/react-accordion": "^1.2.12",
     "@radix-ui/react-dialog": "^1.1.15",
