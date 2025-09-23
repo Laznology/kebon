@@ -1,101 +1,220 @@
-import fs from "fs/promises";
-import path from "path";
-import matter from "gray-matter";
-import type { Page } from "@/types/page";
+import { prisma } from "@/lib/prisma";
+import type { DatabasePage } from "@/types/page";
+import type { JSONContent } from "@tiptap/core";
+import { extractAndCleanText } from "@/lib/extractText";
 
-const CONTENT_DIR = path.join(process.cwd(), "content", "posts");
+export async function getPageBySlug(
+  slug: string,
+): Promise<DatabasePage | null> {
+  try {
+    const page = await prisma.page.findUnique({
+      where: {
+        slug: slug,
+        isDeleted: false,
+      },
+      include: {
+        author: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+      },
+    });
 
-export async function readMarkdown(slug: string) {
-  const filePath = path.join(CONTENT_DIR, `${slug}.md`);
-  const raw = await fs.readFile(filePath, "utf-8");
-  const { data: frontmatter, content } = matter(raw);
-  return { frontmatter, content };
+    return page as unknown as DatabasePage | null;
+  } catch (error) {
+    console.error("Error fetching page by slug:", error);
+    return null;
+  }
 }
 
-export async function writeMarkdown(slug: string, frontmatter: Record<string, unknown>, content: string) {
-  const filePath = path.join(CONTENT_DIR, `${slug}.md`)
-  const fm = matter.stringify(content, frontmatter)
-  await fs.writeFile(filePath, fm, 'utf-8')
+export async function getAllPublishedPages(): Promise<DatabasePage[]> {
+  try {
+    const pages = await prisma.page.findMany({
+      where: {
+        isDeleted: false,
+        published: true,
+      },
+      include: {
+        author: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+      },
+      orderBy: {
+        updatedAt: "desc",
+      },
+    });
+
+    return pages as unknown as DatabasePage[];
+  } catch (error) {
+    console.error("Error fetching published pages:", error);
+    return [];
+  }
 }
 
-export async function readHomePage(){
-  const filePath = path.join(CONTENT_DIR, 'index.md')
-  const raw = await fs.readFile(filePath, 'utf-8')
-  const { data: frontmatter, content } = matter(raw)
-  return { frontmatter, content }
+export async function getAllPages(authorId?: string): Promise<DatabasePage[]> {
+  try {
+    const pages = await prisma.page.findMany({
+      where: {
+        isDeleted: false,
+        ...(authorId && { authorId }),
+      },
+      include: {
+        author: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+      },
+      orderBy: {
+        updatedAt: "desc",
+      },
+    });
+
+    return pages as unknown as DatabasePage[];
+  } catch (error) {
+    console.error("Error fetching all pages:", error);
+    return [];
+  }
 }
 
-export async function readAllPages(): Promise<Page[]> {
-  const files = await fs.readdir(CONTENT_DIR);
-  const markdownFiles = files.filter((file) => file.endsWith(".md"));
+export async function createPage(
+  title: string,
+  authorId: string,
+  content?: JSONContent,
+): Promise<DatabasePage | null> {
+  try {
+    const slug = title
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, "")
+      .replace(/\s+/g, "-")
+      .replace(/-+/g, "-")
+      .trim();
 
-  const pages = await Promise.all(
-    markdownFiles.map(async (file) => {
-      const slug = file.replace(/\.md$/, "");
-      const filePath = path.join(CONTENT_DIR, file);
-      const raw = await fs.readFile(filePath, "utf-8");
-      const { data: frontmatter, content } = matter(raw);
+    const defaultContent: JSONContent = content || {
+      type: "doc",
+      content: [
+        {
+          type: "heading",
+          attrs: { level: 1 },
+          content: [{ type: "text", text: title }],
+        },
+        {
+          type: "paragraph",
+          content: [
+            { type: "text", text: "Start writing your content here..." },
+          ],
+        },
+      ],
+    };
 
-      const rawStatus =
-        typeof frontmatter.status === "string" ? frontmatter.status : undefined;
-      const allowedStatuses: Array<"draft" | "published"> = [
-        "draft",
-        "published",
-      ];
-
-      const safeFrontmatter = {
-        title: typeof frontmatter.title === "string" ? frontmatter.title : undefined,
-        description:
-          typeof frontmatter.description === "string"
-            ? frontmatter.description
-            : undefined,
-        tags: Array.isArray(frontmatter.tags)
-          ? (frontmatter.tags as string[])
-          : undefined,
-        created:
-          typeof frontmatter.created === "string"
-            ? frontmatter.created
-            : undefined,
-        updated:
-          typeof frontmatter.updated === "string"
-            ? frontmatter.updated
-            : undefined,
-        status: allowedStatuses.includes(rawStatus as never)
-          ? (rawStatus as "draft" | "published")
-          : undefined,
-        author:
-          typeof frontmatter.author === "string"
-            ? frontmatter.author
-            : undefined,
-      } as Page["frontmatter"];
-
-      const title = safeFrontmatter?.title || slug.replace(/-/g, " ");
-
-      return {
-        id: slug,
-        slug,
+    const page = await prisma.page.create({
+      data: {
         title,
-        content,
-        excerpt: content.slice(0, 200),
-        tags: safeFrontmatter?.tags ?? [],
-        created: safeFrontmatter?.created,
-        updated: safeFrontmatter?.updated,
-        frontmatter: safeFrontmatter,
-      } satisfies Page;
-    }),
-  );
+        slug,
+        content: defaultContent,
+        published: false,
+        authorId,
+      },
+      include: {
+        author: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+      },
+    });
 
-  return pages.sort((a, b) => a.title.localeCompare(b.title));
+    return page as unknown as DatabasePage | null;
+  } catch (error) {
+    console.error("Error creating page:", error);
+    return null;
+  }
 }
 
-export function resolveUpdatedAt(frontmatter: Record<string, unknown>): string | undefined {
-  if (typeof frontmatter.updatedAt === "string") {
-    return frontmatter.updatedAt;
-  }
+export async function updatePage(
+  id: string,
+  data: {
+    title?: string;
+    content?: JSONContent;
+    tags?: string[];
+    published?: boolean;
+    image?: string;
+  },
+): Promise<DatabasePage | null> {
+  try {
+    const updateData: Partial<{
+      title: string;
+      content: JSONContent;
+      tags: string[];
+      published: boolean;
+      image: string;
+      excerpt: string | null;
+    }> = { ...data };
 
-  if (typeof frontmatter.updated === "string") {
-    return frontmatter.updated;
-  }
+    if (data.content) {
+      const excerpt = extractAndCleanText(data.content).slice(0, 200);
+      updateData.excerpt = excerpt || null;
+    }
 
-  return undefined;
+    const page = await prisma.page.update({
+      where: { id },
+      data: updateData,
+      include: {
+        author: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+      },
+    });
+
+    return page as unknown as DatabasePage | null;
+  } catch (error) {
+    console.error("Error updating page:", error);
+    return null;
+  }
+}
+
+export async function deletePage(id: string): Promise<boolean> {
+  try {
+    await prisma.page.update({
+      where: { id },
+      data: { isDeleted: true },
+    });
+    return true;
+  } catch (error) {
+    console.error("Error deleting page:", error);
+    return false;
+  }
+}
+
+export async function readAllPages() {
+  return getAllPublishedPages();
+}
+
+export async function readHomePage() {
+  const homePage =
+    (await getPageBySlug("index")) || (await getPageBySlug("home"));
+  return homePage
+    ? {
+        frontmatter: {
+          title: homePage.title,
+          updatedAt: homePage.updatedAt.toISOString(),
+        },
+        content: extractAndCleanText(homePage.content as JSONContent),
+      }
+    : null;
 }

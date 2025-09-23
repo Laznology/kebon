@@ -21,8 +21,9 @@ import React from "react";
 import { useDisclosure, useHotkeys, useMediaQuery } from "@mantine/hooks";
 import { Icon } from "@iconify/react";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import SearchModal, { spotlight } from "@/components/search-modal";
 import type { Page } from "@/types/page";
+import SearchModalRaw, { spotlight } from "@/components/search-modal";
+const SearchModal = SearchModalRaw as unknown as React.ComponentType<{ pages: Page[] }>;
 import { useSession, signOut } from "next-auth/react";
 import { AddPageButton } from "./add-page-button";
 
@@ -52,7 +53,7 @@ export default function DocsLayout({ children, toc, pages }: DocsLayoutProps) {
           rightSectionWidth={100}
           rightSection={
             <div className="absolute flex items-center gap-1 pr-1 text-[11px] text-gray-500">
-              <Kbd>Ctrl</Kbd>+<Kbd>/</Kbd>
+              <Kbd>Ctrl</Kbd>+<Kbd>K</Kbd>
             </div>
           }
           readOnly

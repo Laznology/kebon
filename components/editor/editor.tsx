@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { Placeholder } from "@tiptap/extension-placeholder";
@@ -18,8 +18,8 @@ import DragHandle from "@tiptap/extension-drag-handle-react";
 import { NodeRange } from "@tiptap/extension-node-range";
 import { cx } from "class-variance-authority";
 import { common, createLowlight } from "lowlight";
-import { Markdown } from "tiptap-markdown";
 import { BackgroundColor } from "@tiptap/extension-text-style";
+import type { JSONContent } from "@tiptap/core";
 
 import { CustomHeading } from "@/lib/custom-heading";
 import { usePage } from "@/app/[slug]/page-provider";
@@ -31,18 +31,35 @@ import { LinkSelector } from "@/components/editor/bubble/link-selector";
 import { slashCommand } from "./slash-command";
 import { notifications } from "@mantine/notifications";
 
+// Debounce hook
+function useDebounce<T>(value: T, delay: number): T {
+  const [debouncedValue, setDebouncedValue] = useState<T>(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
+}
+
 type EditorProps = {
   className?: string;
   slug?: string;
-  initialMarkdown?: string;
-  initialFrontmatter?: Record<string, unknown>;
+  initialContent?: JSONContent;
+  title?: string;
 };
 
 export default function Editor({
   className,
   slug,
-  initialMarkdown,
-  initialFrontmatter,
+  initialContent,
+  title,
 }: EditorProps) {
   const { setSaving, setSaveHandler } = usePage();
   const [openNode, setOpenNode] = useState<boolean>(false);
@@ -54,6 +71,15 @@ export default function Editor({
     left: number;
   }>({ top: 0, left: 0 });
 
+  const [content, setContent] = useState<JSONContent | null>(
+    initialContent || null,
+  );
+  const [lastSavedContent, setLastSavedContent] = useState<JSONContent | null>(
+    initialContent || null,
+  );
+
+  const debouncedContent = useDebounce(content, 2000);
+
   const editor = useEditor(
     {
       immediatelyRender: false,
@@ -62,9 +88,9 @@ export default function Editor({
         BackgroundColor.configure({
           types: ["textStyle"],
         }),
-        Markdown.configure({}),
         StarterKit.configure({
           heading: false,
+          link: false, // Disable link in StarterKit to use custom Link extension
           bulletList: {
             HTMLAttributes: {
               class: cx("list-disc list-outside leading-normal ml-6"),
@@ -162,12 +188,16 @@ export default function Editor({
         }),
         NodeRange,
       ],
-      content: initialMarkdown,
+      content: initialContent,
       editorProps: {
         attributes: {
           class:
             "py-12 prose prose-base dark:prose-invert focus:outline-none max-w-full min-h-[500px]",
         },
+      },
+      onUpdate: ({ editor }) => {
+        const newContent = editor.getJSON();
+        setContent(newContent);
       },
       onSelectionUpdate: ({ editor }) => {
         const { from, to } = editor.state.selection;
@@ -187,32 +217,85 @@ export default function Editor({
         }
       },
     },
-    [initialMarkdown],
+    [initialContent],
   );
 
-  const getMarkdown = React.useCallback(() => {
-    // @ts-expect-error - Tiptap markdown extension type is not properly exported
-    return editor?.storage.markdown.getMarkdown() as string;
-  }, [editor]);
+  const autoSave = useCallback(
+    async (contentToSave: JSONContent) => {
+      if (!editor || !slug) return;
 
-  const handleSave = React.useCallback(async () => {
+      setSaving(true);
+      try {
+        const response = await fetch(`/api/pages/${slug}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            content: contentToSave,
+            title: title,
+          }),
+        });
+
+        if (response.ok) {
+          setLastSavedContent(contentToSave);
+        } else {
+          const errorData = await response
+            .json()
+            .catch(() => ({ error: "Unknown error" }));
+          console.error("Auto-save failed:", response.status, errorData);
+          notifications.show({
+            title: "Auto-save Failed",
+            message: `Error ${response.status}: ${errorData.error || "There was an error auto-saving the page."}`,
+            color: "red",
+          });
+        }
+      } catch (error) {
+        console.error("Auto-save failed:", error);
+      }
+      setSaving(false);
+    },
+    [editor, slug, title, setSaving],
+  );
+
+  useEffect(() => {
+    if (!editor || !slug || !debouncedContent) return;
+
+    if (JSON.stringify(debouncedContent) === JSON.stringify(lastSavedContent)) {
+      return;
+    }
+
+    autoSave(debouncedContent);
+  }, [debouncedContent, editor, slug, lastSavedContent, autoSave]);
+
+  const handleSave = useCallback(async () => {
     if (!editor || !slug) return;
+
+    const currentContent = editor.getJSON();
     setSaving(true);
-    const md = getMarkdown() ?? "";
     try {
       const response = await fetch(`/api/pages/${slug}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          frontmatter: initialFrontmatter ?? {},
-          content: md,
-          message: `edit: ${slug}.md via TipTap`,
+          content: currentContent,
+          title: title,
         }),
       });
-      if (!response.ok) {
+
+      if (response.ok) {
+        setLastSavedContent(currentContent);
+        notifications.show({
+          title: "Saved",
+          message: "Page saved successfully.",
+          color: "green",
+        });
+      } else {
+        const errorData = await response
+          .json()
+          .catch(() => ({ error: "Unknown error" }));
+        console.error("Manual save failed:", response.status, errorData);
         notifications.show({
           title: "Save Failed",
-          message: "There was an error saving the page.",
+          message: `Error ${response.status}: ${errorData.error || "There was an error saving the page."}`,
           color: "red",
         });
       }
@@ -220,14 +303,14 @@ export default function Editor({
       console.error("Save failed:", error);
     }
     setSaving(false);
-  }, [editor, getMarkdown, initialFrontmatter, slug, setSaving]);
+  }, [editor, slug, title, setSaving]);
 
   useEffect(() => {
     setSaveHandler(() => handleSave);
     return () => setSaveHandler(null);
   }, [handleSave, setSaveHandler]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "s") {
         e.preventDefault();
@@ -252,8 +335,8 @@ export default function Editor({
       >
         <EditorContent editor={editor} />
 
-        {editor && (
-          <DragHandle editor={editor}>
+        {editor && editor.isDestroyed === false && (
+          <DragHandle key={`drag-handle-${slug || "default"}`} editor={editor}>
             <div className="drag-handle" />
           </DragHandle>
         )}

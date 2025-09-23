@@ -1,97 +1,70 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
-import Fuse, { FuseResultMatch, IFuseOptions } from "fuse.js";
-import { type Page } from "@/types/page";
-import { extractAndCleanText } from "@/lib/extractText";
+import { useState, useEffect, useCallback } from "react";
+import type { DatabasePage } from "@/types/page";
 
-export type SearchableDocument = {
-  id: string;
-  title: string;
-  slug: string;
-  content: string;
+export type SearchResult = DatabasePage & {
+  searchScore: number;
+  highlightedTitle: string;
+  highlightedExcerpt: string | null;
 };
 
-const fuseOptions: IFuseOptions<SearchableDocument> = {
-  keys: [
-    { name: "title", weight: 0.7 },
-    { name: "content", weight: 0.4 },
-  ],
-  includeMatches: true,
-  threshold: 0.3,
-  ignoreLocation: true,
-  minMatchCharLength: 2,
-};
-
-export function useSearch(pages: Page[] = []) {
+export function useSearch() {
   const [query, setQuery] = useState("");
+  const [results, setResults] = useState<SearchResult[]>([]);
+  const [loading, setLoading] = useState(false);
 
-  const searchablePages = useMemo(() => {
-    return pages.map(
-      (page): SearchableDocument => ({
-        id: page.id,
-        title: page.title,
-        slug: page.slug,
-        content: page.content ? extractAndCleanText(page.content) : "",
-      }),
-    );
-  }, [pages]);
-
-  const fuse = useMemo(() => {
-    return new Fuse(searchablePages, fuseOptions);
-  }, [searchablePages]);
-
-  const results = useMemo(() => {
-    if (!query.trim()) return [];
-
-    const fuseResults = fuse.search(query);
-
-    return fuseResults.map((result) => ({
-      item: result.item,
-      matches: result.matches || [],
-      highlightedTitle: getHighlightedText(
-        result.item.title,
-        result.matches,
-        "title",
-      ),
-      highlightedContent: getHighlightedText(
-        result.item.content,
-        result.matches,
-        "content",
-      ),
-    }));
-  }, [query, fuse]);
-
-  const search = useCallback((searchQuery: string) => {
+  const search = useCallback(async (searchQuery: string) => {
     setQuery(searchQuery);
+
+    if (!searchQuery.trim()) {
+      setResults([]);
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await fetch(
+        `/api/search?q=${encodeURIComponent(searchQuery)}`,
+      );
+      if (response.ok) {
+        const searchResults = await response.json();
+        setResults(searchResults);
+      } else {
+        console.error("Search failed:", response.statusText);
+        setResults([]);
+      }
+    } catch (error) {
+      console.error("Search error:", error);
+      setResults([]);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   const clearSearch = useCallback(() => {
     setQuery("");
+    setResults([]);
   }, []);
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (query.trim().length >= 2) {
+        search(query);
+      } else if (query.trim().length === 0) {
+        setResults([]);
+      }
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
+  }, [query, search]);
 
   return {
     query,
     results,
+    loading,
     clearSearch,
     search,
+    setQuery,
     hasResults: results.length > 0,
     isSearching: query.trim().length > 0,
   };
-}
-function getHighlightedText(
-  text: string,
-  matches: readonly FuseResultMatch[] = [],
-  key: string,
-): string {
-  const match = matches.find((m) => m.key === key);
-  if (!match || !match.indices.length) return text;
-  const firstMatch = match.indices[0];
-  const [start, end] = firstMatch;
-  const contextStart = Math.max(0, start - 50);
-  const contexEnd = Math.min(text.length, end + 50);
-
-  let snippet = text.substring(contextStart, contexEnd);
-  if (contextStart > 0) snippet = "..." + snippet;
-  if (contexEnd < text.length) snippet = snippet + "...";
-
-  return snippet;
 }

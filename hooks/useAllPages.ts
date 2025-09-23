@@ -1,9 +1,9 @@
 "use client";
 import { useState, useEffect } from "react";
-import { SearchablePage } from "@/components/search-modal";
+import type { DatabasePage } from "@/types/page";
 
 export function useAllPages() {
-  const [pages, setPages] = useState<SearchablePage[]>([]);
+  const [pages, setPages] = useState<DatabasePage[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -12,7 +12,7 @@ export function useAllPages() {
       try {
         const response = await fetch("/api/pages");
         if (!response.ok) throw new Error("Failed to fetch pages");
-        
+
         const data = await response.json();
         setPages(data);
       } catch (err) {
@@ -25,5 +25,21 @@ export function useAllPages() {
     fetchPages();
   }, []);
 
-  return { pages, loading, error };
+  const refetch = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await fetch("/api/pages");
+      if (!response.ok) throw new Error("Failed to fetch pages");
+
+      const data = await response.json();
+      setPages(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unknown error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { pages, loading, error, refetch };
 }

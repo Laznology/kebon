@@ -1,40 +1,40 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { Plus } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 export function AddPageButton() {
   const [open, setOpen] = useState(false);
-  const [title, setTitle] = useState('');
+  const [title, setTitle] = useState("");
   const [isCreating, setIsCreating] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const router = useRouter();
 
   const handleCreate = async () => {
     if (!title.trim()) {
-      setError('Title is required');
+      setError("Title is required");
       return;
     }
 
     setIsCreating(true);
-    setError('');
+    setError("");
 
     try {
-      const response = await fetch('/api/pages', {
-        method: 'POST',
+      const response = await fetch("/api/pages", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ title: title.trim() }),
       });
@@ -42,23 +42,22 @@ export function AddPageButton() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to create page');
+        throw new Error(data.error || "Failed to create page");
       }
 
-      setTitle('');
+      setTitle("");
       setOpen(false);
-      
-      router.push(`/${data.slug}`);
-      
+
+      router.push(`/${data.page.slug}`);
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Failed to create page');
+      setError(err instanceof Error ? err.message : "Failed to create page");
     } finally {
       setIsCreating(false);
     }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleCreate();
     }
@@ -88,12 +87,15 @@ export function AddPageButton() {
               disabled={isCreating}
               autoFocus
             />
-            {error && (
-              <p className="text-sm text-destructive">{error}</p>
-            )}
+            {error && <p className="text-sm text-destructive">{error}</p>}
             {title && (
               <p className="text-xs text-muted-foreground">
-                Filename: {title.toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-')}.md
+                URL: /
+                {title
+                  .toLowerCase()
+                  .replace(/[^a-z0-9\s-]/g, "")
+                  .replace(/\s+/g, "-")
+                  .replace(/-+/g, "-")}
               </p>
             )}
           </div>
@@ -106,11 +108,8 @@ export function AddPageButton() {
           >
             Cancel
           </Button>
-          <Button
-            onClick={handleCreate}
-            disabled={isCreating || !title.trim()}
-          >
-            {isCreating ? 'Creating...' : 'Create Page'}
+          <Button onClick={handleCreate} disabled={isCreating || !title.trim()}>
+            {isCreating ? "Creating..." : "Create Page"}
           </Button>
         </div>
       </DialogContent>
