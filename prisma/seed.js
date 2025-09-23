@@ -3,13 +3,11 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 async function main() {
-  // Hapus data lama
   await prisma.page.deleteMany();
   await prisma.user.deleteMany();
 
   console.log("Data lama berhasil dihapus.");
 
-  // Seed users
   const admin = await prisma.user.create({
     data: {
       email: "admin@example.com",
@@ -34,58 +32,96 @@ async function main() {
 
   console.log("Users berhasil di-seed.");
 
-  // Seed pages
   await prisma.page.create({
     data: {
-      title: "page 1",
-      slug: "page-1",
+      title: "Home",
+      slug: "index",
       image: null,
       published: true,
       content: {
-        blocks: [
+        type: "doc",
+        content: [
+          {
+            type: "heading",
+            attrs: { level: 1 },
+            content: [{ type: "text", text: "Welcome to Kebon Docs" }],
+          },
           {
             type: "paragraph",
-            data: { text: "This is the content of page 1." },
+            content: [
+              {
+                type: "text",
+                text: "This is the home page of your documentation.",
+              },
+            ],
           },
         ],
       },
+      excerpt: "This is the home page of your documentation.",
+      tags: ["home", "welcome"],
       authorId: admin.id,
     },
   });
 
   await prisma.page.create({
     data: {
-      title: "page 2",
-      slug: "page-2",
+      title: "Getting Started",
+      slug: "getting-started",
       image: null,
-      published: false,
+      published: true,
       content: {
-        blocks: [
+        type: "doc",
+        content: [
+          {
+            type: "heading",
+            attrs: { level: 1 },
+            content: [{ type: "text", text: "Getting Started" }],
+          },
           {
             type: "paragraph",
-            data: { text: "This is the content of page 2." },
+            content: [
+              {
+                type: "text",
+                text: "Learn how to get started with this documentation system.",
+              },
+            ],
           },
         ],
       },
-      authorId: user1.id,
+      excerpt: "Learn how to get started with this documentation system.",
+      tags: ["guide", "tutorial"],
+      authorId: admin.id,
     },
   });
 
   await prisma.page.create({
     data: {
-      title: "page 3",
-      slug: "page-3",
+      title: "Advanced Usage",
+      slug: "advanced-usage",
       image: null,
-      published: true,
+      published: false,
       content: {
-        blocks: [
+        type: "doc",
+        content: [
+          {
+            type: "heading",
+            attrs: { level: 1 },
+            content: [{ type: "text", text: "Advanced Usage" }],
+          },
           {
             type: "paragraph",
-            data: { text: "This is the content of page 3." },
+            content: [
+              {
+                type: "text",
+                text: "Advanced features and configuration options.",
+              },
+            ],
           },
         ],
       },
-      authorId: user2.id,
+      excerpt: "Advanced features and configuration options.",
+      tags: ["advanced", "configuration"],
+      authorId: user1.id,
     },
   });
 
