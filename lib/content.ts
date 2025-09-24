@@ -24,8 +24,7 @@ export async function getPageBySlug(
     });
 
     return page as unknown as DatabasePage | null;
-  } catch (error) {
-    console.error("Error fetching page by slug:", error);
+  } catch {
     return null;
   }
 }
@@ -52,8 +51,7 @@ export async function getAllPublishedPages(): Promise<DatabasePage[]> {
     });
 
     return pages as unknown as DatabasePage[];
-  } catch (error) {
-    console.error("Error fetching published pages:", error);
+  } catch {
     return [];
   }
 }
@@ -80,8 +78,7 @@ export async function getAllPages(authorId?: string): Promise<DatabasePage[]> {
     });
 
     return pages as unknown as DatabasePage[];
-  } catch (error) {
-    console.error("Error fetching all pages:", error);
+  } catch {
     return [];
   }
 }
@@ -136,8 +133,7 @@ export async function createPage(
     });
 
     return page as unknown as DatabasePage | null;
-  } catch (error) {
-    console.error("Error creating page:", error);
+  } catch {
     return null;
   }
 }
@@ -182,8 +178,7 @@ export async function updatePage(
     });
 
     return page as unknown as DatabasePage | null;
-  } catch (error) {
-    console.error("Error updating page:", error);
+  } catch {
     return null;
   }
 }
@@ -195,8 +190,7 @@ export async function deletePage(id: string): Promise<boolean> {
       data: { isDeleted: true },
     });
     return true;
-  } catch (error) {
-    console.error("Error deleting page:", error);
+  } catch {
     return false;
   }
 }

@@ -110,8 +110,7 @@ export default function SearchModal() {
             const data = await response.json();
             router.push(`/${data.page.slug}`);
             spotlight.close();
-          } catch (error) {
-            console.error("Error creating page:", error);
+          } catch {
           }
         },
         leftSection: (

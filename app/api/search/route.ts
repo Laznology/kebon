@@ -93,8 +93,7 @@ export async function GET(request: NextRequest) {
     results.sort((a, b) => b.searchScore - a.searchScore);
 
     return NextResponse.json(results);
-  } catch (error) {
-    console.error("Search error:", error);
+  } catch {
     return NextResponse.json({ error: "Search failed" }, { status: 500 });
   }
 }

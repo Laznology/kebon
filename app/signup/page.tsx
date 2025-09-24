@@ -65,8 +65,7 @@ export default function SignupPage() {
         color: "green",
       });
       router.push("/signin");
-    } catch (error) {
-      console.error("Registration error:", error);
+    } catch {
       notifications.show({
         title: "Error",
         message: "Registration failed. Please try again.",

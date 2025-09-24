@@ -29,11 +29,9 @@ export function useSearch() {
         const searchResults = await response.json();
         setResults(searchResults);
       } else {
-        console.error("Search failed:", response.statusText);
         setResults([]);
       }
     } catch (error) {
-      console.error("Search error:", error);
       setResults([]);
     } finally {
       setLoading(false);

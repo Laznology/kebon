@@ -27,8 +27,7 @@ export async function POST(request: NextRequest) {
       width: width,
       alt: originalName,
     });
-  } catch (err) {
-    console.error(err);
+  } catch {
     return NextResponse.json(
       { error: "Failed to upload image" },
       { status: 500 },
