@@ -5,43 +5,79 @@ import {
   useContext,
   useState,
   useEffect,
-  ReactNode,
   useMemo,
   useCallback,
   useRef,
-  type Dispatch,
-  type SetStateAction,
 } from "react";
 import { usePathname } from "next/navigation";
-import { generateTocFromMarkdown, type TocItem } from "@/lib/toc";
-
-export type CurrentPage = {
-  slug: string;
-  title: string;
-  content: string;
-  frontmatter?: Record<string, unknown>;
-  updatedAt?: string;
-  author?: { name?: string; email?: string } | null;
-};
-
-type PageContextType = {
-  page: CurrentPage | null;
-  loading: boolean;
-  tocItems: TocItem[];
-  saving: boolean;
-  setSaving: Dispatch<SetStateAction<boolean>>;
-  requestSave: () => void;
-  setSaveHandler: (handler: (() => void) | null) => void;
-};
+import { generateTocFromContent } from "@/lib/generateToc";
+import { type TocItem } from "@/lib/toc";
+import type { JSONContent } from "@tiptap/core";
+import type {
+  CurrentPage,
+  PageContextType,
+  PageProviderProps,
+  ApiPageResponse,
+} from "@/types/page";
 
 const PageContext = createContext<PageContextType | undefined>(undefined);
 
-type PageProviderProps = {
-  children: ReactNode;
-  slug?: string;
-  initialPage?: CurrentPage | null;
-  initialToc?: TocItem[];
-};
+function normalizeApiResponse(
+  data: ApiPageResponse,
+  slug: string,
+): CurrentPage {
+  const fallbackTitle = slug.replace(/-/g, " ");
+  const content = (data?.content as JSONContent) ?? {
+    type: "doc",
+    content: [
+      {
+        type: "heading",
+        attrs: { level: 1 },
+        content: [{ type: "text", text: fallbackTitle }],
+      },
+      {
+        type: "paragraph",
+        content: [{ type: "text", text: "Start writing your content here..." }],
+      },
+    ],
+  };
+
+  const updatedAt =
+    typeof data?.updatedAt === "string"
+      ? data.updatedAt
+      : data?.updatedAt
+        ? new Date(data.updatedAt).toISOString()
+        : undefined;
+
+  const frontmatter: Record<string, unknown> = {
+    title: data?.title ?? fallbackTitle,
+    description: data?.excerpt ?? undefined,
+    tags: data?.tags ?? [],
+    status:
+      typeof data?.published === "boolean"
+        ? data.published
+          ? "published"
+          : "draft"
+        : undefined,
+    updatedAt,
+    ...(data?.frontmatter ?? {}),
+  };
+
+  return {
+    slug: data?.slug ?? slug,
+    title: data?.title ?? fallbackTitle,
+    content,
+    frontmatter,
+    updatedAt,
+    author: data?.author
+      ? {
+          id: data.author.id,
+          name: data.author.name,
+          email: data.author.email,
+        }
+      : null,
+  };
+}
 
 export function PageProvider({
   children,
@@ -59,14 +95,34 @@ export function PageProvider({
     return pathname === "/" ? "index" : undefined;
   }, [pathname, slugProp]);
 
+  const pageCache = useRef<Map<string, CurrentPage>>(new Map());
+  const tocCache = useRef<Map<string, TocItem[]>>(new Map());
+
   const [page, setPage] = useState<CurrentPage | null>(initialPage ?? null);
   const [loading, setLoading] = useState<boolean>(!initialPage);
   const [tocItems, setTocItems] = useState<TocItem[]>(
-    initialToc
-      ?? (initialPage?.content ? generateTocFromMarkdown(initialPage.content) : []),
+    initialToc ??
+      (initialPage?.content ? generateTocFromContent(initialPage.content) : []),
   );
   const [saving, setSaving] = useState<boolean>(false);
+
   const saveHandlerRef = useRef<() => void>(() => {});
+
+  const computedTocItems = useMemo(() => {
+    if (!page?.content) return [];
+    return generateTocFromContent(page.content);
+  }, [page?.content]);
+
+  useEffect(() => {
+    setTocItems(computedTocItems);
+  }, [computedTocItems]);
+
+  useEffect(() => {
+    if (slug && page) {
+      pageCache.current.set(slug, page);
+      tocCache.current.set(slug, tocItems);
+    }
+  }, [slug, page, tocItems]);
 
   const setSaveHandler = useCallback((handler: (() => void) | null) => {
     saveHandlerRef.current = handler ?? (() => {});
@@ -76,18 +132,42 @@ export function PageProvider({
     saveHandlerRef.current();
   }, []);
 
-  useEffect(() => {
-    if (!initialPage) {
-      return;
-    }
+  const updateTocFromContent = useCallback(
+    (content: JSONContent) => {
+      const newTocItems = generateTocFromContent(content);
+      setTocItems(newTocItems);
+      if (slug) {
+        tocCache.current.set(slug, newTocItems);
+      }
+    },
+    [slug],
+  );
 
-    setPage(initialPage);
-    setLoading(false);
-    setTocItems(
-      initialToc ??
-        (initialPage.content ? generateTocFromMarkdown(initialPage.content) : []),
-    );
-  }, [initialPage, initialToc]);
+  const syncCurrentPage = useCallback(
+    (updates: Partial<CurrentPage>) => {
+      if (!slug || !page) return;
+
+      const updatedPage: CurrentPage = {
+        ...page,
+        ...updates,
+        frontmatter: updates.frontmatter
+          ? { ...(page.frontmatter ?? {}), ...updates.frontmatter }
+          : page.frontmatter,
+      };
+
+      setPage(updatedPage);
+
+      if (updates.content) {
+        updateTocFromContent(updates.content);
+      }
+    },
+    [page, slug, updateTocFromContent],
+  );
+
+  const clearPageCache = useCallback(() => {
+    pageCache.current.clear();
+    tocCache.current.clear();
+  }, []);
 
   useEffect(() => {
     if (!slug) {
@@ -95,7 +175,20 @@ export function PageProvider({
       return;
     }
 
+    const cachedPage = pageCache.current.get(slug);
+    const cachedToc = tocCache.current.get(slug);
+
+    if (cachedPage) {
+      setPage(cachedPage);
+      if (cachedToc) setTocItems(cachedToc);
+      setLoading(false);
+      return;
+    }
+
     if (initialPage && initialPage.slug === slug) {
+      setPage(initialPage);
+      if (initialToc) setTocItems(initialToc);
+      setLoading(false);
       return;
     }
 
@@ -106,30 +199,20 @@ export function PageProvider({
       try {
         const response = await fetch(`/api/pages/${slug}`);
         if (!response.ok) {
-          const fallbackTitle = slug.replace(/-/g, " ");
-          const fallbackContent = `# ${fallbackTitle}\n\nStart writing your content here...`;
-
           if (!isCancelled) {
-            setPage({
-              slug,
-              title: fallbackTitle,
-              content: fallbackContent,
-              frontmatter: { title: fallbackTitle },
-            });
-            setTocItems(generateTocFromMarkdown(fallbackContent));
+            setPage(null);
+            setTocItems([]);
           }
           return;
         }
 
         const data = await response.json();
         if (!isCancelled) {
-          setPage(data);
-          setTocItems(
-            data.content ? generateTocFromMarkdown(data.content) : [],
-          );
+          const normalizedPage = normalizeApiResponse(data, slug);
+          setPage(normalizedPage);
+          setTocItems(generateTocFromContent(normalizedPage.content));
         }
-      } catch (error) {
-        console.error("Error fetching page:", error);
+      } catch {
         if (!isCancelled) {
           setPage(null);
           setTocItems([]);
@@ -146,9 +229,9 @@ export function PageProvider({
     return () => {
       isCancelled = true;
     };
-  }, [slug, initialPage]);
+  }, [slug, initialPage, initialToc]);
 
-  const value = useMemo<PageContextType>(
+  const contextValue = useMemo<PageContextType>(
     () => ({
       page,
       loading,
@@ -157,17 +240,32 @@ export function PageProvider({
       setSaving,
       requestSave,
       setSaveHandler,
+      updateTocFromContent,
+      syncCurrentPage,
+      clearPageCache,
     }),
-    [loading, page, requestSave, saving, setSaveHandler, setSaving, tocItems],
+    [
+      page,
+      loading,
+      tocItems,
+      saving,
+      requestSave,
+      setSaveHandler,
+      updateTocFromContent,
+      syncCurrentPage,
+      clearPageCache,
+    ],
   );
 
-  return <PageContext.Provider value={value}>{children}</PageContext.Provider>;
+  return (
+    <PageContext.Provider value={contextValue}>{children}</PageContext.Provider>
+  );
 }
 
 export function usePage() {
-  const ctx = useContext(PageContext);
-  if (!ctx) {
+  const context = useContext(PageContext);
+  if (!context) {
     throw new Error("usePage must be used within a PageProvider");
   }
-  return ctx;
+  return context;
 }

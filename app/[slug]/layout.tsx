@@ -1,7 +1,7 @@
 import DocsPageShell from "@/components/docs-page-shell";
-import { generateTocFromMarkdown } from "@/lib/toc";
+import { generateTocFromContent } from "@/lib/generateToc";
 import { getAllPublishedPages, getPageBySlug } from "@/lib/content";
-import type { CurrentPage } from "@/app/[slug]/page-provider";
+import type { CurrentPage } from "@/types/page";
 import type { Page } from "@/types/page";
 import { extractAndCleanText } from "@/lib/extractText";
 import type { JSONContent } from '@tiptap/core';
@@ -84,12 +84,12 @@ export default async function EditPageLayout({
     isDeleted: false,
   };
 
-  const markdownContent = extractAndCleanText(page.content as JSONContent);
+  const jsonContent = page.content as JSONContent;
 
   const initialPage: CurrentPage = {
     slug,
     title: page.title,
-    content: markdownContent,
+    content: jsonContent,
     frontmatter: {
       title: page.title,
       updatedAt: page.updatedAt.toISOString(),
@@ -97,7 +97,7 @@ export default async function EditPageLayout({
     updatedAt: page.updatedAt.toISOString(),
   };
 
-  const initialToc = generateTocFromMarkdown(markdownContent);
+  const initialToc = generateTocFromContent(jsonContent);
 
   return (
     <DocsPageShell

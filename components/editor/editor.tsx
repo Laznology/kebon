@@ -20,6 +20,7 @@ import { cx } from "class-variance-authority";
 import { common, createLowlight } from "lowlight";
 import { BackgroundColor } from "@tiptap/extension-text-style";
 import type { JSONContent } from "@tiptap/core";
+import type { ApiResponse } from "@/types/page";
 
 import { CustomHeading } from "@/lib/custom-heading";
 import { usePage } from "@/app/[slug]/page-provider";
@@ -31,7 +32,14 @@ import { LinkSelector } from "@/components/editor/bubble/link-selector";
 import { slashCommand } from "./slash-command";
 import { notifications } from "@mantine/notifications";
 
-// Debounce hook
+export type EditorProps = {
+  className?: string;
+  slug?: string;
+  initialContent?: JSONContent;
+  title?: string;
+  onUpdate?: (content: JSONContent) => void;
+};
+
 function useDebounce<T>(value: T, delay: number): T {
   const [debouncedValue, setDebouncedValue] = useState<T>(value);
 
@@ -48,20 +56,19 @@ function useDebounce<T>(value: T, delay: number): T {
   return debouncedValue;
 }
 
-type EditorProps = {
-  className?: string;
-  slug?: string;
-  initialContent?: JSONContent;
-  title?: string;
-};
-
 export default function Editor({
   className,
   slug,
   initialContent,
   title,
 }: EditorProps) {
-  const { setSaving, setSaveHandler } = usePage();
+  const {
+    setSaving,
+    setSaveHandler,
+    updateTocFromContent,
+    syncCurrentPage,
+    page: currentPage,
+  } = usePage();
   const [openNode, setOpenNode] = useState<boolean>(false);
   const [openColor, setOpenColor] = useState<boolean>(false);
   const [openLink, setOpenLink] = useState<boolean>(false);
@@ -78,6 +85,12 @@ export default function Editor({
     initialContent || null,
   );
 
+  useEffect(() => {
+    if (initialContent) {
+      updateTocFromContent(initialContent);
+    }
+  }, [initialContent, updateTocFromContent]);
+
   const debouncedContent = useDebounce(content, 2000);
 
   const editor = useEditor(
@@ -90,7 +103,7 @@ export default function Editor({
         }),
         StarterKit.configure({
           heading: false,
-          link: false, // Disable link in StarterKit to use custom Link extension
+          link: false,
           bulletList: {
             HTMLAttributes: {
               class: cx("list-disc list-outside leading-normal ml-6"),
@@ -198,6 +211,7 @@ export default function Editor({
       onUpdate: ({ editor }) => {
         const newContent = editor.getJSON();
         setContent(newContent);
+        updateTocFromContent(newContent);
       },
       onSelectionUpdate: ({ editor }) => {
         const { from, to } = editor.state.selection;
@@ -220,6 +234,55 @@ export default function Editor({
     [initialContent],
   );
 
+  const applySaveResult = useCallback(
+    (contentToSave: JSONContent, payload: ApiResponse) => {
+      setLastSavedContent(contentToSave);
+
+      const updatedPage = payload?.page;
+      const updatedAtSource = updatedPage?.updatedAt ?? currentPage?.updatedAt;
+      const updatedAt =
+        typeof updatedAtSource === "string"
+          ? updatedAtSource
+          : updatedAtSource instanceof Date
+            ? updatedAtSource.toISOString()
+            : new Date().toISOString();
+
+      const resolvedTitle =
+        updatedPage?.title ??
+        title ??
+        currentPage?.title ??
+        (slug ? slug.replace(/-/g, " ") : "Untitled");
+
+      const frontmatter: Record<string, unknown> = {
+        ...(currentPage?.frontmatter ?? {}),
+        title: resolvedTitle,
+      };
+
+      if (updatedAt) {
+        frontmatter.updatedAt = updatedAt;
+      }
+
+      if (updatedPage) {
+        frontmatter.description = updatedPage.excerpt ?? undefined;
+        if (Array.isArray(updatedPage.tags)) {
+          frontmatter.tags = updatedPage.tags;
+        }
+        if (typeof updatedPage.published === "boolean") {
+          frontmatter.status = updatedPage.published ? "published" : "draft";
+        }
+      }
+
+      syncCurrentPage({
+        content: contentToSave,
+        title: resolvedTitle,
+        updatedAt,
+        frontmatter,
+        author: updatedPage?.author ?? currentPage?.author ?? null,
+      });
+    },
+    [currentPage, syncCurrentPage, title, slug],
+  );
+
   const autoSave = useCallback(
     async (contentToSave: JSONContent) => {
       if (!editor || !slug) return;
@@ -231,29 +294,31 @@ export default function Editor({
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             content: contentToSave,
-            title: title,
+            title,
           }),
         });
 
+        const payload = await response
+          .json()
+          .catch(() => ({ error: "Unknown error" }));
+
         if (response.ok) {
-          setLastSavedContent(contentToSave);
+          applySaveResult(contentToSave, payload);
         } else {
-          const errorData = await response
-            .json()
-            .catch(() => ({ error: "Unknown error" }));
-          console.error("Auto-save failed:", response.status, errorData);
+          console.error("Auto-save failed:", response.status, payload);
           notifications.show({
             title: "Auto-save Failed",
-            message: `Error ${response.status}: ${errorData.error || "There was an error auto-saving the page."}`,
+            message: `Error ${response.status}: ${payload?.error || "There was an error auto-saving the page."}`,
             color: "red",
           });
         }
       } catch (error) {
         console.error("Auto-save failed:", error);
+      } finally {
+        setSaving(false);
       }
-      setSaving(false);
     },
-    [editor, slug, title, setSaving],
+    [applySaveResult, editor, slug, title, setSaving],
   );
 
   useEffect(() => {
@@ -281,29 +346,31 @@ export default function Editor({
         }),
       });
 
+      const payload = await response
+        .json()
+        .catch(() => ({ error: "Unknown error" }));
+
       if (response.ok) {
-        setLastSavedContent(currentContent);
+        applySaveResult(currentContent, payload);
         notifications.show({
           title: "Saved",
           message: "Page saved successfully.",
           color: "green",
         });
       } else {
-        const errorData = await response
-          .json()
-          .catch(() => ({ error: "Unknown error" }));
-        console.error("Manual save failed:", response.status, errorData);
+        console.error("Manual save failed:", response.status, payload);
         notifications.show({
           title: "Save Failed",
-          message: `Error ${response.status}: ${errorData.error || "There was an error saving the page."}`,
+          message: `Error ${response.status}: ${payload?.error || "There was an error saving the page."}`,
           color: "red",
         });
       }
     } catch (error) {
       console.error("Save failed:", error);
+    } finally {
+      setSaving(false);
     }
-    setSaving(false);
-  }, [editor, slug, title, setSaving]);
+  }, [applySaveResult, editor, slug, title, setSaving]);
 
   useEffect(() => {
     setSaveHandler(() => handleSave);
@@ -321,24 +388,40 @@ export default function Editor({
     return () => window.removeEventListener("keydown", onKey);
   }, [handleSave]);
 
+  useEffect(() => {
+    return () => {
+      if (editor && !editor.isDestroyed) {
+        editor.destroy();
+      }
+    };
+  }, [editor]);
+
   if (!editor) {
-    return null;
+    return (
+      <div className="flex justify-center items-center min-h-[400px]">
+        <div className="text-muted-foreground">Loading editor...</div>
+      </div>
+    );
   }
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-3" key={`editor-wrapper-${slug}`}>
       <div
         className={
           className ||
           "relative min-h-[600px] w-full transition-all duration-200"
         }
       >
-        <EditorContent editor={editor} />
+        {editor && (
+          <EditorContent editor={editor} key={`editor-content-${slug}`} />
+        )}
 
-        {editor && editor.isDestroyed === false && (
-          <DragHandle key={`drag-handle-${slug || "default"}`} editor={editor}>
-            <div className="drag-handle" />
-          </DragHandle>
+        {editor && !editor.isDestroyed && (
+          <div key={`drag-handle-wrapper-${slug}`}>
+            <DragHandle editor={editor}>
+              <div className="drag-handle" />
+            </DragHandle>
+          </div>
         )}
 
         {editor && showBubbleMenu && (

@@ -1,5 +1,5 @@
 "use client";
-import { ReactNode } from "react";
+import React, { ReactNode } from "react";
 import {
   AppShell,
   Burger,
@@ -17,7 +17,6 @@ import {
   Paper,
   Drawer,
 } from "@mantine/core";
-import React from "react";
 import { useDisclosure, useHotkeys, useMediaQuery } from "@mantine/hooks";
 import { Icon } from "@iconify/react";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -26,6 +25,7 @@ import SearchModalRaw, { spotlight } from "@/components/search-modal";
 const SearchModal = SearchModalRaw as unknown as React.ComponentType<{ pages: Page[] }>;
 import { useSession, signOut } from "next-auth/react";
 import { AddPageButton } from "./add-page-button";
+import Link from "next/link";
 
 type DocsLayoutProps = {
   children: React.ReactNode;
@@ -79,6 +79,7 @@ export default function DocsLayout({ children, toc, pages }: DocsLayoutProps) {
             {pages.map((page) => (
               <NavLink
                 key={page.slug}
+                component={Link}
                 href={`/${page.slug}`}
                 label={page.title}
                 onClick={() => {

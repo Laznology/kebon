@@ -6,11 +6,8 @@ import { Icon } from "@iconify/react";
 import DocsLayout from "@/components/docs-layout";
 import { TableOfContents } from "@/components/TableOfContents";
 import type { Page } from "@/types/page";
-import {
-  PageProvider,
-  usePage,
-  type CurrentPage,
-} from "@/app/[slug]/page-provider";
+import { PageProvider, usePage } from "@/app/[slug]/page-provider";
+import type { CurrentPage } from "@/types/page";
 import type { TocItem } from "@/lib/toc";
 
 const TocComponent = () => {
@@ -141,7 +138,11 @@ export default function DocsPageShell({
   initialToc,
 }: DocsPageShellProps) {
   return (
-    <PageProvider slug={slug} initialPage={initialPage ?? null} initialToc={initialToc}>
+    <PageProvider
+      slug={slug}
+      initialPage={initialPage ?? null}
+      initialToc={initialToc}
+    >
       <DocsLayout pages={pages} toc={<TocComponent />}>
         <PageHeader />
         {children}

@@ -5,6 +5,8 @@ type TocItem = {
   depth: number;
 };
 
+import { slugifyHeading } from "@/lib/toc";
+
 export function generateTocFromContent(data: JSONContent): TocItem[] {
   const headings: TocItem[] = [];
 
@@ -12,7 +14,7 @@ export function generateTocFromContent(data: JSONContent): TocItem[] {
     return headings;
   }
 
-  const processNode = (node: JSONContent, index: number) => {
+  const processNode = (node: JSONContent) => {
     if (node.type === "heading" && node.attrs?.level && node.content) {
       const depth = node.attrs.level;
       const title = node.content
@@ -21,7 +23,7 @@ export function generateTocFromContent(data: JSONContent): TocItem[] {
         .trim();
 
       if (title) {
-        const id = `heading-${title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-${index}`;
+        const id = node.attrs.id || slugifyHeading(title);
         headings.push({
           id: id,
           value: title,
@@ -31,14 +33,14 @@ export function generateTocFromContent(data: JSONContent): TocItem[] {
     }
 
     if (node.content) {
-      node.content.forEach((child, childIndex) => {
-        processNode(child, childIndex * 1000 + childIndex);
+      node.content.forEach((child) => {
+        processNode(child);
       });
     }
   };
 
-  data.content.forEach((node, index) => {
-    processNode(node, index);
+  data.content.forEach((node) => {
+    processNode(node);
   });
 
   return headings;

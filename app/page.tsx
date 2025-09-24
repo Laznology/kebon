@@ -1,14 +1,13 @@
 import DocsPageShell from "@/components/docs-page-shell";
 import DocsPageContent from "@/components/docs-page-content";
 import { getAllPublishedPages, getPageBySlug } from "@/lib/content";
-import { generateTocFromMarkdown } from "@/lib/toc";
-import type { CurrentPage } from "@/app/[slug]/page-provider";
+import { generateTocFromContent } from "@/lib/generateToc";
+import type { CurrentPage } from "@/types/page";
 import type { Page } from "@/types/page";
-import type { Metadata } from "next";
 import { extractAndCleanText } from "@/lib/extractText";
 import type { JSONContent } from '@tiptap/core';
 
-export async function generateMetadata(): Promise<Metadata> {
+export async function generateMetadata() {
   const page = await getPageBySlug("index");
 
   const title = page?.title || "Kebon Docs";
@@ -17,7 +16,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title, description };
 }
 
-export default async function Page() {
+export default async function HomePage() {
   const slug = "index";
 
   const [dbPages, homePage] = await Promise.all([
@@ -45,7 +44,7 @@ export default async function Page() {
     },
   }));
 
-  const home = homePage || {
+  const page = homePage || {
     id: "temp",
     title: "Home",
     slug: "index",
@@ -73,20 +72,20 @@ export default async function Page() {
     isDeleted: false,
   };
 
-  const markdownContent = extractAndCleanText(home.content as JSONContent);
-  
+  const jsonContent = page.content as JSONContent;
+
   const initialPage: CurrentPage = {
     slug,
-    title: home.title,
-    content: markdownContent,
+    title: page.title,
+    content: jsonContent,
     frontmatter: {
-      title: home.title,
-      updatedAt: home.updatedAt.toISOString(),
+      title: page.title,
+      updatedAt: page.updatedAt.toISOString(),
     },
-    updatedAt: home.updatedAt.toISOString(),
+    updatedAt: page.updatedAt.toISOString(),
   };
 
-  const initialToc = generateTocFromMarkdown(markdownContent);
+  const initialToc = generateTocFromContent(jsonContent);
 
   return (
     <DocsPageShell
