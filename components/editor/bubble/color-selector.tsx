@@ -132,12 +132,12 @@ export const ColorSelector = ({
 
       <PopoverContent
         sideOffset={5}
-        className="my-1 flex max-h-80 w-48 flex-col overflow-hidden overflow-y-auto rounded border border-border bg-popover p-1 shadow-xl z-[9999]"
+        className="my-1 flex max-h-80 w-48 flex-col overflow-hidden overflow-y-auto rounded border border-border bg-[rgb(var(--background))] p-1 shadow-xl z-[9999]"
         align="start"
       >
         <div className="flex flex-col">
           <div className="my-1 px-2 text-sm font-semibold text-muted-foreground">
-            Color
+            Color 
           </div>
           {TEXT_COLORS.map(({ name, color }, index) => (
             <div

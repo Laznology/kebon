@@ -6,12 +6,13 @@ import {
   Heading3,
   TextQuote,
   ListOrdered,
-  TextIcon,
+  TextIcon,  
   Code,
   CheckSquare,
   type LucideIcon,
 } from "lucide-react";
 import { Editor as TiptapEditor } from "@tiptap/react";
+import { useEffect, useState } from "react";
 
 import { Popover } from "@radix-ui/react-popover";
 import { PopoverContent, PopoverTrigger } from "@radix-ui/react-popover";
@@ -36,7 +37,7 @@ const items: SelectorItem[] = [
       !editor?.isActive("orderedList"),
   },
   {
-    name: "Heading 1",
+    name: "Heading 1", 
     icon: Heading1,
     command: (editor) =>
       editor?.chain().focus().setNode("heading", { level: 1 }).run(),
@@ -69,7 +70,7 @@ const items: SelectorItem[] = [
     isActive: (editor) => !!editor?.isActive("bulletList"),
   },
   {
-    name: "Numbered List",
+    name: "Numbered List", 
     icon: ListOrdered,
     command: (editor) => editor?.chain().focus().toggleOrderedList().run(),
     isActive: (editor) => !!editor?.isActive("orderedList"),
@@ -95,7 +96,21 @@ interface NodeSelectorProps {
 }
 
 export const NodeSelector = ({ open, onOpenChange, editor }: NodeSelectorProps) => {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   if (!editor) return null;
+  
   const activeItem = items.filter((item) => item.isActive(editor)).pop() ?? {
     name: "Multiple",
   };
@@ -112,28 +127,33 @@ export const NodeSelector = ({ open, onOpenChange, editor }: NodeSelectorProps) 
         </Button>
       </PopoverTrigger>
       <PopoverContent
-        sideOffset={5}
-        align="start"
-        className="w-48 p-1 bg-popover border border-border shadow-md z-[9999]"
+        sideOffset={isMobile ? 8 : 5}
+        side={isMobile ? "bottom" : "bottom"}
+        align={isMobile ? "center" : "start"}
+        className="w-48 p-1 bg-[rgb(var(--background))] border border-border shadow-md z-[9999] rounded-md"
+        avoidCollisions={true}
+        collisionPadding={isMobile ? 16 : 8}
       >
-        {items.map((item, index) => (
-          <div
-            key={index}
-            onClick={() => {
-              item.command(editor);
-              onOpenChange(false);
-            }}
-            className="flex cursor-pointer items-center justify-between rounded-sm px-2 py-1 text-sm hover:bg-accent"
-          >
-            <div className="flex items-center space-x-2">
-              <div className="rounded-sm border p-1">
-                <item.icon className="h-3 w-3" />
+        <div className={`grid ${isMobile ? 'grid-cols-1 gap-1' : 'grid-cols-1'}`}>
+          {items.map((item, index) => (
+            <div
+              key={index} 
+              onClick={() => {
+                item.command(editor);
+                onOpenChange(false);
+              }}
+              className="flex cursor-pointer items-center justify-between rounded-sm px-2 py-1 text-sm hover:bg-accent transition-colors"
+            >
+              <div className="flex items-center space-x-2">
+                <div className="rounded-sm border p-1">
+                  <item.icon className="h-3 w-3" />
+                </div>
+                <span className="truncate">{item.name}</span>
               </div>
-              <span>{item.name}</span>
+              {activeItem.name === item.name && <Check className="h-4 w-4 flex-shrink-0" />}
             </div>
-            {activeItem.name === item.name && <Check className="h-4 w-4" />}
-          </div>
-        ))}
+          ))}
+        </div>
       </PopoverContent>
     </Popover>
   );
