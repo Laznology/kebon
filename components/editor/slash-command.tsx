@@ -233,10 +233,12 @@ export const suggestionItems: SuggestionItem[] = [
     command: async ({ editor, range }) => {
       editor.chain().focus().deleteRange(range).run();
       
-      const result = await showImageUrlDialog();
-      if (result) {
-        editor.chain().focus().insertContent(`<img src="${result.url}" alt="${result.alt}" title="${result.title}" />`).run();
-      }
+
+        const result = await showImageUrlDialog();
+        if (result && editor && !editor.isDestroyed && editor.view) {
+          editor.chain().focus().insertContent(`<img src="${result.url}" alt="${result.alt || ''}" title="${result.title || ''}" />`).run();
+        }
+
     },
   },
 ];

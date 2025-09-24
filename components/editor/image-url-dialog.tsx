@@ -78,7 +78,7 @@ export function ImageUrlDialog({ open, onOpenChange, onSubmit }: ImageUrlDialogP
   return (
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent
-        className="sm:max-w-[425px] bg-[hsl(var(--background))] border border-border shadow-2xl"
+        className="sm:max-w-[425px] bg-[rgb(var(--background))] border border-border shadow-2xl"
         overlayClassName="bg-transparent"
       >
         <DialogHeader>
