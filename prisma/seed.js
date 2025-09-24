@@ -3,10 +3,9 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 async function main() {
+  await prisma.pageVersion.deleteMany();
   await prisma.page.deleteMany();
   await prisma.user.deleteMany();
-
-  console.log("Data lama berhasil dihapus.");
 
   const admin = await prisma.user.create({
     data: {
@@ -15,26 +14,11 @@ async function main() {
       password: "hashed_password",
     },
   });
-  const user1 = await prisma.user.create({
-    data: {
-      email: "user1@example.com",
-      name: "User One",
-      password: "hashed_password",
-    },
-  });
-  const user2 = await prisma.user.create({
-    data: {
-      email: "user2@example.com",
-      name: "User Two",
-      password: "hashed_password",
-    },
-  });
 
-  console.log("Users berhasil di-seed.");
 
   await prisma.page.create({
     data: {
-      title: "Home",
+      title: "Get Started",
       slug: "index",
       image: null,
       published: true,
@@ -44,88 +28,54 @@ async function main() {
           {
             type: "heading",
             attrs: { level: 1 },
-            content: [{ type: "text", text: "Welcome to Kebon Docs" }],
+            content: [{ type: "text", text: "Get Started" }],
           },
           {
             type: "paragraph",
             content: [
               {
                 type: "text",
-                text: "This is the home page of your documentation.",
+                text: "Welcome! This is your starting point for building documentation with Kebon.",
+              },
+            ],
+          },
+          {
+            type: "heading",
+            attrs: { level: 2 },
+            content: [{ type: "text", text: "How to Begin" }],
+          },
+          {
+            type: "paragraph",
+            content: [
+              {
+                type: "text",
+                text: "Edit this page or create new pages to organize your documentation. Use the TipTap editor for easy content management.",
+              },
+            ],
+          },
+          {
+            type: "heading",
+            attrs: { level: 2 },
+            content: [{ type: "text", text: "Next Steps" }],
+          },
+          {
+            type: "paragraph",
+            content: [
+              {
+                type: "text",
+                text: "Start by adding your project details, guides, or FAQs to help users get up and running.",
               },
             ],
           },
         ],
       },
-      excerpt: "This is the home page of your documentation.",
-      tags: ["home", "welcome"],
+      excerpt: "Get started with Kebon documentation.",
+      tags: ["get-started", "home", "welcome"],
       authorId: admin.id,
     },
   });
 
-  await prisma.page.create({
-    data: {
-      title: "Getting Started",
-      slug: "getting-started",
-      image: null,
-      published: true,
-      content: {
-        type: "doc",
-        content: [
-          {
-            type: "heading",
-            attrs: { level: 1 },
-            content: [{ type: "text", text: "Getting Started" }],
-          },
-          {
-            type: "paragraph",
-            content: [
-              {
-                type: "text",
-                text: "Learn how to get started with this documentation system.",
-              },
-            ],
-          },
-        ],
-      },
-      excerpt: "Learn how to get started with this documentation system.",
-      tags: ["guide", "tutorial"],
-      authorId: admin.id,
-    },
-  });
-
-  await prisma.page.create({
-    data: {
-      title: "Advanced Usage",
-      slug: "advanced-usage",
-      image: null,
-      published: false,
-      content: {
-        type: "doc",
-        content: [
-          {
-            type: "heading",
-            attrs: { level: 1 },
-            content: [{ type: "text", text: "Advanced Usage" }],
-          },
-          {
-            type: "paragraph",
-            content: [
-              {
-                type: "text",
-                text: "Advanced features and configuration options.",
-              },
-            ],
-          },
-        ],
-      },
-      excerpt: "Advanced features and configuration options.",
-      tags: ["advanced", "configuration"],
-      authorId: user1.id,
-    },
-  });
-
-  console.log("Pages berhasil di-seed.");
+  console.log("Index page berhasil dibuat.");
 }
 
 main()
