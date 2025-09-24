@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { Placeholder } from "@tiptap/extension-placeholder";
@@ -9,7 +9,6 @@ import { TaskList } from "@tiptap/extension-task-list";
 import { TaskItem } from "@tiptap/extension-task-item";
 import { HorizontalRule } from "@tiptap/extension-horizontal-rule";
 import { Highlight } from "@tiptap/extension-highlight";
-import { Underline } from "@tiptap/extension-underline";
 import { TextStyle } from "@tiptap/extension-text-style";
 import { Color } from "@tiptap/extension-color";
 import { CharacterCount } from "@tiptap/extension-character-count";
@@ -31,6 +30,8 @@ import { ColorSelector } from "@/components/editor/bubble/color-selector";
 import { LinkSelector } from "@/components/editor/bubble/link-selector";
 import { slashCommand } from "./slash-command";
 import { notifications } from "@mantine/notifications";
+import { BubbleMenu } from "@tiptap/react/menus";
+
 
 export type EditorProps = {
   className?: string;
@@ -72,11 +73,7 @@ export default function Editor({
   const [openNode, setOpenNode] = useState<boolean>(false);
   const [openColor, setOpenColor] = useState<boolean>(false);
   const [openLink, setOpenLink] = useState<boolean>(false);
-  const [showBubbleMenu, setShowBubbleMenu] = useState<boolean>(false);
-  const [bubbleMenuPosition, setBubbleMenuPosition] = useState<{
-    top: number;
-    left: number;
-  }>({ top: 0, left: 0 });
+
 
   const [content, setContent] = useState<JSONContent | null>(
     initialContent || null,
@@ -185,7 +182,6 @@ export default function Editor({
           },
         }),
         Highlight,
-        Underline,
         TextStyle,
         Color,
         CharacterCount,
@@ -212,23 +208,6 @@ export default function Editor({
         const newContent = editor.getJSON();
         setContent(newContent);
         updateTocFromContent(newContent);
-      },
-      onSelectionUpdate: ({ editor }) => {
-        const { from, to } = editor.state.selection;
-        const hasSelection = from !== to;
-        setShowBubbleMenu(hasSelection);
-
-        if (hasSelection) {
-          const { view } = editor;
-          const start = view.coordsAtPos(from);
-          const end = view.coordsAtPos(to);
-          const centerX = (start.left + end.right) / 2;
-          const topY = start.top;
-          setBubbleMenuPosition({
-            top: topY - 60,
-            left: centerX,
-          });
-        }
       },
     },
     [initialContent],
@@ -424,31 +403,27 @@ export default function Editor({
           </div>
         )}
 
-        {editor && showBubbleMenu && (
-          <div
-            className="flex w-fit overflow-visible rounded border border-border bg-[rgb(var(--background))] shadow-xl z-[9999] fixed transform -translate-x-1/2"
-            style={{
-              top: `${bubbleMenuPosition.top}px`,
-              left: `${bubbleMenuPosition.left}px`,
-            }}
-          >
-            <LinkSelector
-              open={openLink}
-              onOpenChange={setOpenLink}
-              editor={editor}
-            />
-            <NodeSelector
-              open={openNode}
-              onOpenChange={setOpenNode}
-              editor={editor}
-            />
-            <TextButtons editor={editor} />
-            <ColorSelector
-              open={openColor}
-              onOpenChange={setOpenColor}
-              editor={editor}
-            />
-          </div>
+        {editor && (
+          <BubbleMenu editor={editor} options={{ placement: 'bottom', flip: false, shift: true, offset: 8, strategy: 'absolute'}} >
+            <div className="flex rounded border border-border bg-[rgb(var(--background))] shadow-xl">
+              <LinkSelector
+                open={openLink}
+                onOpenChange={setOpenLink}
+                editor={editor}
+              />
+              <NodeSelector
+                open={openNode}
+                onOpenChange={setOpenNode}
+                editor={editor}
+              />
+              <TextButtons editor={editor} />
+              <ColorSelector
+                open={openColor}
+                onOpenChange={setOpenColor}
+                editor={editor}
+              />
+            </div>
+          </BubbleMenu>
         )}
       </div>
     </div>

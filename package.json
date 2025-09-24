@@ -6,7 +6,6 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
-    "postbuild": "prisma migrate deploy",
     "start": "next start",
     "lint": "next lint",
     "format": "prettier . --write",

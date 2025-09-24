@@ -64,7 +64,7 @@ export const LinkSelector = ({ open, onOpenChange, editor }: LinkSelectorProps) 
       </PopoverTrigger>
       <PopoverContent
         align={"start"}
-        className={"w-60 p-1 bg-popover border  shadow-md"}
+        className={"w-60 p-1 bg-[rgb(var(--background))] border  shadow-md"}
         alignOffset={10}
       >
         <form
