@@ -106,12 +106,6 @@ export async function POST(
       },
     });
 
-    await prisma.pageVersion.create({
-      data: {
-        pageId: existingPage.id,
-        content: content || null,
-      },
-    });
 
     return NextResponse.json({ success: true, page: updatedPage });
   } catch {
