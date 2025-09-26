@@ -15,32 +15,45 @@ import {
   Button,
   NavLink,
   Paper,
+  Stack,
   Drawer,
+  Badge,
 } from "@mantine/core";
-import { useDisclosure, useHotkeys, useMediaQuery } from "@mantine/hooks";
+import {
+  useDisclosure,
+  useMediaQuery,
+  useFetch,
+} from "@mantine/hooks";
 import { Icon } from "@iconify/react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import type { Page } from "@/types/page";
-import SearchModalRaw, { spotlight } from "@/components/search-modal";
-const SearchModal = SearchModalRaw as unknown as React.ComponentType<{ pages: Page[] }>;
+import dynamic from "next/dynamic";
+import { spotlight } from "@mantine/spotlight";
 import { useSession, signOut } from "next-auth/react";
 import { AddPageButton } from "./add-page-button";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { notifications } from "@mantine/notifications";
 
 type DocsLayoutProps = {
   children: React.ReactNode;
   toc: ReactNode;
-  pages: Page[];
 };
 
-export default function DocsLayout({ children, toc, pages }: DocsLayoutProps) {
+const SearchModal = dynamic(() => import("@/components/search-modal"), {
+  ssr: false,
+  loading: () => null,
+});
+
+export default function DocsLayout({ children, toc }: DocsLayoutProps) {
   const [mobileNavOpened, { toggle: toggleMobileNav, close: closeMobileNav }] =
     useDisclosure(false);
-  const [tocOpened, { toggle: toggleToc, close: closeToc }] = useDisclosure(false);
+  const [tocOpened, { toggle: toggleToc, close: closeToc }] =
+    useDisclosure(false);
   const { data: session, status } = useSession();
   const isMobile = useMediaQuery("(max-width: 768px)");
-
-  useHotkeys([["mod+K", spotlight.open]]);
+  const router = useRouter();
+  const { data: pages, refetch: refetchPages } = useFetch<Page[]>("/api/pages");
 
   const renderNavigationContent = (closeOnNavigate = false) => (
     <Box className="flex h-full flex-col" style={{ height: "100%" }}>
@@ -76,17 +89,117 @@ export default function DocsLayout({ children, toc, pages }: DocsLayoutProps) {
       <Box className="flex-1 overflow-hidden">
         <ScrollArea h="100%" type="auto">
           <div className="space-y-1">
-            {pages.map((page) => (
+            {(pages || []).map((page) => (
               <NavLink
                 key={page.slug}
                 component={Link}
                 href={`/${page.slug}`}
-                label={page.title}
+                label={
+                  <Group justify="space-between" wrap="nowrap">
+                    <Text size="sm" truncate="end">
+                      {page.title}
+                    </Text>
+                    {status === "authenticated" && (
+                      <Badge
+                        size="xs"
+                        variant="light"
+                        color={page.published ? "green" : "orange"}
+                        style={{ fontSize: "10px", minWidth: "auto" }}
+                      >
+                        {page.published ? "✓" : "○"}
+                      </Badge>
+                    )}
+                  </Group>
+                }
                 onClick={() => {
                   if (closeOnNavigate) {
                     closeMobileNav();
                   }
                 }}
+                rightSection={
+                  status === "authenticated" && (
+                    <Popover>
+                      <Popover.Target>
+                        <Button
+                          variant="transparent"
+                          size="sm"
+                          aria-label="Edit page options"
+                        >
+                          <Icon icon={"mdi:file-edit-outline"} />
+                        </Button>
+                      </Popover.Target>
+                      <Popover.Dropdown>
+                        <Stack gap={2}>
+                          <Button
+                            variant="transparent"
+                            size="xs"
+                            onClick={async (e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              const nextPublished = !page.published;
+
+                              const response = await fetch(
+                                `/api/pages/${page.slug}`,
+                                {
+                                  method: "POST",
+                                  headers: {
+                                    "Content-Type": "application/json",
+                                  },
+                                  body: JSON.stringify({
+                                    published: nextPublished,
+                                  }),
+                                },
+                              );
+
+                              if (!response.ok) {
+                                return;
+                              }
+
+                              await refetchPages();
+                              router.refresh();
+                            }}
+                          >
+                            {page.published ? "Unpublish" : "Publish"}
+                          </Button>
+                          <Button
+                            variant="transparent"
+                            size="xs"
+                            color="red"
+                            onClick={async (e) => {
+                              e.preventDefault();
+                              const response = await fetch(
+                                `/api/pages/${page.slug}`,
+                                {
+                                  method: "DELETE",
+                                  headers: {
+                                    "Content-Type": "application.json",
+                                  },
+                                },
+                              );
+                              const data = await response.json();
+                              if (!response.ok) {
+                                notifications.show({
+                                  title: `Error deleting ${page.title}`,
+                                  message: data.message,
+                                  color: "red",
+                                });
+                              }
+                              notifications.show({
+                                title: `Succesfully`,
+                                message: `Deleted ${page.title}`,
+                                color: "green",
+                              });
+                              // Refetch pages after delete
+                              await refetchPages();
+                            }}
+                          >
+                            Delete
+                          </Button>
+                        </Stack>
+                      </Popover.Dropdown>
+                    </Popover>
+                  )
+                }
                 leftSection={
                   <Icon
                     icon="mdi:file-document-outline"
@@ -103,12 +216,7 @@ export default function DocsLayout({ children, toc, pages }: DocsLayoutProps) {
       {status === "authenticated" && session && (
         <Box mt="md">
           <Divider mb="md" />
-          <Group
-            justify="space-between"
-            gap="md"
-            p="sm"
-            className=""
-          >
+          <Group justify="space-between" gap="md" p="sm" className="">
             <div>
               <Text size="sm" fw={600}>
                 {session.user?.name || "User"}
@@ -119,7 +227,12 @@ export default function DocsLayout({ children, toc, pages }: DocsLayoutProps) {
             </div>
             <Popover position="top" width={150} withArrow shadow="md">
               <Popover.Target>
-                <Button variant="light" color="gray" size="xs">
+                <Button
+                  variant="light"
+                  color="gray"
+                  size="xs"
+                  aria-label="User menu"
+                >
                   <Icon icon="mdi:dots-vertical" width={16} height={16} />
                 </Button>
               </Popover.Target>
@@ -159,10 +272,9 @@ export default function DocsLayout({ children, toc, pages }: DocsLayoutProps) {
                   }}
                   size="sm"
                   hiddenFrom="md"
+                  aria-label="Toggle navigation menu"
                 />
-                <Title order={3}>
-                  Kebon
-                </Title>
+                <Title order={3}>Kebon</Title>
               </Group>
               <Group gap="sm">
                 <Burger
@@ -229,7 +341,8 @@ export default function DocsLayout({ children, toc, pages }: DocsLayoutProps) {
                   p="md"
                   style={{
                     height: "100%",
-                    borderRight: "1px solid var(--mantine-color-default-border)",
+                    borderRight:
+                      "1px solid var(--mantine-color-default-border)",
                   }}
                 >
                   {renderNavigationContent()}
@@ -253,7 +366,7 @@ export default function DocsLayout({ children, toc, pages }: DocsLayoutProps) {
         </AppShell.Main>
       </AppShell>
 
-      <SearchModal pages={pages} />
+      <SearchModal />
     </>
   );
 }

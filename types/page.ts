@@ -117,8 +117,21 @@ export interface BasePage {
   tags: string[];
   created?: string;
   updated?: string;
+  published: boolean;
 }
 
 export interface Page extends BasePage {
   frontmatter?: PageFrontmatter;
+}
+
+export interface PageSummary {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt: string | null;
+  tags: string[];
+  createdAt: Date;
+  updatedAt: Date;
+  published: boolean;
+  author?: Author;
 }

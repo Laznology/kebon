@@ -1,11 +1,9 @@
 export const revalidate = 0;
 import DocsPageShell from "@/components/docs-page-shell";
 import { generateTocFromContent } from "@/lib/generateToc";
-import { getAllPublishedPages, getPageBySlug } from "@/lib/content";
+import { getPageBySlug } from "@/lib/content";
 import type { CurrentPage } from "@/types/page";
-import type { Page } from "@/types/page";
-import { extractAndCleanText } from "@/lib/extractText";
-import type { JSONContent } from '@tiptap/core';
+import type { JSONContent } from "@tiptap/core";
 
 export async function generateMetadata({
   params,
@@ -14,10 +12,10 @@ export async function generateMetadata({
 }) {
   const { slug } = await params;
   const page = await getPageBySlug(slug);
-  
+
   const title = page?.title || slug.replace(/-/g, " ");
   const description = page?.excerpt || `${title}`;
-  
+
   return {
     title,
     description,
@@ -32,46 +30,25 @@ export default async function EditPageLayout({
 }) {
   const { slug } = await params;
 
-  const [dbPages, pageData] = await Promise.all([
-    getAllPublishedPages(),
-    getPageBySlug(slug),
-  ]);
-
-  const pages: Page[] = dbPages.map(dbPage => ({
-    id: dbPage.id,
-    slug: dbPage.slug,
-    title: dbPage.title,
-    content: extractAndCleanText(dbPage.content as JSONContent),
-    excerpt: dbPage.excerpt || undefined,
-    tags: dbPage.tags || [],
-    created: dbPage.createdAt.toISOString().split('T')[0],
-    updated: dbPage.updatedAt.toISOString().split('T')[0],
-    frontmatter: {
-      title: dbPage.title,
-      description: dbPage.excerpt || undefined,
-      tags: dbPage.tags || [],
-      created: dbPage.createdAt.toISOString().split('T')[0],
-      updated: dbPage.updatedAt.toISOString().split('T')[0],
-      status: dbPage.published ? 'published' : 'draft',
-      author: dbPage.author?.name || undefined,
-    },
-  }));
+  const pageData = await getPageBySlug(slug);
 
   const page = pageData || {
     id: "temp",
     title: slug.replace(/-/g, " "),
     slug,
     content: {
-      type: 'doc',
+      type: "doc",
       content: [
         {
-          type: 'heading',
+          type: "heading",
           attrs: { level: 1 },
-          content: [{ type: 'text', text: slug.replace(/-/g, " ") }],
+          content: [{ type: "text", text: slug.replace(/-/g, " ") }],
         },
         {
-          type: 'paragraph',
-          content: [{ type: 'text', text: 'Start writing your content here...' }],
+          type: "paragraph",
+          content: [
+            { type: "text", text: "Start writing your content here..." },
+          ],
         },
       ],
     } as JSONContent,
@@ -103,7 +80,6 @@ export default async function EditPageLayout({
   return (
     <DocsPageShell
       slug={slug}
-      pages={pages}
       initialPage={initialPage}
       initialToc={initialToc}
     >

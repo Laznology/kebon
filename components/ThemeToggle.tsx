@@ -19,6 +19,7 @@ export function ThemeToggle() {
 
   return (
     <Switch
+      aria-label={`Switch to ${computedColorScheme === "light" ? "dark" : "light"} theme`}
       color="dark.4"
       checked={computedColorScheme === "dark"}
       onChange={() =>

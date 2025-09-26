@@ -1,11 +1,9 @@
 export const revalidate = 0;
 import DocsPageShell from "@/components/docs-page-shell";
 import DocsPageContent from "@/components/docs-page-content";
-import { getAllPublishedPages, getPageBySlug } from "@/lib/content";
+import { getPageBySlug } from "@/lib/content";
 import { generateTocFromContent } from "@/lib/generateToc";
 import type { CurrentPage } from "@/types/page";
-import type { Page } from "@/types/page";
-import { extractAndCleanText } from "@/lib/extractText";
 import type { JSONContent } from '@tiptap/core';
 
 export async function generateMetadata() {
@@ -20,30 +18,7 @@ export async function generateMetadata() {
 export default async function HomePage() {
   const slug = "index";
 
-  const [dbPages, homePage] = await Promise.all([
-    getAllPublishedPages(),
-    getPageBySlug("index"),
-  ]);
-
-  const pages: Page[] = dbPages.map(dbPage => ({
-    id: dbPage.id,
-    slug: dbPage.slug,
-    title: dbPage.title,
-    content: extractAndCleanText(dbPage.content as JSONContent),
-    excerpt: dbPage.excerpt || undefined,
-    tags: dbPage.tags || [],
-    created: dbPage.createdAt.toISOString().split('T')[0],
-    updated: dbPage.updatedAt.toISOString().split('T')[0],
-    frontmatter: {
-      title: dbPage.title,
-      description: dbPage.excerpt || undefined,
-      tags: dbPage.tags || [],
-      created: dbPage.createdAt.toISOString().split('T')[0],
-      updated: dbPage.updatedAt.toISOString().split('T')[0],
-      status: dbPage.published ? 'published' : 'draft',
-      author: dbPage.author?.name || undefined,
-    },
-  }));
+  const homePage = await getPageBySlug("index");
 
   const page = homePage || {
     id: "temp",
@@ -91,7 +66,6 @@ export default async function HomePage() {
   return (
     <DocsPageShell
       slug={slug}
-      pages={pages}
       initialPage={initialPage}
       initialToc={initialToc}
     >

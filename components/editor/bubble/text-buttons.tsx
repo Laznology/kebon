@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { Editor as TiptapEditor } from "@tiptap/react";
+import { Editor as TiptapEditor, useEditorState } from "@tiptap/react";
 import {
   BoldIcon,
   ItalicIcon,
@@ -15,6 +15,23 @@ interface TextButtonsProps {
 }
 
 export const TextButtons = ({ editor }: TextButtonsProps = {}) => {
+  const editorState = useEditorState({
+    editor: editor!,
+    selector: ({ editor }) => ({
+      isBold: editor?.isActive("bold") ?? false,
+      isItalic: editor?.isActive("italic") ?? false,
+      isUnderline: editor?.isActive("underline") ?? false,
+      isStrike: editor?.isActive("strike") ?? false,
+      isCode: editor?.isActive("code") ?? false,
+    }),
+  }) as {
+    isBold: boolean;
+    isItalic: boolean;
+    isUnderline: boolean;
+    isStrike: boolean;
+    isCode: boolean;
+  };
+
   if (!editor) return null;
   
   const items: SelectorItem[] = [
@@ -22,31 +39,31 @@ export const TextButtons = ({ editor }: TextButtonsProps = {}) => {
       name: "bold",
       icon: BoldIcon,
       command: (editor) => editor?.chain().focus().toggleBold().run(),
-      isActive: (editor) => !!editor?.isActive("bold"),
+      isActive: () => editorState.isBold,
     },
     {
       name: "italic",
       icon: ItalicIcon,
       command: (editor) => editor?.chain().focus().toggleItalic().run(),
-      isActive: (editor) => !!editor?.isActive("italic"),
+      isActive: () => editorState.isItalic,
     },
     {
       name: "underline",
       icon: UnderlineIcon,
       command: (editor) => editor?.chain().focus().toggleUnderline().run(),
-      isActive: (editor) => !!editor?.isActive("underline"),
+      isActive: () => editorState.isUnderline,
     },
     {
       name: "strike",
       icon: StrikethroughIcon,
       command: (editor) => editor?.chain().focus().toggleStrike().run(),
-      isActive: (editor) => !!editor?.isActive("strike"),
+      isActive: () => editorState.isStrike,
     },
     {
       name: "code",
       icon: CodeIcon,
       command: (editor) => editor?.chain().focus().toggleCode().run(),
-      isActive: (editor) => !!editor?.isActive("code"),
+      isActive: () => editorState.isCode,
     },
   ];
 

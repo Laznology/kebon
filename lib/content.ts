@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import type { DatabasePage } from "@/types/page";
+import type { DatabasePage, PageSummary } from "@/types/page";
 import type { JSONContent } from "@tiptap/core";
 import { extractAndCleanText } from "@/lib/extractText";
 
@@ -51,6 +51,41 @@ export async function getAllPublishedPages(): Promise<DatabasePage[]> {
     });
 
     return pages as unknown as DatabasePage[];
+  } catch {
+    return [];
+  }
+}
+
+export async function getPublishedPageSummaries(): Promise<PageSummary[]> {
+  try {
+    const pages = await prisma.page.findMany({
+      where: {
+        isDeleted: false,
+        published: true,
+      },
+      select: {
+        id: true,
+        slug: true,
+        title: true,
+        excerpt: true,
+        tags: true,
+        createdAt: true,
+        updatedAt: true,
+        published: true,
+        author: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+      },
+      orderBy: {
+        updatedAt: "desc",
+      },
+    });
+
+    return pages as PageSummary[];
   } catch {
     return [];
   }

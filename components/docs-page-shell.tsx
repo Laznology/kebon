@@ -5,7 +5,6 @@ import { Button, Group, Text } from "@mantine/core";
 import { Icon } from "@iconify/react";
 import DocsLayout from "@/components/docs-layout";
 import { TableOfContents } from "@/components/TableOfContents";
-import type { Page } from "@/types/page";
 import { PageProvider, usePage } from "@/app/[slug]/page-provider";
 import type { CurrentPage } from "@/types/page";
 import type { TocItem } from "@/lib/toc";
@@ -42,7 +41,6 @@ const PageHeader = () => {
   }
 
   const slug = page?.slug ?? "index";
-  const breadcrumbLabel = slug === "index" ? "home" : slug;
   const fallbackTitle = slug === "index" ? "Home" : slug.replace(/-/g, " ");
   const frontmatter = page?.frontmatter as Record<string, unknown> | undefined;
   const title =
@@ -57,16 +55,6 @@ const PageHeader = () => {
     <div className="flex flex-col">
       <div className="flex items-start justify-between mb-6">
         <div className="flex-1">
-          <Group gap={8} mb={6} align="center">
-            <Text size="xs" c="dimmed">
-              Page
-            </Text>
-            <Icon icon="mdi:chevron-right" width={16} height={16} />
-            <Text size="xs" c="dimmed">
-              {breadcrumbLabel}
-            </Text>
-          </Group>
-
           <Text
             size="2rem"
             fw={600}
@@ -124,7 +112,6 @@ const PageHeader = () => {
 
 export type DocsPageShellProps = {
   children: ReactNode;
-  pages: Page[];
   slug: string;
   initialPage?: CurrentPage | null;
   initialToc?: TocItem[];
@@ -132,7 +119,6 @@ export type DocsPageShellProps = {
 
 export default function DocsPageShell({
   children,
-  pages,
   slug,
   initialPage,
   initialToc,
@@ -143,7 +129,7 @@ export default function DocsPageShell({
       initialPage={initialPage ?? null}
       initialToc={initialToc}
     >
-      <DocsLayout pages={pages} toc={<TocComponent />}>
+      <DocsLayout toc={<TocComponent />}>
         <PageHeader />
         {children}
       </DocsLayout>

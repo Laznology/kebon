@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect, useCallback } from "react";
-import { useEditor, EditorContent } from "@tiptap/react";
+import { useEditor, EditorContent, EditorContext } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { Placeholder } from "@tiptap/extension-placeholder";
 import { Link } from "@tiptap/extension-link";
@@ -23,14 +23,11 @@ import type { ApiResponse } from "@/types/page";
 
 import { CustomHeading } from "@/lib/custom-heading";
 import { usePage } from "@/app/[slug]/page-provider";
-
-import { NodeSelector } from "@/components/editor/bubble/node-selector";
-import { TextButtons } from "@/components/editor/bubble/text-buttons";
-import { ColorSelector } from "@/components/editor/bubble/color-selector";
-import { LinkSelector } from "@/components/editor/bubble/link-selector";
 import { slashCommand } from "./slash-command";
 import { notifications } from "@mantine/notifications";
-import { BubbleMenu } from "@tiptap/react/menus";
+import { OptimizedBubbleMenu } from "./optimized-bubble-menu";
+import { useMemo } from "react";
+import { useHotkeys } from '@mantine/hooks';
 
 
 export type EditorProps = {
@@ -40,6 +37,29 @@ export type EditorProps = {
   title?: string;
   onUpdate?: (content: JSONContent) => void;
 };
+
+
+const EditorSkeleton = () => (
+  <div className="w-full space-y-6 py-12">
+    <div className="space-y-3">
+      <div className="h-10 w-1/2 rounded-md bg-gray-200 dark:bg-gray-700 animate-pulse" />
+      <div className="h-4 w-full rounded-md bg-gray-200 dark:bg-gray-700 animate-pulse" />
+      <div className="h-4 w-5/6 rounded-md bg-gray-200 dark:bg-gray-700 animate-pulse" />
+    </div>
+    <div className="space-y-2">
+      {[...Array(8)].map((_, index) => (
+        <div
+          key={index}
+          className="h-4 w-full rounded-md bg-gray-200 dark:bg-gray-700 animate-pulse"
+        />
+      ))}
+    </div>
+    <div className="space-y-2">
+      <div className="h-32 w-full rounded-md bg-gray-200 dark:bg-gray-700 animate-pulse" />
+      <div className="h-4 w-2/3 rounded-md bg-gray-200 dark:bg-gray-700 animate-pulse" />
+    </div>
+  </div>
+);
 
 function useDebounce<T>(value: T, delay: number): T {
   const [debouncedValue, setDebouncedValue] = useState<T>(value);
@@ -90,9 +110,16 @@ export default function Editor({
 
   const debouncedContent = useDebounce(content, 2000);
 
+  useEffect(() => {
+    if (debouncedContent) {
+      updateTocFromContent(debouncedContent);
+    }
+  }, [debouncedContent, updateTocFromContent]);
+
   const editor = useEditor(
     {
       immediatelyRender: false,
+      shouldRerenderOnTransaction: false,
       extensions: [
         slashCommand,
         BackgroundColor.configure({
@@ -207,11 +234,11 @@ export default function Editor({
       onUpdate: ({ editor }) => {
         const newContent = editor.getJSON();
         setContent(newContent);
-        updateTocFromContent(newContent);
       },
     },
     [initialContent],
   );
+  const editorValue = useMemo(() => ({editor}), [editor])
 
   const applySaveResult = useCallback(
     (contentToSave: JSONContent, payload: ApiResponse) => {
@@ -284,15 +311,17 @@ export default function Editor({
         if (response.ok) {
           applySaveResult(contentToSave, payload);
         } else {
-          console.error("Auto-save failed:", response.status, payload);
           notifications.show({
             title: "Auto-save Failed",
             message: `Error ${response.status}: ${payload?.error || "There was an error auto-saving the page."}`,
             color: "red",
           });
         }
-      } catch (error) {
-        console.error("Auto-save failed:", error);
+      } catch {
+        notifications.show({
+          title: "Auto-save failed",
+          message: "Error while saving"
+        })
       } finally {
         setSaving(false);
       }
@@ -337,15 +366,17 @@ export default function Editor({
           color: "green",
         });
       } else {
-        console.error("Manual save failed:", response.status, payload);
         notifications.show({
           title: "Save Failed",
           message: `Error ${response.status}: ${payload?.error || "There was an error saving the page."}`,
           color: "red",
         });
       }
-    } catch (error) {
-      console.error("Save failed:", error);
+    } catch {
+        notifications.show({
+          title: 'Error',
+          message: 'Error with manual saving'
+        })
     } finally {
       setSaving(false);
     }
@@ -356,16 +387,10 @@ export default function Editor({
     return () => setSaveHandler(null);
   }, [handleSave, setSaveHandler]);
 
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "s") {
-        e.preventDefault();
-        handleSave();
-      }
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [handleSave]);
+  useHotkeys([['mod+s', (e) => {
+    e.preventDefault();
+    handleSave();
+  }]]);
 
   useEffect(() => {
     return () => {
@@ -377,13 +402,21 @@ export default function Editor({
 
   if (!editor) {
     return (
-      <div className="flex justify-center items-center min-h-[400px]">
-        <div className="text-muted-foreground">Loading editor...</div>
+      <div className="space-y-3" key={`editor-wrapper-${slug ?? "loading"}`}>
+        <div
+          className={
+            className ||
+            "relative min-h-[600px] w-full transition-all duration-200"
+          }
+        >
+          <EditorSkeleton />
+        </div>
       </div>
     );
   }
 
   return (
+    <EditorContext.Provider value={editorValue}>
     <div className="space-y-3" key={`editor-wrapper-${slug}`}>
       <div
         className={
@@ -404,28 +437,18 @@ export default function Editor({
         )}
 
         {editor && (
-          <BubbleMenu editor={editor} options={{ placement: 'bottom', flip: false, shift: true, offset: 8, strategy: 'absolute'}} >
-            <div className="flex rounded border border-border bg-[rgb(var(--background))] shadow-xl">
-              <LinkSelector
-                open={openLink}
-                onOpenChange={setOpenLink}
-                editor={editor}
-              />
-              <NodeSelector
-                open={openNode}
-                onOpenChange={setOpenNode}
-                editor={editor}
-              />
-              <TextButtons editor={editor} />
-              <ColorSelector
-                open={openColor}
-                onOpenChange={setOpenColor}
-                editor={editor}
-              />
-            </div>
-          </BubbleMenu>
+          <OptimizedBubbleMenu
+            editor={editor}
+            openNode={openNode}
+            setOpenNode={setOpenNode}
+            openColor={openColor}
+            setOpenColor={setOpenColor}
+            openLink={openLink}
+            setOpenLink={setOpenLink}
+          />
         )}
       </div>
     </div>
+    </EditorContext.Provider>
   );
 }
