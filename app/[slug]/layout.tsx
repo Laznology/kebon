@@ -1,3 +1,4 @@
+export const revalidate = 0;
 import DocsPageShell from "@/components/docs-page-shell";
 import { generateTocFromContent } from "@/lib/generateToc";
 import { getAllPublishedPages, getPageBySlug } from "@/lib/content";
