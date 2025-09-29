@@ -49,9 +49,41 @@ export const authOptions: NextAuthOptions = {
   },
   pages: {
     signIn: "/signin",
+    error: "/auth/error", // Custom error page
   },
   secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
+    async signIn({ user, account }) {
+      if (account?.provider !== "github") {
+        return true;
+      }
+
+      const allowedEmails = process.env.ALLOWED_EMAILS;
+      
+      if (!allowedEmails || allowedEmails.trim() === "") {
+        return false;
+      }
+
+      const allowed = allowedEmails
+        .split(",")
+        .map((entry) => entry.trim().toLowerCase())
+        .filter(Boolean);
+
+      if (!allowed.length) {
+        return false;
+      }
+
+      const email = user?.email?.toLowerCase();
+      if (!email) {
+        return false;
+      }
+
+      if (!allowed.includes(email)) {
+        return false;
+      }
+
+      return true;
+    },
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
