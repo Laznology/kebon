@@ -1,36 +1,80 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+  # Kebon
 
-## Getting Started
+Blogging web app with a Notion-style editor. Basically you write in blocks instead of one big text area, so you can drag things around, split into sections, drop in quotes, lists, or code blocks just by typing /. The whole thing feels closer to building with Lego than filling a form.
 
-First, run the development server:
+## Prerequisites
+
+- Node.js LTS Version
+- PNPM 
+- A PostgreSQL database (local or managed)
+
+## Environment Variables
+
+1. Duplicate `.env.example` and rename it to `.env`:
+   ```bash
+   cp .env.example .env
+   ```
+2. Update `DATABASE_URL` to point at your PostgreSQL instance.
+3. Generate a new `NEXTAUTH_SECRET` if you do not already have one:
+   ```bash
+   openssl rand -base64 32
+   ```
+4. Configure any OAuth provider details (e.g. GitHub) and `ALLOWED_EMAILS` before you deploy.
+
+## Getting Started Locally
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm install
+pnpm prisma migrate deploy   # applies committed migrations
+pnpm db:seed                 # ensures the Home (index) page exist
+pnpm dev                     
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The seed script respects the following optional variables:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- `SEED_ADMIN_EMAIL` (default `admin@example.com`)
+- `SEED_ADMIN_NAME` (default `Admin`)
+- `SEED_ADMIN_PASSWORD` (default `admin123`)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+The seeded password is hashed with `bcryptjs`. Update these values in production environments.
 
-## Learn More
+## Working with Prisma
 
-To learn more about Next.js, take a look at the following resources:
+- **Create a new migration (development only)**
+  ```bash
+  pnpm prisma migrate dev --name <migration-name>
+  ```
+  This follows the official guidance in the Prisma docs: <https://www.prisma.io/docs/orm/prisma-migrate/working-with-prisma-migrate/development-and-production>.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- **Apply migrations in production**
+  ```bash
+  pnpm prisma migrate deploy
+  ```
+  Run this during your deployment pipeline so the schema stays in sync. See the deployment checklist at <https://www.prisma.io/docs/orm/prisma-migrate/migrate-deploy>.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **Re-run the seed script**
+  ```bash
+  pnpm db:seed
+  ```
+  This is idempotent—it will ensure the admin user and the `index` page exist without deleting other records.
 
-## Deploy on Vercel
+## Deployment Notes
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+The repository includes a `netlify.toml`, but the project works on any platform that supports Next.js 15.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Project Structure
+
+- `app/` – Next.js App Router pages, layouts, and API routes.
+- `components/` – Shared UI elements, including the document editor.
+- `lib/` – Server utilities (Prisma client, TOC generation, etc.).
+- `prisma/` – Prisma schema, migrations, and seed script.
+
+## Useful References
+
+- Next.js App Router documentation: <https://nextjs.org/docs/app>
+- Mantine UI components: <https://mantine.dev/>
+- TipTap editor guide: <https://tiptap.dev/>
+- Prisma ORM documentation: <https://www.prisma.io/docs/>
+
+Feel free to open issues or discussions if you run into bugs or want to contribute improvements before the public release.
