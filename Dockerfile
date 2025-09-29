@@ -17,6 +17,8 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
+RUN mkdir -p content
+
 RUN \
   npm i -g pnpm && \
   if [ -f pnpm.lock ] || [ -f pnpm-lock.yaml ]; then \
