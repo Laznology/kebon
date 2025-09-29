@@ -14,14 +14,16 @@ should_seed() {
 
 if should_seed; then
   if [ -z "${DATABASE_URL}" ]; then
-    echo "DATABASE_URL not set; skipping Prisma seed."
+    echo "DATABASE_URL not set; skipping Prisma migrate/seed."
   else
+    echo "Applying Prisma migrations..."
+    npx --yes prisma migrate deploy
     echo "Running Prisma database seed..."
     npx --yes prisma db seed
-    echo "Prisma seed completed."
+    echo "Prisma migrate & seed completed."
   fi
 else
-  echo "SKIP_DB_SEED set; skipping Prisma seed."
+  echo "SKIP_DB_SEED set; skipping Prisma migrate/seed."
 fi
 
 exec "$@"
