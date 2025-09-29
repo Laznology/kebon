@@ -43,11 +43,11 @@ export default function NotFound() {
               404
             </Badge>
             <Title order={2} className="text-3xl font-semibold tracking-tight text-primary">
-              Halaman tidak ditemukan
+              Page not found
             </Title>
             <Text size="md" c="dimmed">
-              Kami tidak dapat menemukan halaman yang kamu cari. Periksa kembali tautannya
-              atau kembali ke beranda untuk menjelajahi dokumentasi Kebon.
+              We couldn't find the page you're looking for. Please check the link
+              or return to the homepage to explore Kebon documentation.
             </Text>
             <Group gap="md" mt="sm">
               <Button
@@ -56,7 +56,7 @@ export default function NotFound() {
                 href="/"
                 leftSection={<Icon icon="mdi:home" width={18} height={18} />}
               >
-                Kembali ke beranda
+                Go to homepage
               </Button>
               <Button
                 size="md"
@@ -66,7 +66,7 @@ export default function NotFound() {
                 onClick={() => window.history.back()}
                 leftSection={<Icon icon="mdi:arrow-left" width={18} height={18} />}
               >
-                Halaman sebelumnya
+                Previous page
               </Button>
             </Group>
           </Stack>
