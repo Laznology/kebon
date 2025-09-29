@@ -115,7 +115,7 @@ export async function POST(
   }
 }
 
-export async function DELETE(reqeust: NextRequest, context: { params: Promise<{ slug: string }> }) {
+export async function DELETE(_request: NextRequest, context: { params: Promise<{ slug: string }> }) {
   const { slug } = await context.params;
   if (!slug) {
     return new NextResponse("Bad Request: slug is required", { status: 400 });

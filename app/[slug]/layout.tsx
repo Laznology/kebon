@@ -1,4 +1,5 @@
 export const revalidate = 0;
+import { notFound } from "next/navigation";
 import DocsPageShell from "@/components/docs-page-shell";
 import { generateTocFromContent } from "@/lib/generateToc";
 import { getPageBySlug } from "@/lib/content";
@@ -13,8 +14,12 @@ export async function generateMetadata({
   const { slug } = await params;
   const page = await getPageBySlug(slug);
 
-  const title = page?.title || slug.replace(/-/g, " ");
-  const description = page?.excerpt || `${title}`;
+  if (!page) {
+    notFound();
+  }
+
+  const title = page.title || slug.replace(/-/g, " ");
+  const description = page.excerpt || `${title}`;
 
   return {
     title,
@@ -31,48 +36,25 @@ export default async function EditPageLayout({
   const { slug } = await params;
 
   const pageData = await getPageBySlug(slug);
+  if (!pageData) {
+    notFound();
+  }
 
-  const page = pageData || {
-    id: "temp",
-    title: slug.replace(/-/g, " "),
-    slug,
-    content: {
+  const jsonContent =
+    (pageData.content as JSONContent | null) ?? {
       type: "doc",
-      content: [
-        {
-          type: "heading",
-          attrs: { level: 1 },
-          content: [{ type: "text", text: slug.replace(/-/g, " ") }],
-        },
-        {
-          type: "paragraph",
-          content: [
-            { type: "text", text: "Start writing your content here..." },
-          ],
-        },
-      ],
-    } as JSONContent,
-    excerpt: "Start writing your content here...",
-    tags: [],
-    published: false,
-    image: null,
-    authorId: "",
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    isDeleted: false,
-  };
-
-  const jsonContent = page.content as JSONContent;
+      content: [],
+    };
 
   const initialPage: CurrentPage = {
     slug,
-    title: page.title,
+    title: pageData.title,
     content: jsonContent,
     frontmatter: {
-      title: page.title,
-      updatedAt: page.updatedAt.toISOString(),
+      title: pageData.title,
+      updatedAt: pageData.updatedAt.toISOString(),
     },
-    updatedAt: page.updatedAt.toISOString(),
+    updatedAt: pageData.updatedAt.toISOString(),
   };
 
   const initialToc = generateTocFromContent(jsonContent);

@@ -20,6 +20,7 @@ import { common, createLowlight } from "lowlight";
 import { BackgroundColor } from "@tiptap/extension-text-style";
 import type { JSONContent } from "@tiptap/core";
 import type { ApiResponse } from "@/types/page";
+import { TableKit } from "@tiptap/extension-table";
 
 import { CustomHeading } from "@/lib/custom-heading";
 import { usePage } from "@/app/[slug]/page-provider";
@@ -27,8 +28,7 @@ import { slashCommand } from "./slash-command";
 import { notifications } from "@mantine/notifications";
 import { OptimizedBubbleMenu } from "./optimized-bubble-menu";
 import { useMemo } from "react";
-import { useHotkeys } from '@mantine/hooks';
-
+import { useHotkeys } from "@mantine/hooks";
 
 export type EditorProps = {
   className?: string;
@@ -37,7 +37,6 @@ export type EditorProps = {
   title?: string;
   onUpdate?: (content: JSONContent) => void;
 };
-
 
 const EditorSkeleton = () => (
   <div className="w-full space-y-6 py-12">
@@ -94,7 +93,6 @@ export default function Editor({
   const [openColor, setOpenColor] = useState<boolean>(false);
   const [openLink, setOpenLink] = useState<boolean>(false);
 
-
   const [content, setContent] = useState<JSONContent | null>(
     initialContent || null,
   );
@@ -121,6 +119,9 @@ export default function Editor({
       immediatelyRender: false,
       shouldRerenderOnTransaction: false,
       extensions: [
+        TableKit.configure({
+          table: { resizable: true },
+        }),
         slashCommand,
         BackgroundColor.configure({
           types: ["textStyle"],
@@ -238,7 +239,7 @@ export default function Editor({
     },
     [initialContent],
   );
-  const editorValue = useMemo(() => ({editor}), [editor])
+  const editorValue = useMemo(() => ({ editor }), [editor]);
 
   const applySaveResult = useCallback(
     (contentToSave: JSONContent, payload: ApiResponse) => {
@@ -320,8 +321,8 @@ export default function Editor({
       } catch {
         notifications.show({
           title: "Auto-save failed",
-          message: "Error while saving"
-        })
+          message: "Error while saving",
+        });
       } finally {
         setSaving(false);
       }
@@ -373,10 +374,10 @@ export default function Editor({
         });
       }
     } catch {
-        notifications.show({
-          title: 'Error',
-          message: 'Error with manual saving'
-        })
+      notifications.show({
+        title: "Error",
+        message: "Error with manual saving",
+      });
     } finally {
       setSaving(false);
     }
@@ -387,10 +388,15 @@ export default function Editor({
     return () => setSaveHandler(null);
   }, [handleSave, setSaveHandler]);
 
-  useHotkeys([['mod+s', (e) => {
-    e.preventDefault();
-    handleSave();
-  }]]);
+  useHotkeys([
+    [
+      "mod+s",
+      (e) => {
+        e.preventDefault();
+        handleSave();
+      },
+    ],
+  ]);
 
   useEffect(() => {
     return () => {
@@ -417,38 +423,38 @@ export default function Editor({
 
   return (
     <EditorContext.Provider value={editorValue}>
-    <div className="space-y-3" key={`editor-wrapper-${slug}`}>
-      <div
-        className={
-          className ||
-          "relative min-h-[600px] w-full transition-all duration-200"
-        }
-      >
-        {editor && (
-          <EditorContent editor={editor} key={`editor-content-${slug}`} />
-        )}
+      <div className="space-y-3" key={`editor-wrapper-${slug}`}>
+        <div
+          className={
+            className ||
+            "relative min-h-[600px] w-full transition-all duration-200"
+          }
+        >
+          {editor && (
+            <EditorContent editor={editor} key={`editor-content-${slug}`} />
+          )}
 
-        {editor && !editor.isDestroyed && (
-          <div key={`drag-handle-wrapper-${slug}`}>
-            <DragHandle editor={editor}>
-              <div className="drag-handle" />
-            </DragHandle>
-          </div>
-        )}
+          {editor && !editor.isDestroyed && (
+            <div key={`drag-handle-wrapper-${slug}`}>
+              <DragHandle editor={editor}>
+                <div className="drag-handle" />
+              </DragHandle>
+            </div>
+          )}
 
-        {editor && (
-          <OptimizedBubbleMenu
-            editor={editor}
-            openNode={openNode}
-            setOpenNode={setOpenNode}
-            openColor={openColor}
-            setOpenColor={setOpenColor}
-            openLink={openLink}
-            setOpenLink={setOpenLink}
-          />
-        )}
+          {editor && (
+            <OptimizedBubbleMenu
+              editor={editor}
+              openNode={openNode}
+              setOpenNode={setOpenNode}
+              openColor={openColor}
+              setOpenColor={setOpenColor}
+              openLink={openLink}
+              setOpenLink={setOpenLink}
+            />
+          )}
+        </div>
       </div>
-    </div>
     </EditorContext.Provider>
   );
 }

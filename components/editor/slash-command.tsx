@@ -17,8 +17,14 @@ import { ReactRenderer } from '@tiptap/react';
 import tippy from 'tippy.js';
 import { showImageUrlDialog } from "@/lib/image-dialog-utils";
 
-import React, { useState, useEffect, useImperativeHandle, forwardRef } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useImperativeHandle,
+  forwardRef,
+} from 'react';
 import { Editor as TiptapEditor } from '@tiptap/react';
+import clsx from 'clsx';
 
 interface SuggestionItem {
   title: string;
@@ -83,25 +89,58 @@ const CommandList = forwardRef<CommandListRef, CommandListProps>((props, ref) =>
   }));
 
   return (
-    <div className="z-50 h-auto max-h-[330px] overflow-y-auto bg-[rgb(var(--background))] border border-border rounded-md px-1 py-2 shadow-md transition-all">
+    <div
+      role="listbox"
+      aria-label="Formatting options"
+      className="z-50 h-auto max-h-[330px] overflow-y-auto bg-[rgb(var(--background))] border border-border rounded-md px-1 py-2 shadow-md transition-all"
+    >
       {props.items.length ? (
-        props.items.map((item, index) => (
-          <button
-            className={`flex w-full items-center space-x-3 rounded-md px-3 py-2 text-left text-sm hover:bg-accent text-foreground cursor-pointer transition-colors ${
-              index === selectedIndex ? 'bg-accent' : ''
-            }`}
-            key={index}
-            onClick={() => selectItem(index)}
-          >
-            <div className="flex h-10 w-10 items-center justify-center bg-muted rounded-md">
-              {item.icon}
-            </div>
-            <div>
-              <p className="font-medium text-foreground">{item.title}</p>
-              <p className="text-xs text-muted-foreground">{item.description}</p>
-            </div>
-          </button>
-        ))
+        props.items.map((item, index) => {
+          const isSelected = index === selectedIndex;
+
+          return (
+            <button
+              key={index}
+              type="button"
+              role="option"
+              aria-selected={isSelected}
+              tabIndex={-1}
+              data-selected={isSelected}
+              onClick={() => selectItem(index)}
+              onMouseEnter={() => setSelectedIndex(index)}
+              className={clsx(
+                'flex w-full items-center space-x-3 rounded-md px-3 py-2 text-left text-sm cursor-pointer transition-all duration-150',
+                'hover:bg-accent hover:text-accent-foreground',
+                isSelected 
+                  ? 'shadow-md scale-[1.02]' 
+                  : 'bg-transparent border-l-4 border-transparent hover:border-l-4 hover:border-border',
+              )}
+            >
+              <div
+                className={clsx(
+                  'flex h-10 w-10 items-center justify-center rounded-md transition-colors',
+                  !isSelected && 'bg-muted text-foreground',
+                )}
+              >
+                {item.icon}
+              </div>
+              <div>
+                <p className="font-medium">{item.title}</p>
+                <p
+                  className={clsx(
+                    'text-xs transition-colors',
+                    !isSelected && 'text-muted-foreground',
+                  )}
+                  style={isSelected ? {
+                    color: 'rgba(var(--primary), 0.8)'
+                  } : {}}
+                >
+                  {item.description}
+                </p>
+              </div>
+            </button>
+          );
+        })
       ) : (
         <div className="px-2 text-muted-foreground">No results</div>
       )}

@@ -4,13 +4,15 @@ import DocsPageContent from "@/components/docs-page-content";
 import { getPageBySlug } from "@/lib/content";
 import { generateTocFromContent } from "@/lib/generateToc";
 import type { CurrentPage } from "@/types/page";
-import type { JSONContent } from '@tiptap/core';
+import type { JSONContent } from "@tiptap/core";
+import { notFound } from "next/navigation";
 
 export async function generateMetadata() {
   const page = await getPageBySlug("index");
 
-  const title = page?.title || "Kebon Docs";
-  const description = page?.excerpt || "Documentation home.";
+  const title = page?.title || "Home";
+  const description =
+    page?.excerpt || "Start writing your documentation here.";
 
   return { title, description };
 }
@@ -19,46 +21,24 @@ export default async function HomePage() {
   const slug = "index";
 
   const homePage = await getPageBySlug("index");
+  if (!homePage) {
+    notFound();
+  }
 
-  const page = homePage || {
-    id: "temp",
-    title: "Home",
-    slug: "index",
-    content: {
-      type: 'doc',
-      content: [
-        {
-          type: 'heading',
-          attrs: { level: 1 },
-          content: [{ type: 'text', text: 'Home' }],
-        },
-        {
-          type: 'paragraph',
-          content: [{ type: 'text', text: 'Start writing your content here...' }],
-        },
-      ],
-    } as JSONContent,
-    excerpt: "Start writing your content here...",
-    tags: [],
-    published: true,
-    image: null,
-    authorId: "",
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    isDeleted: false,
+  const jsonContent = (homePage.content as JSONContent | null) ?? {
+    type: 'doc',
+    content: [],
   };
-
-  const jsonContent = page.content as JSONContent;
 
   const initialPage: CurrentPage = {
     slug,
-    title: page.title,
+    title: homePage.title,
     content: jsonContent,
     frontmatter: {
-      title: page.title,
-      updatedAt: page.updatedAt.toISOString(),
+      title: homePage.title,
+      updatedAt: homePage.updatedAt.toISOString(),
     },
-    updatedAt: page.updatedAt.toISOString(),
+    updatedAt: homePage.updatedAt.toISOString(),
   };
 
   const initialToc = generateTocFromContent(jsonContent);

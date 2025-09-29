@@ -37,11 +37,8 @@ export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      console.log("No session or user ID:", { session: !!session, userId: session?.user?.id });
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-
-    console.log("User found:", { userId: session.user.id });
 
     const { title } = await request.json();
     if (!title || typeof title !== "string") {
@@ -55,36 +52,73 @@ export async function POST(request: NextRequest) {
       .replace(/-+/g, "-")
       .trim();
 
+    const defaultContent: JSONContent = {
+      type: 'doc',
+      content: [
+        {
+          type: 'heading',
+          attrs: { level: 1 },
+          content: [{ type: 'text', text: title }],
+        },
+        {
+          type: 'paragraph',
+          content: [{ type: 'text', text: 'Start writing your content here...' }],
+        },
+      ],
+    };
+    const defaultExcerpt = 'Start writing your content here...';
+
     const existingPage = await prisma.page.findUnique({
       where: { slug },
+      include: {
+        author: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+      },
     });
 
     if (existingPage) {
+      if (existingPage.isDeleted) {
+        const restoredPage = await prisma.page.update({
+          where: { id: existingPage.id },
+          data: {
+            title,
+            content: defaultContent,
+            excerpt: defaultExcerpt.slice(0, 200),
+            published: false,
+            isDeleted: false,
+            authorId: session.user.id,
+          },
+          include: {
+            author: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+              },
+            },
+          },
+        });
+
+        return NextResponse.json({ success: true, page: restoredPage });
+      }
+
       return NextResponse.json(
         { error: "Page with this title already exists" },
         { status: 409 },
       );
     }
 
-    // Create new page
     const newPage = await prisma.page.create({
       data: {
         title,
         slug,
-        content: {
-          type: 'doc',
-          content: [
-            {
-              type: 'heading',
-              attrs: { level: 1 },
-              content: [{ type: 'text', text: title }],
-            },
-            {
-              type: 'paragraph',
-              content: [{ type: 'text', text: 'Start writing your content here...' }],
-            },
-          ],
-        } as JSONContent,
+        content: defaultContent,
+        excerpt: defaultExcerpt,
         published: false,
         authorId: session.user.id,
       },

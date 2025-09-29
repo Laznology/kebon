@@ -331,9 +331,9 @@ export default function DocsLayout({ children, toc }: DocsLayoutProps) {
                 className="hidden w-64 shrink-0 md:block"
                 style={{
                   position: "sticky",
-                  top: 88,
+                  top: 24,
                   height: "calc(100vh - 120px)",
-                  maxHeight: "calc(100vh - 120px)",
+                  maxHeight: `calc(100vh - ${24 + 32}px)`,
                   overflow: "hidden",
                 }}
               >
