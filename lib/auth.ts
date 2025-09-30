@@ -49,7 +49,7 @@ export const authOptions: NextAuthOptions = {
   },
   pages: {
     signIn: "/signin",
-    error: "/auth/error", // Custom error page
+    error: "/auth/error", 
   },
   secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
@@ -58,31 +58,29 @@ export const authOptions: NextAuthOptions = {
         return true;
       }
 
-      const allowedEmails = process.env.ALLOWED_EMAILS;
-      
-      if (!allowedEmails || allowedEmails.trim() === "") {
+      try {
+        const settings = await prisma.appSettings.findFirst();
+        const allowedEmails = settings?.allowedEmails?.trim();
+        
+        if (!allowedEmails) {
+          return false;
+        }
+
+        const userEmail = user?.email?.toLowerCase();
+        if (!userEmail) {
+          return false;
+        }
+
+        const allowedList = allowedEmails
+          .toLowerCase()
+          .split(",")
+          .map(email => email.trim())
+          .filter(email => email.length > 0);
+
+        return allowedList.includes(userEmail);
+      } catch {
         return false;
       }
-
-      const allowed = allowedEmails
-        .split(",")
-        .map((entry) => entry.trim().toLowerCase())
-        .filter(Boolean);
-
-      if (!allowed.length) {
-        return false;
-      }
-
-      const email = user?.email?.toLowerCase();
-      if (!email) {
-        return false;
-      }
-
-      if (!allowed.includes(email)) {
-        return false;
-      }
-
-      return true;
     },
     async jwt({ token, user }) {
       if (user) {

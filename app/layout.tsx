@@ -23,6 +23,20 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+export async function generateMetadata() {
+  return {
+    title: "Kebon",
+    icons: {
+      icon: [
+        { url: "/favicon.ico" },
+        { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+        { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+      ],
+      apple: [{ url: "/apple-touch-icon.png" }],
+    },
+    manifest: "/site.webmanifest",
+  };
+}
 
 export default function RootLayout({
   children,
@@ -33,7 +47,6 @@ export default function RootLayout({
     <html lang="en" {...mantineHtmlProps}>
       <head>
         <ColorSchemeScript defaultColorScheme={"auto"} />
-        <link rel="icon" href="/Kebon.ico" type="image/x-icon" />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} !text-primary !bg-background antialiased`}

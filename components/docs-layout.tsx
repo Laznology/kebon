@@ -18,6 +18,7 @@ import {
   Stack,
   Drawer,
   Badge,
+  Avatar,
 } from "@mantine/core";
 import {
   useDisclosure,
@@ -37,7 +38,7 @@ import { notifications } from "@mantine/notifications";
 
 type DocsLayoutProps = {
   children: React.ReactNode;
-  toc: ReactNode;
+  toc?: ReactNode;
 };
 
 const SearchModal = dynamic(() => import("@/components/search-modal"), {
@@ -216,15 +217,27 @@ export default function DocsLayout({ children, toc }: DocsLayoutProps) {
       {status === "authenticated" && session && (
         <Box mt="md">
           <Divider mb="md" />
-          <Group justify="space-between" gap="md" p="sm" className="">
-            <div>
-              <Text size="sm" fw={600}>
-                {session.user?.name || "User"}
-              </Text>
-              <Text size="xs" c="dimmed">
-                {session.user?.email}
-              </Text>
-            </div>
+          <Group justify="space-between" gap="md" p="sm">
+            <Group gap="sm">
+              <Avatar
+                src={session.user?.image}
+                alt={session.user?.name || "User"}
+                size={32}
+                radius="xl"
+              >
+                {!session.user?.image && (
+                  <Icon icon="mdi:account" width={16} height={16} />
+                )}
+              </Avatar>
+              <div>
+                <Text size="sm" fw={600}>
+                  {session.user?.name || "User"}
+                </Text>
+                <Text size="xs" c="dimmed">
+                  {session.user?.email}
+                </Text>
+              </div>
+            </Group>
             <Popover position="top" width={150} withArrow shadow="md">
               <Popover.Target>
                 <Button
@@ -237,18 +250,33 @@ export default function DocsLayout({ children, toc }: DocsLayoutProps) {
                 </Button>
               </Popover.Target>
               <Popover.Dropdown>
-                <Button
-                  variant="subtle"
-                  color="red"
-                  size="xs"
-                  fullWidth
-                  onClick={() => signOut()}
-                  leftSection={
-                    <Icon icon="mdi:logout" width={14} height={14} />
-                  }
-                >
-                  Sign Out
-                </Button>
+                <Stack gap={4}>
+                  <Button
+                    variant="subtle"
+                    color="gray"
+                    size="xs"
+                    fullWidth
+                    component={Link}
+                    href="/settings"
+                    leftSection={
+                      <Icon icon="mdi:cog" width={14} height={14} />
+                    }
+                  >
+                    Settings
+                  </Button>
+                  <Button
+                    variant="subtle"
+                    color="red"
+                    size="xs"
+                    fullWidth
+                    onClick={() => signOut()}
+                    leftSection={
+                      <Icon icon="mdi:logout" width={14} height={14} />
+                    }
+                  >
+                    Sign Out
+                  </Button>
+                </Stack>
               </Popover.Dropdown>
             </Popover>
           </Group>
