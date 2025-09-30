@@ -1,6 +1,3 @@
-'use client'
-
-import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { AlertCircle, Home, ArrowLeft } from 'lucide-react'
 
@@ -11,10 +8,14 @@ const errorMessages = {
   Default: 'An error occurred during authentication.',
 }
 
-export default function AuthErrorPage() {
-  const searchParams = useSearchParams()
-  const error = searchParams.get('error') as keyof typeof errorMessages
-  
+interface AuthErrorPageProps {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+}
+
+export default async function AuthErrorPage({ searchParams }: AuthErrorPageProps) {
+  const params = await searchParams
+  const error = params.error as keyof typeof errorMessages
+
   const errorMessage = errorMessages[error] || errorMessages.Default
   const isAccessDenied = error === 'AccessDenied'
 
@@ -25,11 +26,11 @@ export default function AuthErrorPage() {
           <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-destructive/10">
             <AlertCircle className="h-8 w-8 text-destructive" />
           </div>
-          
+
           <h1 className="mt-6 text-3xl font-bold tracking-tight text-foreground">
             Authentication Error
           </h1>
-          
+
           <p className="mt-4 text-muted-foreground">
             {errorMessage}
           </p>
@@ -37,7 +38,7 @@ export default function AuthErrorPage() {
           {isAccessDenied && (
             <div className="mt-4 p-4 bg-muted/50 rounded-lg">
               <p className="text-sm text-muted-foreground">
-                Your email address is not authorized to access this application. 
+                Your email address is not authorized to access this application.
                 Please contact the administrator for access.
               </p>
             </div>
@@ -52,7 +53,7 @@ export default function AuthErrorPage() {
             <ArrowLeft className="w-4 h-4 mr-2" />
             Try Again
           </Link>
-          
+
           <Link
             href="/"
             className="group relative w-full flex justify-center py-2 px-4 border border-border text-sm font-medium rounded-md text-foreground bg-background hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors"

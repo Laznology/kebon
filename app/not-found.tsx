@@ -26,7 +26,10 @@ export default function NotFound() {
         <ThemeToggle />
       </header>
 
-      <Container size="sm" className="flex flex-1 items-center justify-center px-6 pb-16">
+      <Container
+        size="sm"
+        className="flex flex-1 items-center justify-center px-6 pb-16"
+      >
         <Paper
           radius="lg"
           p="xl"
@@ -39,15 +42,25 @@ export default function NotFound() {
           }}
         >
           <Stack gap="md">
-            <Badge size="lg" variant="light" radius="md" color="dark" className="w-fit">
+            <Badge
+              size="lg"
+              variant="light"
+              radius="md"
+              color="dark"
+              className="w-fit"
+            >
               404
             </Badge>
-            <Title order={2} className="text-3xl font-semibold tracking-tight text-primary">
+            <Title
+              order={2}
+              className="text-3xl font-semibold tracking-tight text-primary"
+            >
               Page not found
             </Title>
             <Text size="md" c="dimmed">
-              We couldn't find the page you're looking for. Please check the link
-              or return to the homepage to explore Kebon documentation.
+              We couldn&apos;t find the page you&apos;re looking for. Please
+              check the link or return to the homepage to explore Kebon
+              documentation.
             </Text>
             <Group gap="md" mt="sm">
               <Button
@@ -64,7 +77,9 @@ export default function NotFound() {
                 color="gray"
                 type="button"
                 onClick={() => window.history.back()}
-                leftSection={<Icon icon="mdi:arrow-left" width={18} height={18} />}
+                leftSection={
+                  <Icon icon="mdi:arrow-left" width={18} height={18} />
+                }
               >
                 Previous page
               </Button>
