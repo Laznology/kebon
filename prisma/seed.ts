@@ -33,10 +33,13 @@ async function seedAdmin() {
     return existing;
   }
 
+  const existingName = await prisma.user.findUnique({ where: { name } });
+  const finalName = existingName ? `${name}_${Date.now()}` : name;
+
   const user = await prisma.user.create({
     data: {
       email,
-      name,
+      name: finalName,
       password: passwordHash,
     },
   });
