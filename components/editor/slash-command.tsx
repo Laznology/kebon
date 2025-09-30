@@ -9,7 +9,8 @@ import {
   Text,
   TextQuote,
   Link,
-  SeparatorHorizontal
+  SeparatorHorizontal,
+  Table
 } from "lucide-react";
 import { Extension, Range } from '@tiptap/core';
 import { Suggestion } from '@tiptap/suggestion';
@@ -22,6 +23,7 @@ import React, {
   useEffect,
   useImperativeHandle,
   forwardRef,
+  useRef,
 } from 'react';
 import { Editor as TiptapEditor } from '@tiptap/react';
 import clsx from 'clsx';
@@ -45,6 +47,8 @@ interface CommandListRef {
 
 const CommandList = forwardRef<CommandListRef, CommandListProps>((props, ref) => {
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const itemRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
   const selectItem = (index: number) => {
     const item = props.items[index];
@@ -53,19 +57,46 @@ const CommandList = forwardRef<CommandListRef, CommandListProps>((props, ref) =>
     }
   };
 
-  const upHandler = () => {
-    setSelectedIndex((selectedIndex + props.items.length - 1) % props.items.length);
+  const scrollToSelected = (index: number) => {
+    const container = containerRef.current;
+    const selectedElement = itemRefs.current[index];
+    
+    if (container && selectedElement) {
+      const containerRect = container.getBoundingClientRect();
+      const elementRect = selectedElement.getBoundingClientRect();
+      const containerScrollTop = container.scrollTop;
+      const elementTop = selectedElement.offsetTop;
+      const elementHeight = selectedElement.offsetHeight;
+      const containerHeight = container.clientHeight;
+      
+      if (elementTop < containerScrollTop) {
+        container.scrollTop = elementTop;
+      }
+      else if (elementTop + elementHeight > containerScrollTop + containerHeight) {
+        container.scrollTop = elementTop + elementHeight - containerHeight;
+      }
+    }
+  };  const upHandler = () => {
+    const newIndex = (selectedIndex + props.items.length - 1) % props.items.length;
+    setSelectedIndex(newIndex);
+    scrollToSelected(newIndex);
   };
 
   const downHandler = () => {
-    setSelectedIndex((selectedIndex + 1) % props.items.length);
+    const newIndex = (selectedIndex + 1) % props.items.length;
+    setSelectedIndex(newIndex);
+    scrollToSelected(newIndex);
   };
 
   const enterHandler = () => {
     selectItem(selectedIndex);
   };
 
-  useEffect(() => setSelectedIndex(0), [props.items]);
+  useEffect(() => {
+    setSelectedIndex(0);
+    // Reset itemRefs array when items change
+    itemRefs.current = new Array(props.items.length).fill(null);
+  }, [props.items]);
 
   useImperativeHandle(ref, () => ({
     onKeyDown: ({ event }) => {
@@ -90,6 +121,7 @@ const CommandList = forwardRef<CommandListRef, CommandListProps>((props, ref) =>
 
   return (
     <div
+      ref={containerRef}
       role="listbox"
       aria-label="Formatting options"
       className="z-50 h-auto max-h-[330px] overflow-y-auto bg-[rgb(var(--background))] border border-border rounded-md px-1 py-2 shadow-md transition-all"
@@ -101,13 +133,19 @@ const CommandList = forwardRef<CommandListRef, CommandListProps>((props, ref) =>
           return (
             <button
               key={index}
+              ref={(el) => {
+                itemRefs.current[index] = el;
+              }}
               type="button"
               role="option"
               aria-selected={isSelected}
               tabIndex={-1}
               data-selected={isSelected}
               onClick={() => selectItem(index)}
-              onMouseEnter={() => setSelectedIndex(index)}
+              onMouseEnter={() => {
+                setSelectedIndex(index);
+                scrollToSelected(index);
+              }}
               className={clsx(
                 'flex w-full items-center space-x-3 rounded-md px-3 py-2 text-left text-sm cursor-pointer transition-all duration-150',
                 'hover:bg-accent hover:text-accent-foreground',
@@ -278,6 +316,20 @@ export const suggestionItems: SuggestionItem[] = [
           editor.chain().focus().insertContent(`<img src="${result.url}" alt="${result.alt || ''}" title="${result.title || ''}" />`).run();
         }
 
+    },
+  },
+  {
+    title: "Table",
+    description: "Insert a 3x3 table to organize data.",
+    searchTerms: ["table", "grid", "data", "rows", "columns"],
+    icon: <Table size={18} />,
+    command: ({ editor, range }) => {
+      editor
+        .chain()
+        .focus()
+        .deleteRange(range)
+        .insertTable({ rows: 3, cols: 3, withHeaderRow: true })
+        .run();
     },
   },
 ];

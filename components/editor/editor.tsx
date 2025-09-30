@@ -27,6 +27,7 @@ import { usePage } from "@/app/[slug]/page-provider";
 import { slashCommand } from "./slash-command";
 import { notifications } from "@mantine/notifications";
 import { OptimizedBubbleMenu } from "./optimized-bubble-menu";
+import { TableContextMenu } from "./table-context-menu";
 import { useMemo } from "react";
 import { useHotkeys } from "@mantine/hooks";
 
@@ -120,7 +121,29 @@ export default function Editor({
       shouldRerenderOnTransaction: false,
       extensions: [
         TableKit.configure({
-          table: { resizable: true },
+          table: {
+            resizable: true,
+            lastColumnResizable: true,
+            allowTableNodeSelection: true,
+            HTMLAttributes: {
+              class: 'border-collapse table-auto w-full my-4',
+            },
+          },
+          tableRow: {
+            HTMLAttributes: {
+              class: 'border-0',
+            },
+          },
+          tableHeader: {
+            HTMLAttributes: {
+              class: 'border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 px-3 py-2 text-left font-semibold',
+            },
+          },
+          tableCell: {
+            HTMLAttributes: {
+              class: 'border border-gray-300 dark:border-gray-600 px-3 py-2 min-w-[100px] relative',
+            },
+          },
         }),
         slashCommand,
         BackgroundColor.configure({
@@ -173,7 +196,7 @@ export default function Editor({
         }),
         CustomHeading,
         Placeholder.configure({
-          placeholder: 'Ketik "/" untuk command, atau tulis saja',
+          placeholder: 'Type "/" for commands, or just start writing',
         }),
         Link.configure({
           HTMLAttributes: {
@@ -453,6 +476,8 @@ export default function Editor({
               setOpenLink={setOpenLink}
             />
           )}
+
+          {editor && <TableContextMenu editor={editor} />}
         </div>
       </div>
     </EditorContext.Provider>
