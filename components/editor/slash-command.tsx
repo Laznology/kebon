@@ -62,8 +62,6 @@ const CommandList = forwardRef<CommandListRef, CommandListProps>((props, ref) =>
     const selectedElement = itemRefs.current[index];
     
     if (container && selectedElement) {
-      const containerRect = container.getBoundingClientRect();
-      const elementRect = selectedElement.getBoundingClientRect();
       const containerScrollTop = container.scrollTop;
       const elementTop = selectedElement.offsetTop;
       const elementHeight = selectedElement.offsetHeight;
