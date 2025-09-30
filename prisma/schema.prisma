@@ -99,6 +99,10 @@ model PageVersion {
 model AppSettings {
   id            Int     @id @default(autoincrement())
   allowRegister Boolean @default(true)
+  allowedEmails String? @default("")
+  appName       String  @default("Kebon")
+  appLogo       String  @default("/logo.webp")
+  siteIcon      String  @default("/favicon.ico")
 }
 
 

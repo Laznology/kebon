@@ -5,9 +5,9 @@ import type { JSONContent } from "@tiptap/core";
 const prisma = new PrismaClient();
 
 async function seedAdmin() {
-  const email = process.env.SEED_ADMIN_EMAIL ?? "admin@example.com";
+  const email = process.env.SEED_ADMIN_EMAIL ?? "admin@gmail.com";
   const name = process.env.SEED_ADMIN_NAME ?? "Admin";
-  const rawPassword = process.env.SEED_ADMIN_PASSWORD ?? "admin123";
+  const rawPassword = process.env.SEED_ADMIN_PASSWORD ?? "!admin@webapp";
   const passwordHash = await bcrypt.hash(rawPassword, 12);
 
   const existing = await prisma.user.findUnique({ where: { email } });
@@ -102,6 +102,17 @@ async function seedIndexPage(authorId: string) {
 async function main() {
   const admin = await seedAdmin();
   await seedIndexPage(admin.id);
+  await prisma.appSettings.upsert({
+    where: {id: 1},
+    update: {},
+    create: {
+      allowRegister: true,
+      allowedEmails: "",
+      appName: "Kebon",
+      appLogo: "/logo.webp",
+      siteIcon: "/favicon.ico"
+    }
+  })
 
   console.log("Seed completed: admin user ensured and index page ready.");
 }
