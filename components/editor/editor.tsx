@@ -397,7 +397,7 @@ export default function Editor({
   }, [applySaveResult, editor, slug, title, setSaving]);
 
   useEffect(() => {
-    setSaveHandler(() => handleSave);
+    setSaveHandler(handleSave);
     return () => setSaveHandler(null);
   }, [handleSave, setSaveHandler]);
 
