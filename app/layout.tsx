@@ -1,7 +1,7 @@
 import { Geist, Geist_Mono } from "next/font/google";
 
 import "./globals.css";
-import '@mantine/spotlight/styles.css';
+import "@mantine/spotlight/styles.css";
 import Provider from "./provider";
 import SessionProvider from "@/components/SessionProvider";
 import "@mantine/core/styles.css";
@@ -26,9 +26,8 @@ const geistMono = Geist_Mono({
 });
 
 export async function generateMetadata(): Promise<Metadata> {
-  const settings = await prisma.appSettings.findFirst()
-  return {
-    title: settings?.appName,
+  const metadata: Metadata = {
+    title: "Kebon",
     icons: {
       icon: [
         { url: "/favicon.ico" },
@@ -39,6 +38,19 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     manifest: "/site.webmanifest",
   };
+
+  if (!process.env.DATABASE_URL) {
+    return metadata;
+  }
+
+  const settings = await prisma.appSettings.findFirst();
+  if (settings?.appName) {
+    metadata.title = settings.appName;
+
+    return metadata;
+  }
+
+  return metadata;
 }
 
 export default function RootLayout({
