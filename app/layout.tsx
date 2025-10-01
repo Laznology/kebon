@@ -13,7 +13,6 @@ import {
 } from "@mantine/core";
 import { Notifications } from "@mantine/notifications";
 import { Metadata } from "next";
-import { prisma } from "@/lib/prisma";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -25,33 +24,18 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export async function generateMetadata(): Promise<Metadata> {
-  const metadata: Metadata = {
-    title: "Kebon",
-    icons: {
-      icon: [
-        { url: "/favicon.ico" },
-        { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
-        { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
-      ],
-      apple: [{ url: "/apple-touch-icon.png" }],
-    },
-    manifest: "/site.webmanifest",
-  };
-
-  if (!process.env.DATABASE_URL) {
-    return metadata;
-  }
-
-  const settings = await prisma.appSettings.findFirst();
-  if (settings?.appName) {
-    metadata.title = settings.appName;
-
-    return metadata;
-  }
-
-  return metadata;
-}
+export const metadata: Metadata = {
+  title: "Kebon",
+  icons: {
+    icon: [
+      { url: "/favicon.ico" },
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+    ],
+    apple: [{ url: "/apple-touch-icon.png" }],
+  },
+  manifest: "/site.webmanifest",
+};
 
 export default function RootLayout({
   children,
