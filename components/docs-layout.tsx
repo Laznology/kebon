@@ -20,11 +20,7 @@ import {
   Badge,
   Avatar,
 } from "@mantine/core";
-import {
-  useDisclosure,
-  useMediaQuery,
-  useFetch,
-} from "@mantine/hooks";
+import { useDisclosure, useMediaQuery, useFetch } from "@mantine/hooks";
 import { Icon } from "@iconify/react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import type { Page } from "@/types/page";
@@ -55,10 +51,15 @@ export default function DocsLayout({ children, toc }: DocsLayoutProps) {
   const isMobile = useMediaQuery("(max-width: 768px)");
   const router = useRouter();
   const { data: pages, refetch: refetchPages } = useFetch<Page[]>("/api/pages");
-
+  const { data: settings } = useFetch<{ appName: string }>("/api/settings");
   const renderNavigationContent = (closeOnNavigate = false) => (
     <Box className="flex h-full flex-col" style={{ height: "100%" }}>
       <div>
+        <Box mb="md" className="relative">
+          <Title order={1} size="h1" fw={700} c="var(--mantine-color-text)">
+            {settings?.appName} 
+          </Title>
+        </Box>
         <TextInput
           size="sm"
           leftSection={<Icon icon="line-md:search" width={16} height={16} />}
@@ -257,9 +258,7 @@ export default function DocsLayout({ children, toc }: DocsLayoutProps) {
                     fullWidth
                     component={Link}
                     href="/settings"
-                    leftSection={
-                      <Icon icon="mdi:cog" width={14} height={14} />
-                    }
+                    leftSection={<Icon icon="mdi:cog" width={14} height={14} />}
                   >
                     Settings
                   </Button>
