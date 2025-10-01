@@ -20,8 +20,14 @@ model User {
   pages             Page[]
   accounts          Account[]
   sessions          Session[]
+  role              Role      @default(MEMBER)
 
   @@index([isDeleted])
+}
+
+enum Role {
+  ADMIN
+  MEMBER
 }
 
 model VerificationToken {

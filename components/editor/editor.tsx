@@ -1,6 +1,6 @@
 "use client";
-import React, { useState, useEffect, useCallback } from "react";
-import { useEditor, EditorContent, EditorContext } from "@tiptap/react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { EditorContent, EditorContext, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { Placeholder } from "@tiptap/extension-placeholder";
 import { Link } from "@tiptap/extension-link";
@@ -9,7 +9,7 @@ import { TaskList } from "@tiptap/extension-task-list";
 import { TaskItem } from "@tiptap/extension-task-item";
 import { HorizontalRule } from "@tiptap/extension-horizontal-rule";
 import { Highlight } from "@tiptap/extension-highlight";
-import { TextStyle } from "@tiptap/extension-text-style";
+import { BackgroundColor, TextStyle } from "@tiptap/extension-text-style";
 import { Color } from "@tiptap/extension-color";
 import { CharacterCount } from "@tiptap/extension-character-count";
 import { CodeBlockLowlight } from "@tiptap/extension-code-block-lowlight";
@@ -17,7 +17,6 @@ import DragHandle from "@tiptap/extension-drag-handle-react";
 import { NodeRange } from "@tiptap/extension-node-range";
 import { cx } from "class-variance-authority";
 import { common, createLowlight } from "lowlight";
-import { BackgroundColor } from "@tiptap/extension-text-style";
 import type { JSONContent } from "@tiptap/core";
 import type { ApiResponse } from "@/types/page";
 import { TableKit } from "@tiptap/extension-table";
@@ -28,8 +27,8 @@ import { slashCommand } from "./slash-command";
 import { notifications } from "@mantine/notifications";
 import { OptimizedBubbleMenu } from "./optimized-bubble-menu";
 import { TableContextMenu } from "./table-context-menu";
-import { useMemo } from "react";
 import { useHotkeys } from "@mantine/hooks";
+import { useSession } from "next-auth/react";
 
 export type EditorProps = {
   className?: string;
@@ -42,21 +41,9 @@ export type EditorProps = {
 const EditorSkeleton = () => (
   <div className="w-full space-y-6 py-12">
     <div className="space-y-3">
-      <div className="h-10 w-1/2 rounded-md bg-gray-200 dark:bg-gray-700 animate-pulse" />
-      <div className="h-4 w-full rounded-md bg-gray-200 dark:bg-gray-700 animate-pulse" />
-      <div className="h-4 w-5/6 rounded-md bg-gray-200 dark:bg-gray-700 animate-pulse" />
-    </div>
-    <div className="space-y-2">
-      {[...Array(8)].map((_, index) => (
-        <div
-          key={index}
-          className="h-4 w-full rounded-md bg-gray-200 dark:bg-gray-700 animate-pulse"
-        />
-      ))}
-    </div>
-    <div className="space-y-2">
-      <div className="h-32 w-full rounded-md bg-gray-200 dark:bg-gray-700 animate-pulse" />
-      <div className="h-4 w-2/3 rounded-md bg-gray-200 dark:bg-gray-700 animate-pulse" />
+      <div className="h-10 w-1/2 rounded-md bg-gray-200 animate-pulse" />
+      <div className="h-4 w-full rounded-md bg-gray-200 animate-pulse" />
+      <div className="h-4 w-5/6 rounded-md bg-gray-200 animate-pulse" />
     </div>
   </div>
 );
@@ -114,11 +101,12 @@ export default function Editor({
       updateTocFromContent(debouncedContent);
     }
   }, [debouncedContent, updateTocFromContent]);
-
+  const { status } = useSession();
   const editor = useEditor(
     {
       immediatelyRender: false,
       shouldRerenderOnTransaction: false,
+      editable: status === "authenticated",
       extensions: [
         TableKit.configure({
           table: {
@@ -126,22 +114,24 @@ export default function Editor({
             lastColumnResizable: true,
             allowTableNodeSelection: true,
             HTMLAttributes: {
-              class: 'border-collapse table-auto w-full my-4',
+              class: "border-collapse table-auto w-full my-4",
             },
           },
           tableRow: {
             HTMLAttributes: {
-              class: 'border-0',
+              class: "border-0",
             },
           },
           tableHeader: {
             HTMLAttributes: {
-              class: 'border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 px-3 py-2 text-left font-semibold',
+              class:
+                "border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 px-3 py-2 text-left font-semibold",
             },
           },
           tableCell: {
             HTMLAttributes: {
-              class: 'border border-gray-300 dark:border-gray-600 px-3 py-2 min-w-[100px] relative',
+              class:
+                "border border-gray-300 dark:border-gray-600 px-3 py-2 min-w-[100px] relative",
             },
           },
         }),

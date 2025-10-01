@@ -22,6 +22,9 @@ async function seedAdmin() {
     if (existing.isDeleted) {
       updates.isDeleted = false;
     }
+    if (!existing.role || existing.role === "MEMBER") {
+      updates.role = "ADMIN";
+    }
 
     if (Object.keys(updates).length > 0) {
       return prisma.user.update({
@@ -41,6 +44,7 @@ async function seedAdmin() {
       email,
       name: finalName,
       password: passwordHash,
+      role: "ADMIN",
     },
   });
 

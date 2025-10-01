@@ -8,6 +8,7 @@ import { TableOfContents } from "@/components/TableOfContents";
 import { PageProvider, usePage } from "@/app/[slug]/page-provider";
 import type { CurrentPage } from "@/types/page";
 import type { TocItem } from "@/lib/toc";
+import { useSession } from "next-auth/react";
 
 const TocComponent = () => {
   const { tocItems } = usePage();
@@ -27,6 +28,7 @@ const TocComponent = () => {
 };
 
 const PageHeader = () => {
+  const { status } = useSession();
   const { page, loading, saving, requestSave } = usePage();
 
   if (loading) {
@@ -44,9 +46,7 @@ const PageHeader = () => {
   const fallbackTitle = slug === "index" ? "Home" : slug.replace(/-/g, " ");
   const frontmatter = page?.frontmatter as Record<string, unknown> | undefined;
   const title =
-    (frontmatter?.title as string | undefined) ??
-    page?.title ??
-    fallbackTitle;
+    (frontmatter?.title as string | undefined) ?? page?.title ?? fallbackTitle;
   const tags = Array.isArray(frontmatter?.tags)
     ? (frontmatter?.tags as string[])
     : [];
@@ -77,15 +77,19 @@ const PageHeader = () => {
             </Group>
           )}
         </div>
-        <Button
-          variant="light"
-          size="xs"
-          onClick={requestSave}
-          loading={saving}
-          leftSection={<Icon icon="mdi:content-save" width={14} height={14} />}
-        >
-          {saving ? "Saving..." : "Save"}
-        </Button>
+        {status === "authenticated" && (
+          <Button
+            variant="light"
+            size="xs"
+            onClick={requestSave}
+            loading={saving}
+            leftSection={
+              <Icon icon="mdi:content-save" width={14} height={14} />
+            }
+          >
+            {saving ? "Saving..." : "Save"}
+          </Button>
+        )}
       </div>
 
       <div
@@ -96,7 +100,8 @@ const PageHeader = () => {
       >
         <div className="flex items-center gap-1">
           <span>
-            Last updated: {page?.updatedAt
+            Last updated:{" "}
+            {page?.updatedAt
               ? new Date(page.updatedAt).toLocaleDateString("en-US", {
                   year: "numeric",
                   month: "short",

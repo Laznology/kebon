@@ -20,6 +20,7 @@ import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { Icon } from "@iconify/react";
 import DocsLayout from "@/components/docs-layout";
+import UserTable from "@/components/user-table";
 
 interface AppSettings {
   id: number;
@@ -226,6 +227,21 @@ export default function SettingsPage() {
               </Group>
             </Stack>
           </form>
+        </Card>
+
+        <Card withBorder p="lg" style={{ maxWidth: 800, margin: '0 auto' }}>
+          <Stack gap="md">
+            <div>
+              <Title order={3} size="h4">
+                User Management
+              </Title>
+              <Text size="sm" c="dimmed">
+                Manage your application users. You can edit or remove users as needed.
+              </Text>
+            </div>
+
+            <UserTable />
+          </Stack>
         </Card>
       </Stack>
     </DocsLayout>

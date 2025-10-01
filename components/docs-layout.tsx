@@ -190,7 +190,6 @@ export default function DocsLayout({ children, toc }: DocsLayoutProps) {
                                 message: `Deleted ${page.title}`,
                                 color: "green",
                               });
-                              // Refetch pages after delete
                               await refetchPages();
                             }}
                           >

@@ -12,6 +12,8 @@ import {
   mantineHtmlProps,
 } from "@mantine/core";
 import { Notifications } from "@mantine/notifications";
+import { Metadata } from "next";
+import { prisma } from "@/lib/prisma";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,9 +25,10 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export async function generateMetadata() {
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await prisma.appSettings.findFirst()
   return {
-    title: "Kebon",
+    title: settings?.appName,
     icons: {
       icon: [
         { url: "/favicon.ico" },
