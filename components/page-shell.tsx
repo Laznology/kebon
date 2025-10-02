@@ -1,7 +1,7 @@
 "use client";
 
 import { ReactNode, useEffect, useRef, useState } from "react";
-import { ActionIcon, Badge, Button, Group, Text, TextInput } from "@mantine/core";
+import { ActionIcon, Badge, Button, TextInput } from "@mantine/core";
 import { Icon } from "@iconify/react";
 import { useRouter } from "next/navigation";
 import PageLayout from "@/components/page-layout";
