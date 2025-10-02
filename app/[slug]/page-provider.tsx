@@ -26,14 +26,14 @@ function normalizeApiResponse(
   data: ApiPageResponse,
   slug: string,
 ): CurrentPage {
-  const fallbackTitle = slug.replace(/-/g, " ");
-  const content = (data?.content as JSONContent) ?? {
+  const title = data.title || slug.replace(/-/g, " ");
+  const content = data.content || {
     type: "doc",
     content: [
       {
         type: "heading",
         attrs: { level: 1 },
-        content: [{ type: "text", text: fallbackTitle }],
+        content: [{ type: "text", text: title }],
       },
       {
         type: "paragraph",
@@ -42,40 +42,31 @@ function normalizeApiResponse(
     ],
   };
 
-  const updatedAt =
-    typeof data?.updatedAt === "string"
-      ? data.updatedAt
-      : data?.updatedAt
-        ? new Date(data.updatedAt).toISOString()
-        : undefined;
-
-  const frontmatter: Record<string, unknown> = {
-    title: data?.title ?? fallbackTitle,
-    description: data?.excerpt ?? undefined,
-    tags: data?.tags ?? [],
-    status:
-      typeof data?.published === "boolean"
-        ? data.published
-          ? "published"
-          : "draft"
-        : undefined,
-    updatedAt,
-    ...(data?.frontmatter ?? {}),
-  };
+  const updatedAt = typeof data.updatedAt === "string"
+    ? data.updatedAt
+    : data.updatedAt instanceof Date
+    ? data.updatedAt.toISOString()
+    : new Date().toISOString();
 
   return {
-    slug: data?.slug ?? slug,
-    title: data?.title ?? fallbackTitle,
+    slug: data.slug || slug,
+    title,
     content,
-    frontmatter,
+    excerpt: data.excerpt || null,
+    tags: data.tags || [],
+    frontmatter: {
+      title,
+      description: data.excerpt,
+      tags: data.tags || [],
+      status: data.published ? "published" : "draft",
+      updatedAt,
+    },
     updatedAt,
-    author: data?.author
-      ? {
-          id: data.author.id,
-          name: data.author.name,
-          email: data.author.email,
-        }
-      : null,
+    author: data.author ? {
+      id: data.author.id,
+      name: data.author.name,
+      email: data.author.email,
+    } : null,
   };
 }
 
@@ -86,27 +77,19 @@ export function PageProvider({
   initialToc,
 }: PageProviderProps) {
   const pathname = usePathname();
-
-  const slug = useMemo(() => {
-    if (slugProp) return slugProp;
-    const segments = pathname.split("/").filter(Boolean);
-    const lastSegment = segments[segments.length - 1];
-    if (lastSegment) return lastSegment;
-    return pathname === "/" ? "index" : undefined;
-  }, [pathname, slugProp]);
+  const slug = slugProp || pathname.split("/").filter(Boolean).pop() || "index";
 
   const pageCache = useRef<Map<string, CurrentPage>>(new Map());
   const tocCache = useRef<Map<string, TocItem[]>>(new Map());
 
-  const [page, setPage] = useState<CurrentPage | null>(initialPage ?? null);
+  const [page, setPage] = useState<CurrentPage | null>(initialPage || null);
   const [loading, setLoading] = useState<boolean>(!initialPage);
   const [tocItems, setTocItems] = useState<TocItem[]>(
-    initialToc ??
-      (initialPage?.content ? generateTocFromContent(initialPage.content) : []),
+    initialToc || (initialPage?.content ? generateTocFromContent(initialPage.content) : [])
   );
   const [saving, setSaving] = useState<boolean>(false);
 
-  const saveHandlerRef = useRef<() => void>(() => {});
+  const saveHandlerRef = useRef<(title?: string, tags?: string[]) => Promise<{ newSlug?: string } | void>>(() => Promise.resolve());
 
   const computedTocItems = useMemo(() => {
     if (!page?.content) return [];
@@ -124,12 +107,12 @@ export function PageProvider({
     }
   }, [slug, page, tocItems]);
 
-  const setSaveHandler = useCallback((handler: (() => void) | null) => {
-    saveHandlerRef.current = handler ?? (() => {});
+  const setSaveHandler = useCallback((handler: ((title?: string, tags?: string[]) => Promise<{ newSlug?: string } | void>) | null) => {
+    saveHandlerRef.current = handler ?? (() => Promise.resolve());
   }, []);
 
-  const requestSave = useCallback(() => {
-    saveHandlerRef.current();
+  const requestSave = useCallback((title?: string, tags?: string[]) => {
+    return saveHandlerRef.current(title, tags);
   }, []);
 
   const updateTocFromContent = useCallback(
@@ -150,18 +133,29 @@ export function PageProvider({
       const updatedPage: CurrentPage = {
         ...page,
         ...updates,
-        frontmatter: updates.frontmatter
-          ? { ...(page.frontmatter ?? {}), ...updates.frontmatter }
-          : page.frontmatter,
+        frontmatter: {
+          ...(page.frontmatter || {}),
+          ...(updates.frontmatter || {}),
+        },
       };
 
       setPage(updatedPage);
+
+      // Update cache with new slug if slug changed
+      if (updates.slug && updates.slug !== slug) {
+        pageCache.current.delete(slug);
+        pageCache.current.set(updates.slug, updatedPage);
+        if (tocItems.length > 0) {
+          tocCache.current.delete(slug);
+          tocCache.current.set(updates.slug, tocItems);
+        }
+      }
 
       if (updates.content) {
         updateTocFromContent(updates.content);
       }
     },
-    [page, slug, updateTocFromContent],
+    [page, slug, updateTocFromContent, tocItems],
   );
 
   const clearPageCache = useCallback(() => {

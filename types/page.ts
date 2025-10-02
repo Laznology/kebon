@@ -96,8 +96,8 @@ export type PageContextType = {
   tocItems: import("@/lib/toc").TocItem[];
   saving: boolean;
   setSaving: (saving: boolean) => void;
-  requestSave: () => void;
-  setSaveHandler: (handler: (() => void) | null) => void;
+  requestSave: (title?: string, tags?: string[]) => Promise<{ newSlug?: string } | void>;
+  setSaveHandler: (handler: ((title?: string, tags?: string[]) => Promise<{ newSlug?: string } | void>) | null) => void;
   updateTocFromContent: (content: JSONContent) => void;
   syncCurrentPage: (updates: Partial<CurrentPage>) => void;
   clearPageCache: () => void;
