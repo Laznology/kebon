@@ -34,22 +34,19 @@ export default async function EditPageLayout({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-
   const pageData = await getPageBySlug(slug);
+  
   if (!pageData) {
     notFound();
   }
 
-  const jsonContent =
-    (pageData.content as JSONContent | null) ?? {
-      type: "doc",
-      content: [],
-    };
-
+  const content = pageData.content as JSONContent || { type: "doc", content: [] };
   const initialPage: CurrentPage = {
     slug,
     title: pageData.title,
-    content: jsonContent,
+    content,
+    excerpt: pageData.excerpt,
+    tags: pageData.tags,
     frontmatter: {
       title: pageData.title,
       updatedAt: pageData.updatedAt.toISOString(),

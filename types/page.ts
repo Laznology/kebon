@@ -31,6 +31,8 @@ export type CurrentPage = {
   slug: string;
   title: string;
   content: JSONContent;
+  excerpt?: string | null;
+  tags?: string[];
   frontmatter?: Record<string, unknown>;
   updatedAt?: string;
   author?: AuthorInfo;
