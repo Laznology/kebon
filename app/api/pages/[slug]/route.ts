@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { generateSlug } from "@/lib/utils";
 import type { JSONContent } from "@tiptap/core";
 
 export async function GET(
@@ -86,15 +87,33 @@ export async function POST(
     const textContent = content ? extractTextFromContent(content) : "";
     const excerpt = textContent.slice(0, 200).trim();
 
+    const updateData: any = {
+      excerpt: excerpt || null,
+    };
+
+    if (title) {
+      updateData.title = title;
+      // Generate new slug if title changes and it's not the index page
+      if (slug !== "index") {
+        const newSlug = generateSlug(title);
+        // Check if new slug is different and not already taken
+        if (newSlug !== slug) {
+          const existingWithNewSlug = await prisma.page.findUnique({
+            where: { slug: newSlug, isDeleted: false },
+          });
+          if (!existingWithNewSlug || existingWithNewSlug.id === existingPage.id) {
+            updateData.slug = newSlug;
+          }
+        }
+      }
+    }
+    if (content) updateData.content = content;
+    if (tags !== undefined) updateData.tags = tags;
+    if (typeof published === "boolean") updateData.published = published;
+
     const updatedPage = await prisma.page.update({
       where: { id: existingPage.id },
-      data: {
-        ...(title && { title }),
-        ...(content && { content }),
-        ...(tags && { tags }),
-        ...(typeof published === "boolean" && { published }),
-        excerpt: excerpt || null,
-      },
+      data: updateData,
       include: {
         author: {
           select: {
@@ -107,7 +126,7 @@ export async function POST(
     });
 
     return NextResponse.json({ success: true, page: updatedPage });
-  } catch {
+  } catch (error) {
     return NextResponse.json(
       { error: "Failed to update page" },
       { status: 500 },

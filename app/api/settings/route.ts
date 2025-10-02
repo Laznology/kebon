@@ -11,7 +11,7 @@ export async function GET() {
     }
 
     const settings = await prisma.appSettings.findFirst();
-    return NextResponse.json({ data: settings }, { status: 200 });
+    return NextResponse.json(settings, { status: 200 });
   } catch {
     return NextResponse.json(
       { error: "Failed to fetch Setting" },
