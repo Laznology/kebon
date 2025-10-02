@@ -52,10 +52,7 @@ export default function SearchModal() {
     const searchActions = results.map((result: SearchResult) => ({
       id: result.slug,
       label: result.highlightedTitle || result.title,
-      description: createExcerpt(
-        result.highlightedExcerpt || result.excerpt || "",
-        120,
-      ),
+      description: createExcerpt(result.excerpt || "", 120),
       onClick: () => {
         router.push(`/${result.slug}`);
         spotlight.close();
