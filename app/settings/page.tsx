@@ -19,7 +19,7 @@ import {
 import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { Icon } from "@iconify/react";
-import DocsLayout from "@/components/docs-layout";
+import PageLayout from "@/components/page-layout";
 import UserTable from "@/components/user-table";
 
 interface AppSettings {
@@ -128,9 +128,9 @@ export default function SettingsPage() {
 
   if (status === "loading" || loading) {
     return (
-      <DocsLayout>
+      <PageLayout>
         <LoadingOverlay visible />
-      </DocsLayout>
+      </PageLayout>
     );
   }
 
@@ -139,7 +139,7 @@ export default function SettingsPage() {
   }
 
   return (
-    <DocsLayout>
+    <PageLayout>
       <Stack gap="lg">
         <Group>
           <Icon icon="mdi:cog" width={32} height={32} />
@@ -244,6 +244,6 @@ export default function SettingsPage() {
           </Stack>
         </Card>
       </Stack>
-    </DocsLayout>
+    </PageLayout>
   );
 }
