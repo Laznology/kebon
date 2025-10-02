@@ -235,15 +235,15 @@ export async function readAllPages() {
 }
 
 export async function readHomePage() {
-  const homePage =
-    (await getPageBySlug("index")) || (await getPageBySlug("home"));
-  return homePage
-    ? {
-        frontmatter: {
-          title: homePage.title,
-          updatedAt: homePage.updatedAt.toISOString(),
-        },
-        content: extractAndCleanText(homePage.content as JSONContent),
-      }
-    : null;
+  const homePage = await getPageBySlug("index");
+  
+  if (!homePage) return null;
+
+  return {
+    frontmatter: {
+      title: homePage.title,
+      updatedAt: homePage.updatedAt.toISOString(),
+    },
+    content: extractAndCleanText(homePage.content as JSONContent),
+  };
 }
