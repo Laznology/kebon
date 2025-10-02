@@ -258,46 +258,32 @@ export default function Editor({
     (contentToSave: JSONContent, payload: ApiResponse) => {
       setLastSavedContent(contentToSave);
 
-      const updatedPage = payload?.page;
-      const updatedAtSource = updatedPage?.updatedAt ?? currentPage?.updatedAt;
-      const updatedAt =
-        typeof updatedAtSource === "string"
-          ? updatedAtSource
-          : updatedAtSource instanceof Date
-            ? updatedAtSource.toISOString()
-            : new Date().toISOString();
+      const updatedPage = payload.page;
+      if (!updatedPage) return;
 
-      const resolvedTitle =
-        updatedPage?.title ??
-        title ??
-        currentPage?.title ??
-        (slug ? slug.replace(/-/g, " ") : "Untitled");
+      const updatedAt = typeof updatedPage.updatedAt === "string"
+        ? updatedPage.updatedAt
+        : updatedPage.updatedAt instanceof Date
+        ? updatedPage.updatedAt.toISOString()
+        : new Date().toISOString();
 
-      const frontmatter: Record<string, unknown> = {
-        ...(currentPage?.frontmatter ?? {}),
-        title: resolvedTitle,
-      };
-
-      if (updatedAt) {
-        frontmatter.updatedAt = updatedAt;
-      }
-
-      if (updatedPage) {
-        frontmatter.description = updatedPage.excerpt ?? undefined;
-        if (Array.isArray(updatedPage.tags)) {
-          frontmatter.tags = updatedPage.tags;
-        }
-        if (typeof updatedPage.published === "boolean") {
-          frontmatter.status = updatedPage.published ? "published" : "draft";
-        }
-      }
+      const pageTitle = updatedPage.title || title || currentPage?.title || (slug ? slug.replace(/-/g, " ") : "Untitled");
 
       syncCurrentPage({
+        slug: updatedPage.slug,
         content: contentToSave,
-        title: resolvedTitle,
+        title: pageTitle,
         updatedAt,
-        frontmatter,
-        author: updatedPage?.author ?? currentPage?.author ?? null,
+        excerpt: updatedPage.excerpt || currentPage?.excerpt || null,
+        tags: updatedPage.tags || currentPage?.tags || [],
+        frontmatter: {
+          title: pageTitle,
+          updatedAt,
+          description: updatedPage.excerpt,
+          tags: updatedPage.tags || [],
+          status: updatedPage.published ? "published" : "draft",
+        },
+        author: updatedPage.author || currentPage?.author || null,
       });
     },
     [currentPage, syncCurrentPage, title, slug],
@@ -315,6 +301,7 @@ export default function Editor({
           body: JSON.stringify({
             content: contentToSave,
             title,
+            tags: currentPage?.tags,
           }),
         });
 
@@ -340,7 +327,7 @@ export default function Editor({
         setSaving(false);
       }
     },
-    [applySaveResult, editor, slug, title, setSaving],
+    [applySaveResult, editor, slug, title, setSaving, currentPage],
   );
 
   useEffect(() => {
@@ -353,7 +340,7 @@ export default function Editor({
     autoSave(debouncedContent);
   }, [debouncedContent, editor, slug, lastSavedContent, autoSave]);
 
-  const handleSave = useCallback(async () => {
+  const handleSave = useCallback(async (editedTitle?: string, editedTags?: string[]) => {
     if (!editor || !slug) return;
 
     const currentContent = editor.getJSON();
@@ -364,7 +351,8 @@ export default function Editor({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           content: currentContent,
-          title: title,
+          title: editedTitle || title,
+          tags: editedTags,
         }),
       });
 
@@ -379,6 +367,9 @@ export default function Editor({
           message: "Page saved successfully.",
           color: "green",
         });
+        
+        // Return new slug if it changed
+        return { newSlug: payload?.page?.slug };
       } else {
         notifications.show({
           title: "Save Failed",
