@@ -19,7 +19,7 @@ if should_seed; then
     echo "Applying Prisma migrations..."
     npx --yes prisma migrate deploy
     echo "Running Prisma database seed..."
-    npm run db:seed
+    npx --yes prisma db seed
     echo "Prisma migrate & seed completed."
   fi
 else
