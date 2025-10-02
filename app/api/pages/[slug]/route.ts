@@ -87,16 +87,14 @@ export async function POST(
     const textContent = content ? extractTextFromContent(content) : "";
     const excerpt = textContent.slice(0, 200).trim();
 
-    const updateData: any = {
+    const updateData: Record<string, unknown> = {
       excerpt: excerpt || null,
     };
 
     if (title) {
       updateData.title = title;
-      // Generate new slug if title changes and it's not the index page
       if (slug !== "index") {
         const newSlug = generateSlug(title);
-        // Check if new slug is different and not already taken
         if (newSlug !== slug) {
           const existingWithNewSlug = await prisma.page.findUnique({
             where: { slug: newSlug, isDeleted: false },
@@ -126,7 +124,7 @@ export async function POST(
     });
 
     return NextResponse.json({ success: true, page: updatedPage });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: "Failed to update page" },
       { status: 500 },

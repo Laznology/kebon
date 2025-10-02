@@ -368,7 +368,6 @@ export default function Editor({
           color: "green",
         });
         
-        // Return new slug if it changed
         return { newSlug: payload?.page?.slug };
       } else {
         notifications.show({

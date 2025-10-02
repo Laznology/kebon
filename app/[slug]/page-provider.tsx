@@ -141,7 +141,6 @@ export function PageProvider({
 
       setPage(updatedPage);
 
-      // Update cache with new slug if slug changed
       if (updates.slug && updates.slug !== slug) {
         pageCache.current.delete(slug);
         pageCache.current.set(updates.slug, updatedPage);
