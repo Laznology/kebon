@@ -1,6 +1,6 @@
 export const revalidate = 0;
 import { notFound } from "next/navigation";
-import DocsPageShell from "@/components/docs-page-shell";
+import PageShell from "@/components/page-shell";
 import { generateTocFromContent } from "@/lib/generateToc";
 import { getPageBySlug } from "@/lib/content";
 import type { CurrentPage } from "@/types/page";
@@ -57,15 +57,11 @@ export default async function EditPageLayout({
     updatedAt: pageData.updatedAt.toISOString(),
   };
 
-  const initialToc = generateTocFromContent(jsonContent);
+  const initialToc = generateTocFromContent(content);
 
   return (
-    <DocsPageShell
-      slug={slug}
-      initialPage={initialPage}
-      initialToc={initialToc}
-    >
+    <PageShell slug={slug} initialPage={initialPage} initialToc={initialToc}>
       {children}
-    </DocsPageShell>
+    </PageShell>
   );
 }

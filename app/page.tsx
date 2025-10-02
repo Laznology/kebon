@@ -1,6 +1,6 @@
 export const revalidate = 0;
-import DocsPageShell from "@/components/docs-page-shell";
-import DocsPageContent from "@/components/docs-page-content";
+import PageShell from "@/components/page-shell";
+import PageContent from "@/components/page-content";
 import { getPageBySlug } from "@/lib/content";
 import { generateTocFromContent } from "@/lib/generateToc";
 import type { CurrentPage } from "@/types/page";
@@ -9,31 +9,26 @@ import { notFound } from "next/navigation";
 
 export async function generateMetadata() {
   const page = await getPageBySlug("index");
-
-  const title = page?.title || "Home";
-  const description =
-    page?.excerpt || "Start writing your documentation here.";
-
-  return { title, description };
+  return {
+    title: page?.title || "Home",
+    description: page?.excerpt || "Start writing your documentation here.",
+  };
 }
 
 export default async function HomePage() {
-  const slug = "index";
-
   const homePage = await getPageBySlug("index");
+  
   if (!homePage) {
     notFound();
   }
 
-  const jsonContent = (homePage.content as JSONContent | null) ?? {
-    type: 'doc',
-    content: [],
-  };
-
+  const content = homePage.content as JSONContent || { type: "doc", content: [] };
   const initialPage: CurrentPage = {
-    slug,
+    slug: "index",
     title: homePage.title,
-    content: jsonContent,
+    content,
+    excerpt: homePage.excerpt,
+    tags: homePage.tags,
     frontmatter: {
       title: homePage.title,
       updatedAt: homePage.updatedAt.toISOString(),
@@ -41,15 +36,11 @@ export default async function HomePage() {
     updatedAt: homePage.updatedAt.toISOString(),
   };
 
-  const initialToc = generateTocFromContent(jsonContent);
+  const initialToc = generateTocFromContent(content);
 
   return (
-    <DocsPageShell
-      slug={slug}
-      initialPage={initialPage}
-      initialToc={initialToc}
-    >
-      <DocsPageContent />
-    </DocsPageShell>
+    <PageShell slug="index" initialPage={initialPage} initialToc={initialToc}>
+      <PageContent />
+    </PageShell>
   );
 }
