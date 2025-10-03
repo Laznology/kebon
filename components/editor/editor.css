@@ -22,6 +22,18 @@
   border-left-color: rgb(var(--border)) !important;
 }
 
+[data-mantine-color-scheme="dark"] .prose blockquote {
+  border-left-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+.prose hr {
+  border-color: rgb(var(--border)) !important; 
+}
+
+[data-mantine-color-scheme="dark"] .prose hr {
+  border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
 .prose {
   color: rgb(var(--foreground)) !important;
 }
