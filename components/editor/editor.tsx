@@ -1,6 +1,7 @@
 "use client";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { EditorContent, EditorContext, useEditor } from "@tiptap/react";
+import { AllSelection } from "@tiptap/pm/state";
 import StarterKit from "@tiptap/starter-kit";
 import { Placeholder } from "@tiptap/extension-placeholder";
 import { Link } from "@tiptap/extension-link";
@@ -217,7 +218,7 @@ export default function Editor({
           HTMLAttributes: {
             class: cx(
               "mt-4 mb-6 border-t",
-              "border-gray-300 dark:border-gray-100",
+              "border-white",
               "transition-colors duration-200",
             ),
           },
@@ -243,6 +244,19 @@ export default function Editor({
         attributes: {
           class:
             "py-12 prose prose-base dark:prose-invert focus:outline-none max-w-full min-h-[500px]",
+        },
+        handleDOMEvents: {
+          keydown: (view, event) => {
+            if ((event.ctrlKey || event.metaKey) && event.key === 'a') {
+              event.preventDefault();
+              const { state, dispatch } = view;
+              const { doc } = state;
+              const tr = state.tr.setSelection(new AllSelection(doc));
+              dispatch(tr);
+              return true;
+            }
+            return false;
+          },
         },
       },
       onUpdate: ({ editor }) => {
