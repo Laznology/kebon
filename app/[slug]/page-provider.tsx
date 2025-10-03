@@ -130,6 +130,14 @@ export function PageProvider({
     (updates: Partial<CurrentPage>) => {
       if (!slug || !page) return;
 
+      const hasChanges = Object.keys(updates).some(key => {
+        const updateValue = updates[key as keyof CurrentPage];
+        const currentValue = page[key as keyof CurrentPage];
+        return JSON.stringify(updateValue) !== JSON.stringify(currentValue);
+      });
+
+      if (!hasChanges) return;
+
       const updatedPage: CurrentPage = {
         ...page,
         ...updates,
