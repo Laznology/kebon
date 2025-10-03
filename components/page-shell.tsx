@@ -11,6 +11,22 @@ import type { TocItem } from "@/lib/toc";
 import { useSession } from "next-auth/react";
 import { useHotkeys } from "@mantine/hooks";
 
+function useDebounce<T>(value: T, delay: number): T {
+  const [debouncedValue, setDebouncedValue] = useState<T>(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
+}
+
 const TocComponent = () => {
   const { tocItems } = usePage();
   const reinitializeRef = useRef(() => {});
@@ -30,11 +46,14 @@ const TocComponent = () => {
 
 const PageHeader = () => {
   const { status } = useSession();
-  const { page, loading } = usePage();
+  const { page, loading, requestSave } = usePage();
   const [editedTitle, setEditedTitle] = useState<string>("");
   const [editedTags, setEditedTags] = useState<string[]>([]);
   const [newTag, setNewTag] = useState<string>("");
   const [isAddingTag, setIsAddingTag] = useState(false);
+
+  const debouncedTitle = useDebounce(editedTitle, 2000);
+  const debouncedTags = useDebounce(editedTags, 2000);
 
   useHotkeys([
     ["Enter", () => handleAddTag],
@@ -53,6 +72,18 @@ const PageHeader = () => {
       setEditedTags(Array.isArray(page.tags) ? page.tags : []);
     }
   }, [page]);
+
+  useEffect(() => {
+    if (status === "authenticated" && page && debouncedTitle !== page.title) {
+      requestSave(debouncedTitle, page.tags);
+    }
+  }, [debouncedTitle, status, page, requestSave]);
+
+  useEffect(() => {
+    if (status === "authenticated" && page && JSON.stringify(debouncedTags) !== JSON.stringify(page.tags)) {
+      requestSave(page.title, debouncedTags);
+    }
+  }, [debouncedTags, status, page, requestSave]);
 
   if (loading) {
     return (
