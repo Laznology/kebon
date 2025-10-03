@@ -1,7 +1,7 @@
 "use client";
 
 import { ReactNode, useEffect, useRef, useState } from "react";
-import { ActionIcon, Badge, Button, TextInput } from "@mantine/core";
+import { ActionIcon, Badge, Button, Text, TextInput } from "@mantine/core";
 import { Icon } from "@iconify/react";
 import { useRouter } from "next/navigation";
 import PageLayout from "@/components/page-layout";
@@ -75,7 +75,6 @@ const PageHeader = () => {
     }
   };
 
-
   const handleRemoveTag = (index: number) => {
     setEditedTags(editedTags.filter((_, i) => i !== index));
   };
@@ -89,19 +88,19 @@ const PageHeader = () => {
 
   return (
     <div className="flex flex-col">
-      <div className="flex items-start justify-between mb-6">
-        <div className="flex-1">
+      <div className="flex items-start">
+        <div className="flex-1 items-center space-y-2">
           <TextInput
             variant="unstyled"
             size="xl"
-            disabled={status !== "authenticated"}
+            readOnly={status !== "authenticated"}
             value={editedTitle}
             onChange={(e) => setEditedTitle(e.target.value)}
             styles={{
               input: {
+                color: "inherit",
                 fontSize: "2rem",
                 fontWeight: 600,
-                lineHeight: 1.2,
                 background: "transparent",
                 "&:focus": {
                   outline: "1px solid rgba(0,0,0,0.1)",
@@ -110,6 +109,18 @@ const PageHeader = () => {
               },
             }}
           />
+          <div>
+            <Text>
+              Updated:{" "}
+              {page?.updatedAt
+                ? new Date(page.updatedAt).toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                  })
+                : "Unknown"}
+            </Text>
+          </div>
           <div className="flex flex-warp items-center gap-2">
             {editedTags.map((tag, index) => (
               <Badge
@@ -117,7 +128,7 @@ const PageHeader = () => {
                 radius={"sm"}
                 key={index}
                 variant="light"
-                size="sm"
+                size="xs"
                 rightSection={
                   <ActionIcon
                     size="xs"
@@ -134,25 +145,27 @@ const PageHeader = () => {
               </Badge>
             ))}
             {isAddingTag ? (
-              <TextInput 
+              <TextInput
                 size="xs"
                 variant="unstyled"
                 value={newTag}
                 onChange={(e) => setNewTag(e.target.value)}
                 onBlur={handleAddTag}
-                onKeyDown={(e) => { if (e.key === 'Enter') handleAddTag(); }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") handleAddTag();
+                }}
                 placeholder="Enter tag ..."
-                autoFocus 
+                autoFocus
               />
-            ): (
-                <ActionIcon
-                    variant="light"
-                    size="lg"
-                    onClick={() => setIsAddingTag(true)}
-                    color="gray"
-                >
-                    <Icon icon={"mdi:plus"} width={12} height={12} />
-                </ActionIcon>
+            ) : (
+              <ActionIcon
+                variant="light"
+                size="xs"
+                onClick={() => setIsAddingTag(true)}
+                color="gray"
+              >
+                <Icon icon={"mdi:plus"} width={12} height={12} />
+              </ActionIcon>
             )}
           </div>
         </div>
@@ -169,26 +182,6 @@ const PageHeader = () => {
             {saving ? "Saving..." : "Save"}
           </Button>
         )}
-      </div>
-
-      <div
-        className="flex items-center gap-4 text-xs pt-4"
-        style={{
-          color: "rgb(var(--muted-foreground))",
-        }}
-      >
-        <div className="flex items-center gap-1">
-          <span>
-            Last updated:{" "}
-            {page?.updatedAt
-              ? new Date(page.updatedAt).toLocaleDateString("en-US", {
-                  year: "numeric",
-                  month: "short",
-                  day: "numeric",
-                })
-              : "Unknown"}
-          </span>
-        </div>
       </div>
     </div>
   );
