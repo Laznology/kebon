@@ -283,22 +283,28 @@ export default function Editor({
 
       const pageTitle = updatedPage.title || title || currentPage?.title || (slug ? slug.replace(/-/g, " ") : "Untitled");
 
-      syncCurrentPage({
-        slug: updatedPage.slug,
-        content: contentToSave,
-        title: pageTitle,
-        updatedAt,
-        excerpt: updatedPage.excerpt || currentPage?.excerpt || null,
-        tags: updatedPage.tags || currentPage?.tags || [],
-        frontmatter: {
+      const hasSlugChanged = updatedPage.slug !== currentPage?.slug;
+      const hasTitleChanged = pageTitle !== currentPage?.title;
+      const hasExcerptChanged = updatedPage.excerpt !== currentPage?.excerpt;
+      const hasTagsChanged = JSON.stringify(updatedPage.tags) !== JSON.stringify(currentPage?.tags);
+
+      if (hasSlugChanged || hasTitleChanged || hasExcerptChanged || hasTagsChanged) {
+        syncCurrentPage({
+          slug: updatedPage.slug,
           title: pageTitle,
           updatedAt,
-          description: updatedPage.excerpt,
-          tags: updatedPage.tags || [],
-          status: updatedPage.published ? "published" : "draft",
-        },
-        author: updatedPage.author || currentPage?.author || null,
-      });
+          excerpt: updatedPage.excerpt || currentPage?.excerpt || null,
+          tags: updatedPage.tags || currentPage?.tags || [],
+          frontmatter: {
+            title: pageTitle,
+            updatedAt,
+            description: updatedPage.excerpt,
+            tags: updatedPage.tags || [],
+            status: updatedPage.published ? "published" : "draft",
+          },
+          author: updatedPage.author || currentPage?.author || null,
+        });
+      }
     },
     [currentPage, syncCurrentPage, title, slug],
   );
