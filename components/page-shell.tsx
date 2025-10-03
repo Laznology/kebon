@@ -10,6 +10,7 @@ import type { CurrentPage } from "@/types/page";
 import type { TocItem } from "@/lib/toc";
 import { useSession } from "next-auth/react";
 import { useHotkeys } from "@mantine/hooks";
+import Footer from "./footer";
 
 function useDebounce<T>(value: T, delay: number): T {
   const [debouncedValue, setDebouncedValue] = useState<T>(value);
@@ -222,6 +223,7 @@ export default function PageShell({
       <PageLayout toc={<TocComponent />}>
         <PageHeader />
         {children}
+        <Footer />
       </PageLayout>
     </PageProvider>
   );
