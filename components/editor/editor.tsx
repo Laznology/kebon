@@ -40,7 +40,7 @@ export type EditorProps = {
 };
 
 const EditorSkeleton = () => (
-  <div className="w-full space-y-6 py-12">
+  <div className="w-full space-y-6 py-4">
     <div className="space-y-3">
       <div className="h-10 w-1/2 rounded-md bg-gray-200 animate-pulse" />
       <div className="h-4 w-full rounded-md bg-gray-200 animate-pulse" />
@@ -243,7 +243,7 @@ export default function Editor({
       editorProps: {
         attributes: {
           class:
-            "py-12 prose prose-base dark:prose-invert focus:outline-none max-w-full min-h-[500px]",
+            "py-4 prose prose-base dark:prose-invert focus:outline-none max-w-full min-h-[500px]",
         },
         handleDOMEvents: {
           keydown: (view, event) => {

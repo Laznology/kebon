@@ -5,7 +5,7 @@ import { usePage } from "@/app/[slug]/page-provider";
 import type { JSONContent } from "@tiptap/core";
 
 const EditorSkeleton = () => (
-  <div className="w-full space-y-6 py-12">
+  <div className="w-full space-y-6 py-4">
     <div className="space-y-3">
       <div className="h-10 w-1/2 rounded-md bg-gray-200 animate-pulse" />
       <div className="h-4 w-full rounded-md bg-gray-200 animate-pulse" />
