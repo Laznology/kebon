@@ -1,9 +1,8 @@
 "use client";
 
 import { ReactNode, useEffect, useRef, useState } from "react";
-import { ActionIcon, Badge, Button, Text, TextInput } from "@mantine/core";
+import { ActionIcon, Badge, Text, TextInput } from "@mantine/core";
 import { Icon } from "@iconify/react";
-import { useRouter } from "next/navigation";
 import PageLayout from "@/components/page-layout";
 import { TableOfContents } from "@/components/TableOfContents";
 import { PageProvider, usePage } from "@/app/[slug]/page-provider";
@@ -31,8 +30,7 @@ const TocComponent = () => {
 
 const PageHeader = () => {
   const { status } = useSession();
-  const { page, loading, saving, requestSave } = usePage();
-  const router = useRouter();
+  const { page, loading } = usePage();
   const [editedTitle, setEditedTitle] = useState<string>("");
   const [editedTags, setEditedTags] = useState<string[]>([]);
   const [newTag, setNewTag] = useState<string>("");
@@ -77,13 +75,6 @@ const PageHeader = () => {
 
   const handleRemoveTag = (index: number) => {
     setEditedTags(editedTags.filter((_, i) => i !== index));
-  };
-
-  const handleSave = async () => {
-    const result = await requestSave(editedTitle, editedTags);
-    if (result?.newSlug && result.newSlug !== page?.slug) {
-      router.push(`/${result.newSlug}`);
-    }
   };
 
   return (
@@ -169,19 +160,6 @@ const PageHeader = () => {
             )}
           </div>
         </div>
-        {status === "authenticated" && (
-          <Button
-            variant="light"
-            size="xs"
-            onClick={handleSave}
-            loading={saving}
-            leftSection={
-              <Icon icon="mdi:content-save" width={14} height={14} />
-            }
-          >
-            {saving ? "Saving..." : "Save"}
-          </Button>
-        )}
       </div>
     </div>
   );
