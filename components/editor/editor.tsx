@@ -313,6 +313,9 @@ export default function Editor({
     async (contentToSave: JSONContent) => {
       if (!editor || !slug) return;
 
+      const wasFocused = editor.isFocused;
+      const currentSelection = editor.state.selection;
+
       setSaving(true);
       try {
         const response = await fetch(`/api/pages/${slug}`, {
@@ -331,6 +334,17 @@ export default function Editor({
 
         if (response.ok) {
           applySaveResult(contentToSave, payload);
+
+          if (wasFocused && editor && !editor.isDestroyed) {
+            setTimeout(() => {
+              if (editor && !editor.isDestroyed) {
+                editor.commands.focus();
+                if (currentSelection) {
+                  editor.commands.setTextSelection(currentSelection);
+                }
+              }
+            }, 0);
+          }
         } else {
           notifications.show({
             title: "Auto-save Failed",
@@ -364,6 +378,10 @@ export default function Editor({
     if (!editor || !slug) return;
 
     const currentContent = editor.getJSON();
+
+    const wasFocused = editor.isFocused;
+    const currentSelection = editor.state.selection;
+
     setSaving(true);
     try {
       const response = await fetch(`/api/pages/${slug}`, {
@@ -387,6 +405,17 @@ export default function Editor({
           message: "Page saved successfully.",
           color: "green",
         });
+
+        if (wasFocused && editor && !editor.isDestroyed) {
+          setTimeout(() => {
+            if (editor && !editor.isDestroyed) {
+              editor.commands.focus();
+              if (currentSelection) {
+                editor.commands.setTextSelection(currentSelection);
+              }
+            }
+          }, 0);
+        }
         
         return { newSlug: payload?.page?.slug };
       } else {
