@@ -460,7 +460,7 @@ export default function Editor({
 
   if (!editor) {
     return (
-      <div className="space-y-3" key={`editor-wrapper-${slug ?? "loading"}`}>
+      <div className="space-y-3">
         <div
           className={
             className ||
@@ -475,7 +475,7 @@ export default function Editor({
 
   return (
     <EditorContext.Provider value={editorValue}>
-      <div className="space-y-3" key={`editor-wrapper-${slug}`}>
+      <div className="space-y-3">
         <div
           className={
             className ||
@@ -483,11 +483,11 @@ export default function Editor({
           }
         >
           {editor && (
-            <EditorContent editor={editor} key={`editor-content-${slug}`} />
+            <EditorContent editor={editor} />
           )}
 
           {editor && !editor.isDestroyed && (
-            <div key={`drag-handle-wrapper-${slug}`}>
+            <div>
               <DragHandle editor={editor}>
                 <div className="drag-handle" />
               </DragHandle>
