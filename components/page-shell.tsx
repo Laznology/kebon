@@ -152,15 +152,17 @@ const PageHeader = () => {
                 variant="light"
                 size="xs"
                 rightSection={
-                  <ActionIcon
-                    size="xs"
-                    color="gray"
-                    radius="xs"
-                    variant="transparent"
-                    onClick={() => handleRemoveTag(index)}
-                  >
-                    <Icon icon={"mdi:close"} width={12} height={12} />
-                  </ActionIcon>
+                  status === "authenticated" && (
+                    <ActionIcon
+                      size="xs"
+                      color="gray"
+                      radius="xs"
+                      variant="transparent"
+                      onClick={() => handleRemoveTag(index)}
+                    >
+                      <Icon icon="mdi:close" width={12} height={12} />
+                    </ActionIcon>
+                  )
                 }
               >
                 {tag}
@@ -180,14 +182,16 @@ const PageHeader = () => {
                 autoFocus
               />
             ) : (
-              <ActionIcon
-                variant="light"
-                size="xs"
-                onClick={() => setIsAddingTag(true)}
-                color="gray"
-              >
-                <Icon icon={"mdi:plus"} width={12} height={12} />
-              </ActionIcon>
+              status === "authenticated" && (
+                <ActionIcon
+                  variant="light"
+                  size="xs"
+                  onClick={() => setIsAddingTag(true)}
+                  color="gray"
+                >
+                  <Icon icon={"mdi:plus"} width={12} height={12} />
+                </ActionIcon>
+              )
             )}
           </div>
         </div>
