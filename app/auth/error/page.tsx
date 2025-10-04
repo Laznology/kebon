@@ -62,17 +62,6 @@ export default async function AuthErrorPage({ searchParams }: AuthErrorPageProps
             Go Home
           </Link>
         </div>
-
-        {process.env.NODE_ENV === 'development' && error && (
-          <div className="mt-8 p-4 bg-muted rounded-lg">
-            <h3 className="text-sm font-medium text-foreground mb-2">
-              Debug Information
-            </h3>
-            <p className="text-xs text-muted-foreground font-mono">
-              Error Code: {error}
-            </p>
-          </div>
-        )}
       </div>
     </div>
   )
