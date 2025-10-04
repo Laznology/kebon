@@ -9,7 +9,6 @@ export async function GET() {
     if (!session) {
       return NextResponse.json({ error: "Unauthorize" }, { status: 401 });
     }
-    // Member hanya bisa baca, admin bisa lihat semua
     const users = await prisma.user.findMany();
     return NextResponse.json({ data: users }, { status: 200 });
   } catch {
@@ -86,9 +85,29 @@ export async function DELETE(request: Request) {
     if (!id) {
       return NextResponse.json({ error: "Missing user id" }, { status: 400 });
     }
+
+    const userPages = await prisma.page.findMany({
+      where: { authorId: id, isDeleted: false },
+      select: { id: true, title: true },
+    });
+
+    if (userPages.length > 0) {
+      return NextResponse.json(
+        { 
+          error: "Cannot delete user with existing pages",
+          details: `User has ${userPages.length} page(s). Please reassign or delete their pages first.`
+        },
+        { status: 400 }
+      );
+    }
+
     await prisma.user.delete({ where: { id } });
     return NextResponse.json({ message: "User deleted" }, { status: 200 });
-  } catch {
-    return NextResponse.json({ error: "Error deleting user" }, { status: 500 });
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    return NextResponse.json({ 
+      error: "Error deleting user",
+      details: error instanceof Error ? error.message : "Unknown error"
+    }, { status: 500 });
   }
 }
