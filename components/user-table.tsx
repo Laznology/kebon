@@ -9,6 +9,8 @@ import {
   LoadingOverlay,
   Stack,
   Box,
+  Popover,
+  Button,
 } from "@mantine/core";
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
@@ -29,6 +31,7 @@ export default function UserTable() {
   const [loading, setLoading] = useState(true);
   const { data: session } = useSession();
   const isMobile = useMediaQuery("(max-width: 768px)");
+  const [openedPopoverId, setOpenedPopoverId] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchUsers() {
@@ -57,8 +60,6 @@ export default function UserTable() {
   }, []);
 
   const handleDelete = async (id: string, userName: string) => {
-    if (!confirm(`Are you sure you want to delete user "${userName}"?`)) return;
-
     try {
       const response = await fetch("/api/users", {
         method: "DELETE",
@@ -74,7 +75,12 @@ export default function UserTable() {
           color: "green",
         });
       } else {
-        throw new Error("Failed to delete user");
+        const errorData = await response.json().catch(() => ({ error: "Unknown error" }));
+        notifications.show({
+          title: "Cannot Delete User",
+          message: errorData.details,
+          color: "red",
+        });
       }
     } catch (error) {
       console.error("Error deleting user:", error);
@@ -150,14 +156,51 @@ export default function UserTable() {
           {isCurrentUserAdmin &&
             user.role !== "ADMIN" &&
             user.id !== session?.user?.id && (
-              <ActionIcon
-                color="red"
-                variant="light"
-                onClick={() => handleDelete(user.id, user.name || user.email)}
-                size="sm"
+              <Popover
+                width={200}
+                position="bottom"
+                withArrow
+                shadow="md"
+                opened={openedPopoverId === user.id}
+                onChange={(opened) =>
+                  setOpenedPopoverId(opened ? user.id : null)
+                }
               >
-                <Icon icon="mdi:delete" width={16} height={16} />
-              </ActionIcon>
+                <Popover.Target>
+                  <ActionIcon
+                    color="red"
+                    variant="light"
+                    onClick={() => setOpenedPopoverId(user.id)}
+                    size="sm"
+                  >
+                    <Icon icon="mdi:delete" width={16} height={16} />
+                  </ActionIcon>
+                </Popover.Target>
+                <Popover.Dropdown>
+                  <Text size="sm" mb="xs">
+                    Are you sure you want to delete this user?
+                  </Text>
+                  <Group justify="flex-end">
+                    <Button
+                      size="xs"
+                      variant="outline"
+                      onClick={() => setOpenedPopoverId(null)}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      size="xs"
+                      color="red"
+                      onClick={() => {
+                        handleDelete(user.id, user.name || user.email);
+                        setOpenedPopoverId(null);
+                      }}
+                    >
+                      Delete
+                    </Button>
+                  </Group>
+                </Popover.Dropdown>
+              </Popover>
             )}
           {!isCurrentUserAdmin && (
             <Text size="xs" c="dimmed">
@@ -219,16 +262,51 @@ export default function UserTable() {
               {isCurrentUserAdmin &&
                 user.role !== "ADMIN" &&
                 user.id !== session?.user?.id && (
-                  <ActionIcon
-                    color="red"
-                    variant="light"
-                    onClick={() =>
-                      handleDelete(user.id, user.name || user.email)
+                  <Popover
+                    width={200}
+                    position="bottom"
+                    withArrow
+                    shadow="md"
+                    opened={openedPopoverId === user.id}
+                    onChange={(opened) =>
+                      setOpenedPopoverId(opened ? user.id : null)
                     }
-                    size="sm"
                   >
-                    <Icon icon="mdi:delete" width={16} height={16} />
-                  </ActionIcon>
+                    <Popover.Target>
+                      <ActionIcon
+                        color="red"
+                        variant="light"
+                        onClick={() => setOpenedPopoverId(user.id)}
+                        size="sm"
+                      >
+                        <Icon icon="mdi:delete" width={16} height={16} />
+                      </ActionIcon>
+                    </Popover.Target>
+                    <Popover.Dropdown>
+                      <Text size="sm" mb="xs">
+                        Are you sure you want to delete this user?
+                      </Text>
+                      <Group justify="flex-end">
+                        <Button
+                          size="xs"
+                          variant="outline"
+                          onClick={() => setOpenedPopoverId(null)}
+                        >
+                          Cancel
+                        </Button>
+                        <Button
+                          size="xs"
+                          color="red"
+                          onClick={() => {
+                            handleDelete(user.id, user.name || user.email);
+                            setOpenedPopoverId(null);
+                          }}
+                        >
+                          Delete
+                        </Button>
+                      </Group>
+                    </Popover.Dropdown>
+                  </Popover>
                 )}
             </Group>
           </Box>

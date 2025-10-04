@@ -51,13 +51,13 @@ export default function PageLayout({ children, toc }: PageLayoutProps) {
   const isMobile = useMediaQuery("(max-width: 768px)");
   const router = useRouter();
   const { data: pages, refetch: refetchPages } = useFetch<Page[]>("/api/pages");
-  const { data: settings } = useFetch<{ appName: string }>("/api/settings");
+  const { data: settings } = useFetch<{ data: { appName: string } }>("/api/settings");
   const renderNavigationContent = (closeOnNavigate = false) => (
     <Box className="flex h-full flex-col" style={{ height: "100%" }}>
       <div>
         <Box mb="md" className="relative">
           <Title order={1} size="h1" fw={700} c="var(--mantine-color-text)">
-            {settings?.appName}
+            {settings?.data?.appName}
           </Title>
         </Box>
         <TextInput
@@ -313,7 +313,7 @@ export default function PageLayout({ children, toc }: PageLayoutProps) {
                   hiddenFrom="md"
                   aria-label="Toggle navigation menu"
                 />
-                <Title order={3}>{settings?.appName} </Title>
+                <Title order={3}>{settings?.data?.appName} </Title>
               </Group>
               <Group gap="sm">
                 <Burger

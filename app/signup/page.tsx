@@ -22,8 +22,10 @@ export default function SignupPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordConfirmation, setPasswordConfirmation] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showPasswordConfirmation, setShowPasswordConfirmation] = useState(false);
 
-  const { data, loading } = useFetch<{ allowRegister: boolean }>(
+  const { data, loading } = useFetch<{ data: { allowRegister: boolean } }>(
     "/api/settings/",
   );
 
@@ -82,7 +84,7 @@ export default function SignupPage() {
             <Loader color="blue" />
           </Center>
         </Card>
-      ) : data?.allowRegister ? (
+      ) : data?.data?.allowRegister ? (
         <Card className="w-full max-w-sm" withBorder padding="lg">
           <Title order={2} mb="xs">
             Create your account
@@ -108,16 +110,34 @@ export default function SignupPage() {
               label="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              type="password"
+              type={showPassword ? "text" : "password"}
               required
+              rightSection={
+                <Icon
+                  icon={showPassword ? "mdi:eye-off" : "mdi:eye"}
+                  width={20}
+                  height={20}
+                  onClick={() => setShowPassword(!showPassword)}
+                  style={{ cursor: "pointer" }}
+                />
+              }
             />
 
             <TextInput
               label="Confirm Password"
               value={passwordConfirmation}
               onChange={(e) => setPasswordConfirmation(e.target.value)}
-              type="password"
+              type={showPasswordConfirmation ? "text" : "password"}
               required
+              rightSection={
+                <Icon
+                  icon={showPasswordConfirmation ? "mdi:eye-off" : "mdi:eye"}
+                  width={20}
+                  height={20}
+                  onClick={() => setShowPasswordConfirmation(!showPasswordConfirmation)}
+                  style={{ cursor: "pointer" }}
+                />
+              }
             />
 
             <Button type="submit" fullWidth mt="md">

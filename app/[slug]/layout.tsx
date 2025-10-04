@@ -55,6 +55,13 @@ export default async function EditPageLayout({
       updatedAt: pageData.updatedAt.toISOString(),
     },
     updatedAt: pageData.updatedAt.toISOString(),
+    author: pageData.author
+      ? {
+          id: pageData.author.id,
+          name: pageData.author.name,
+          email: pageData.author.email,
+        }
+      : null,
   };
 
   const initialToc = generateTocFromContent(content);

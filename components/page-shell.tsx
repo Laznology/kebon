@@ -146,6 +146,9 @@ const PageHeader = () => {
                     day: "numeric",
                   })
                 : "Unknown"}
+              {page?.author?.name && (
+                <span> - {page.author.name}</span>
+              )}
             </Text>
           </div>
           <div className="flex flex-warp items-center gap-2">

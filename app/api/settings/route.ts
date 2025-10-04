@@ -6,7 +6,7 @@ import { getServerSession } from "next-auth";
 export async function GET() {
   try {
     const settings = await prisma.appSettings.findFirst();
-    return NextResponse.json(settings, { status: 200 });
+    return NextResponse.json({ data: settings }, { status: 200 });
   } catch {
     return NextResponse.json(
       { error: "Failed to fetch Setting" },
@@ -39,14 +39,26 @@ export async function PUT(request: NextRequest) {
     }
 
     const body = await request.json();
-    const updated = await prisma.appSettings.update({
-      where: { id: 1 },
-      data: body,
-    });
+    
+    const existingSettings = await prisma.appSettings.findFirst();
+    
+    let updated;
+    if (existingSettings) {
+      updated = await prisma.appSettings.update({
+        where: { id: existingSettings.id },
+        data: body,
+      });
+    } else {
+      updated = await prisma.appSettings.create({
+        data: body,
+      });
+    }
+    
     return NextResponse.json({ data: updated }, { status: 200 });
-  } catch {
+  } catch (error) {
+    console.error("Settings update error:", error);
     return NextResponse.json(
-      { error: "Failed to update Setting" },
+      { error: "Failed to update Setting", details: error instanceof Error ? error.message : "Unknown error" },
       { status: 500 },
     );
   }

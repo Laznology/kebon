@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Card, TextInput, Text, Title, Divider } from "@mantine/core";
+import { Button, Card, TextInput, Text, Title, Divider, Anchor } from "@mantine/core";
 import { signIn } from "next-auth/react";
 import { notifications } from "@mantine/notifications";
 import React, { useState } from "react";
@@ -123,6 +123,13 @@ export default function SignIn() {
             Sign In with GitHub
           </Button>
         </form>
+        
+        <Text size="sm" ta="center" mt="md">
+          Don&#39;t have an account?{" "}
+          <Anchor href="/signup" size="sm">
+            Create one here
+          </Anchor>
+        </Text>
       </Card>
     </div>
   );
