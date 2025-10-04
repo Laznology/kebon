@@ -5,11 +5,6 @@ import { getServerSession } from "next-auth";
 
 export async function GET() {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
     const settings = await prisma.appSettings.findFirst();
     return NextResponse.json(settings, { status: 200 });
   } catch {
