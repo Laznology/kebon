@@ -214,7 +214,7 @@ export default function PageLayout({ children, toc }: PageLayoutProps) {
         </ScrollArea>
       </Box>
 
-      {status === "authenticated" && session && (
+      {status === "authenticated" && session ? (
         <Box mt="md">
           <Divider mb="md" />
           <Group justify="space-between" gap="md" p="sm">
@@ -279,6 +279,11 @@ export default function PageLayout({ children, toc }: PageLayoutProps) {
             </Popover>
           </Group>
         </Box>
+      ): (
+        <Box mt="md">
+          <Divider mb="md" />
+          <Button onClick={() => router.push("/signin")} variant="filled" color="gray" fullWidth> Signin</Button>
+        </Box>
       )}
     </Box>
   );
@@ -300,7 +305,7 @@ export default function PageLayout({ children, toc }: PageLayoutProps) {
                   hiddenFrom="md"
                   aria-label="Toggle navigation menu"
                 />
-                <Title order={3}>Kebon</Title>
+                <Title order={3}>{settings?.appName} </Title>
               </Group>
               <Group gap="sm">
                 <Burger
