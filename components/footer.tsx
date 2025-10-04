@@ -1,6 +1,5 @@
 "use client";
 import { Box, Text, Group, Anchor } from "@mantine/core";
-import { Icon } from "@iconify/react";
 
 export default function Footer() {
   return (
