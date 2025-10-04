@@ -113,7 +113,7 @@ async function main() {
     where: {id: 1},
     update: {},
     create: {
-      allowRegister: true,
+      allowRegister: false,
       allowedEmails: "",
       appName: "Kebon",
       appLogo: "/logo.webp",
