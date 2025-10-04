@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /private/
+
+Sitemap: https://notes.lazlab.tech/sitemap.xml
