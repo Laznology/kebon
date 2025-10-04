@@ -6,6 +6,7 @@ import { Icon } from "@iconify/react";
 import { Text, Badge, Group, Stack } from "@mantine/core";
 import { useHotkeys } from "@mantine/hooks";
 import { useSearch } from "@/hooks/useSearch";
+import Highlighter from "react-highlight-words";
 import type { SearchResult } from "@/hooks/useSearch";
 
 export interface SearchablePage {
@@ -17,16 +18,6 @@ export interface SearchablePage {
   tags: string[];
   created?: string;
   updated?: string;
-}
-
-function createExcerpt(text: string, maxLength: number = 150): string {
-  if (!text || text.length <= maxLength) return text || "";
-
-  const truncated = text.slice(0, maxLength);
-  const lastSpace = truncated.lastIndexOf(" ");
-  return lastSpace > 0
-    ? truncated.slice(0, lastSpace) + "..."
-    : truncated + "...";
 }
 
 export default function SearchModal() {
@@ -51,8 +42,8 @@ export default function SearchModal() {
   const actions: SpotlightActionData[] = useMemo(() => {
     const searchActions = results.map((result: SearchResult) => ({
       id: result.slug,
-      label: result.highlightedTitle || result.title,
-      description: createExcerpt(result.excerpt || "", 120),
+      label: result.title, // Use plain title, highlight will be handled in render
+      description: result.excerpt || "",
       onClick: () => {
         router.push(`/${result.slug}`);
         spotlight.close();
@@ -83,7 +74,7 @@ export default function SearchModal() {
       ),
     }));
 
-    if (query.trim()) {
+    if (query.trim()) { 
       const createPageAction = {
         id: "create-new-page",
         label: `Create "${query.trim()}"`,
@@ -188,12 +179,29 @@ export default function SearchModal() {
                 >
                   {action.leftSection}
                   <Stack gap={4} style={{ flex: 1, minWidth: 0 }}>
-                    <Text
-                      dangerouslySetInnerHTML={{ __html: action.label ?? "" }}
-                      fw={action.id === "create-new-page" ? 600 : 500}
-                      truncate
-                      c={action.id === "create-new-page" ? "blue" : undefined}
-                    />
+                    {action.id === "create-new-page" ? (
+                      <Text fw={600} c="black">
+                        <Highlighter
+                          searchWords={[query]}
+                          textToHighlight={action.label ?? ""}
+                          highlightStyle={{
+                            backgroundColor: "rgb(59 130 246 / 0.3)",
+                            padding: "2px 4px",
+                            borderRadius: "3px",
+                          }}
+                        />
+                      </Text>
+                    ) : (
+                      <Highlighter
+                        searchWords={[query]}
+                        textToHighlight={action.label ?? ""}
+                        highlightStyle={{
+                          backgroundColor: "rgb(59 130 246 / 0.3)",
+                          padding: "2px 4px",
+                          borderRadius: "3px",
+                        }}
+                      />
+                    )}
                     {action.description && (
                       <Text
                         size="xs"
@@ -201,7 +209,15 @@ export default function SearchModal() {
                         lineClamp={2}
                         style={{ marginTop: "2px" }}
                       >
-                        {action.description}
+                        <Highlighter
+                          searchWords={[query]}
+                          textToHighlight={action.description}
+                          highlightStyle={{
+                            backgroundColor: "rgb(59 130 246 / 0.3)",
+                            padding: "1px 2px",
+                            borderRadius: "2px",
+                          }}
+                        />
                       </Text>
                     )}
                   </Stack>
