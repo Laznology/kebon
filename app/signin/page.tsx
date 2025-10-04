@@ -1,17 +1,16 @@
 "use client";
 
 import { Button, Card, TextInput, Text, Title, Divider } from "@mantine/core";
-import { getSession, signIn } from "next-auth/react";
+import { signIn } from "next-auth/react";
 import { notifications } from "@mantine/notifications";
-import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { Icon } from "@iconify/react";
 
 export default function SignIn() {
-  const router = useRouter();
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
+  const [showPassword, setShowPassword] = useState<boolean>(false)
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,11 +47,8 @@ export default function SignIn() {
           message: "Successfully logged in",
           color: "green",
         });
-        const session = await getSession();
-        if (session) {
-          router.push("/");
-          router.refresh();
-        }
+        
+        window.location.href = "/";
       }
     } catch {
       notifications.show({
@@ -77,6 +73,7 @@ export default function SignIn() {
         <form onSubmit={handleSignIn} className={"space-y-4"}>
           <TextInput
             label="Email"
+            autoComplete="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
@@ -90,7 +87,16 @@ export default function SignIn() {
             onChange={(e) => setPassword(e.target.value)}
             required
             disabled={loading}
-            type="password"
+            type={showPassword ? "text" : "password"}
+            rightSection={
+              <Icon
+          icon={showPassword ? "mdi:eye-off" : "mdi:eye"}
+          width={20}
+          height={20}
+          onClick={() => setShowPassword(!showPassword)}
+          style={{ cursor: 'pointer' }}
+              />
+            }
           />
 
           <Button
