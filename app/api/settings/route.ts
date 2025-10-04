@@ -22,6 +22,19 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    if (!session.user?.email) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { email: session.user.email },
+      select: { role: true },
+    });
+
+    if (!user || user.role !== "ADMIN") {
+      return NextResponse.json({ error: "Forbidden: Admin access required" }, { status: 403 });
+    }
+
     const body = await request.json();
     const updated = await prisma.appSettings.update({
       where: { id: 1 },
