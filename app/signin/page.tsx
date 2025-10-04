@@ -125,7 +125,7 @@ export default function SignIn() {
         </form>
         
         <Text size="sm" ta="center" mt="md">
-          Don't have an account?{" "}
+          Don&#39;t have an account?{" "}
           <Anchor href="/signup" size="sm">
             Create one here
           </Anchor>
