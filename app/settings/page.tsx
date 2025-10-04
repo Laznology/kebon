@@ -50,20 +50,22 @@ export default function SettingsPage() {
     },
     validate: {
       appName: (value) => (value.length < 1 ? "App name is required" : null),
-      appLogo: (value) => (value.length < 1 ? "App logo URL is required" : null),
-      siteIcon: (value) => (value.length < 1 ? "Site icon URL is required" : null),
+      appLogo: (value) =>
+        value.length < 1 ? "App logo URL is required" : null,
+      siteIcon: (value) =>
+        value.length < 1 ? "Site icon URL is required" : null,
     },
   });
 
   const fetchSettings = useCallback(async () => {
     if (hasFetched.current) return;
-    
+
     try {
       const response = await fetch("/api/settings");
       if (response.ok) {
         const result = await response.json();
         const settingsData = result.data;
-        
+
         if (settingsData) {
           form.setValues(settingsData);
         }
@@ -149,7 +151,7 @@ export default function SettingsPage() {
           </div>
         </Group>
 
-        <Card withBorder p="lg" style={{ maxWidth: 800, margin: '0 auto' }}>
+        <Card withBorder p="lg" style={{ maxWidth: 800, margin: "0 auto" }}>
           <form onSubmit={form.onSubmit(handleSubmit)}>
             <Stack gap="md">
               <Title order={3} size="h4">
@@ -162,7 +164,9 @@ export default function SettingsPage() {
                 placeholder="Enter application name"
                 key={form.key("appName")}
                 {...form.getInputProps("appName")}
-                leftSection={<Icon icon="mdi:application" width={16} height={16} />}
+                leftSection={
+                  <Icon icon="mdi:application" width={16} height={16} />
+                }
               />
 
               <TextInput
@@ -205,14 +209,15 @@ export default function SettingsPage() {
                 leftSection={<Icon icon="mdi:email" width={16} height={16} />}
               />
 
-              <Alert 
+              <Alert
                 icon={<Icon icon="mdi:information" width={16} height={16} />}
                 color="blue"
                 variant="light"
               >
                 <Text size="sm">
-                  Make sure the logo and icon files exist in your public directory. 
-                  Recommended formats: .webp for logo, .ico for Site Icon.
+                  Make sure the logo and icon files exist in your public
+                  directory. Recommended formats: .webp for logo, .ico for Site
+                  Icon.
                 </Text>
               </Alert>
 
@@ -220,7 +225,9 @@ export default function SettingsPage() {
                 <Button
                   type="submit"
                   loading={saving}
-                  leftSection={<Icon icon="mdi:content-save" width={16} height={16} />}
+                  leftSection={
+                    <Icon icon="mdi:content-save" width={16} height={16} />
+                  }
                 >
                   Save Settings
                 </Button>
@@ -229,14 +236,15 @@ export default function SettingsPage() {
           </form>
         </Card>
 
-        <Card withBorder p="lg" style={{ maxWidth: 800, margin: '0 auto' }}>
+        <Card withBorder p="lg" style={{ maxWidth: 800, margin: "0 auto" }}>
           <Stack gap="md">
             <div>
               <Title order={3} size="h4">
                 User Management
               </Title>
               <Text size="sm" c="dimmed">
-                Manage your application users. You can edit or remove users as needed.
+                Manage your application users. You can edit or remove users as
+                needed.
               </Text>
             </div>
 

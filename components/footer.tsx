@@ -9,14 +9,15 @@ export default function Footer() {
           <Text size="sm" c="dimmed" ta="center">
             Powered by{" "}
             <Anchor
-              href="https://github.com/Laznology/kebon" 
+              href="https://github.com/Laznology/kebon"
               target="_blank"
               rel="noopener noreferrer"
               c="dimmed"
               fw={700}
             >
               Kebon
-            </Anchor> v0.1.0
+            </Anchor>{" "}
+            v0.1.0
           </Text>
         </Group>
       </Box>

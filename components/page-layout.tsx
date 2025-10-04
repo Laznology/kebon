@@ -57,7 +57,7 @@ export default function PageLayout({ children, toc }: PageLayoutProps) {
       <div>
         <Box mb="md" className="relative">
           <Title order={1} size="h1" fw={700} c="var(--mantine-color-text)">
-            {settings?.appName} 
+            {settings?.appName}
           </Title>
         </Box>
         <TextInput
@@ -69,7 +69,7 @@ export default function PageLayout({ children, toc }: PageLayoutProps) {
           rightSection={
             <div className="absolute flex items-center gap-1 pr-1 text-[11px] text-gray-500">
               <Kbd>Ctrl</Kbd>+<Kbd>K</Kbd>
-          </div>
+            </div>
           }
           readOnly
         />
@@ -279,10 +279,18 @@ export default function PageLayout({ children, toc }: PageLayoutProps) {
             </Popover>
           </Group>
         </Box>
-      ): (
+      ) : (
         <Box mt="md">
           <Divider mb="md" />
-          <Button onClick={() => router.push("/signin")} variant="filled" color="gray" fullWidth> Signin</Button>
+          <Button
+            onClick={() => router.push("/signin")}
+            variant="filled"
+            color="gray"
+            fullWidth
+          >
+            {" "}
+            Signin
+          </Button>
         </Box>
       )}
     </Box>

@@ -49,7 +49,7 @@ export const authOptions: NextAuthOptions = {
   },
   pages: {
     signIn: "/signin",
-    error: "/auth/error", 
+    error: "/auth/error",
   },
   secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
@@ -61,7 +61,7 @@ export const authOptions: NextAuthOptions = {
       try {
         const settings = await prisma.appSettings.findFirst();
         const allowedEmails = settings?.allowedEmails?.trim();
-        
+
         if (!allowedEmails) {
           return false;
         }
@@ -74,8 +74,8 @@ export const authOptions: NextAuthOptions = {
         const allowedList = allowedEmails
           .toLowerCase()
           .split(",")
-          .map(email => email.trim())
-          .filter(email => email.length > 0);
+          .map((email) => email.trim())
+          .filter((email) => email.length > 0);
 
         return allowedList.includes(userEmail);
       } catch {
@@ -87,7 +87,7 @@ export const authOptions: NextAuthOptions = {
         token.id = user.id;
         const dbUser = await prisma.user.findUnique({
           where: { id: user.id },
-          select: { role: true }
+          select: { role: true },
         });
         token.role = dbUser?.role || "MEMBER";
       }
@@ -95,11 +95,11 @@ export const authOptions: NextAuthOptions = {
       return token;
     },
     async session({ session, token }) {
-        if (token && session.user) {
-          session.user.id = token.id as string;
-          session.user.role = token.role as "ADMIN" | "MEMBER";
-        }
-        return session;
+      if (token && session.user) {
+        session.user.id = token.id as string;
+        session.user.role = token.role as "ADMIN" | "MEMBER";
+      }
+      return session;
     },
   },
 };

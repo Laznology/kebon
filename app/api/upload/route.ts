@@ -8,7 +8,8 @@ export async function POST(request: NextRequest) {
   try {
     const arrayBuffer = await request.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
-    const originalName = request.headers.get("x-filename") || `image-${Date.now()}.png`;
+    const originalName =
+      request.headers.get("x-filename") || `image-${Date.now()}.png`;
     const hash = crypto
       .createHash("md5")
       .update(buffer + Date.now().toString())

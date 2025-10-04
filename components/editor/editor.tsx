@@ -247,7 +247,7 @@ export default function Editor({
         },
         handleDOMEvents: {
           keydown: (view, event) => {
-            if ((event.ctrlKey || event.metaKey) && event.key === 'a') {
+            if ((event.ctrlKey || event.metaKey) && event.key === "a") {
               event.preventDefault();
               const { state, dispatch } = view;
               const { doc } = state;
@@ -275,20 +275,31 @@ export default function Editor({
       const updatedPage = payload.page;
       if (!updatedPage) return;
 
-      const updatedAt = typeof updatedPage.updatedAt === "string"
-        ? updatedPage.updatedAt
-        : updatedPage.updatedAt instanceof Date
-        ? updatedPage.updatedAt.toISOString()
-        : new Date().toISOString();
+      const updatedAt =
+        typeof updatedPage.updatedAt === "string"
+          ? updatedPage.updatedAt
+          : updatedPage.updatedAt instanceof Date
+            ? updatedPage.updatedAt.toISOString()
+            : new Date().toISOString();
 
-      const pageTitle = updatedPage.title || title || currentPage?.title || (slug ? slug.replace(/-/g, " ") : "Untitled");
+      const pageTitle =
+        updatedPage.title ||
+        title ||
+        currentPage?.title ||
+        (slug ? slug.replace(/-/g, " ") : "Untitled");
 
       const hasSlugChanged = updatedPage.slug !== currentPage?.slug;
       const hasTitleChanged = pageTitle !== currentPage?.title;
       const hasExcerptChanged = updatedPage.excerpt !== currentPage?.excerpt;
-      const hasTagsChanged = JSON.stringify(updatedPage.tags) !== JSON.stringify(currentPage?.tags);
+      const hasTagsChanged =
+        JSON.stringify(updatedPage.tags) !== JSON.stringify(currentPage?.tags);
 
-      if (hasSlugChanged || hasTitleChanged || hasExcerptChanged || hasTagsChanged) {
+      if (
+        hasSlugChanged ||
+        hasTitleChanged ||
+        hasExcerptChanged ||
+        hasTagsChanged
+      ) {
         syncCurrentPage({
           slug: updatedPage.slug,
           title: pageTitle,
@@ -374,66 +385,69 @@ export default function Editor({
     autoSave(debouncedContent);
   }, [debouncedContent, editor, slug, lastSavedContent, autoSave]);
 
-  const handleSave = useCallback(async (editedTitle?: string, editedTags?: string[]) => {
-    if (!editor || !slug) return;
+  const handleSave = useCallback(
+    async (editedTitle?: string, editedTags?: string[]) => {
+      if (!editor || !slug) return;
 
-    const currentContent = editor.getJSON();
+      const currentContent = editor.getJSON();
 
-    const wasFocused = editor.isFocused;
-    const currentSelection = editor.state.selection;
+      const wasFocused = editor.isFocused;
+      const currentSelection = editor.state.selection;
 
-    setSaving(true);
-    try {
-      const response = await fetch(`/api/pages/${slug}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          content: currentContent,
-          title: editedTitle || title,
-          tags: editedTags,
-        }),
-      });
-
-      const payload = await response
-        .json()
-        .catch(() => ({ error: "Unknown error" }));
-
-      if (response.ok) {
-        applySaveResult(currentContent, payload);
-        notifications.show({
-          title: "Saved",
-          message: "Page saved successfully.",
-          color: "green",
+      setSaving(true);
+      try {
+        const response = await fetch(`/api/pages/${slug}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            content: currentContent,
+            title: editedTitle || title,
+            tags: editedTags,
+          }),
         });
 
-        if (wasFocused && editor && !editor.isDestroyed) {
-          setTimeout(() => {
-            if (editor && !editor.isDestroyed) {
-              editor.commands.focus();
-              if (currentSelection) {
-                editor.commands.setTextSelection(currentSelection);
+        const payload = await response
+          .json()
+          .catch(() => ({ error: "Unknown error" }));
+
+        if (response.ok) {
+          applySaveResult(currentContent, payload);
+          notifications.show({
+            title: "Saved",
+            message: "Page saved successfully.",
+            color: "green",
+          });
+
+          if (wasFocused && editor && !editor.isDestroyed) {
+            setTimeout(() => {
+              if (editor && !editor.isDestroyed) {
+                editor.commands.focus();
+                if (currentSelection) {
+                  editor.commands.setTextSelection(currentSelection);
+                }
               }
-            }
-          }, 0);
+            }, 0);
+          }
+
+          return { newSlug: payload?.page?.slug };
+        } else {
+          notifications.show({
+            title: "Save Failed",
+            message: `Error ${response.status}: ${payload?.error || "There was an error saving the page."}`,
+            color: "red",
+          });
         }
-        
-        return { newSlug: payload?.page?.slug };
-      } else {
+      } catch {
         notifications.show({
-          title: "Save Failed",
-          message: `Error ${response.status}: ${payload?.error || "There was an error saving the page."}`,
-          color: "red",
+          title: "Error",
+          message: "Error with manual saving",
         });
+      } finally {
+        setSaving(false);
       }
-    } catch {
-      notifications.show({
-        title: "Error",
-        message: "Error with manual saving",
-      });
-    } finally {
-      setSaving(false);
-    }
-  }, [applySaveResult, editor, slug, title, setSaving]);
+    },
+    [applySaveResult, editor, slug, title, setSaving],
+  );
 
   useEffect(() => {
     setSaveHandler(handleSave);
@@ -482,9 +496,7 @@ export default function Editor({
             "relative min-h-[600px] w-full transition-all duration-200"
           }
         >
-          {editor && (
-            <EditorContent editor={editor} />
-          )}
+          {editor && <EditorContent editor={editor} />}
 
           {editor && !editor.isDestroyed && (
             <div>

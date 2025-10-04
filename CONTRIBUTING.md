@@ -27,23 +27,27 @@ This project follows a code of conduct to ensure a welcoming environment for all
 ### Installation
 
 1. Clone your fork:
+
    ```bash
    git clone https://github.com/your-username/kebon.git
    cd kebon
    ```
 
 2. Install dependencies:
+
    ```bash
    pnpm install
    ```
 
 3. Set up environment variables:
+
    ```bash
    cp .env.example .env
    # Edit .env with your database URL and other required variables
    ```
 
 4. Set up the database:
+
    ```bash
    pnpm prisma migrate deploy
    pnpm db:seed
@@ -61,6 +65,7 @@ This project uses ESLint and Prettier for code formatting and linting.
 ### Linting
 
 Run the linter:
+
 ```bash
 pnpm lint
 ```
@@ -68,6 +73,7 @@ pnpm lint
 ### Formatting
 
 Format code with Prettier:
+
 ```bash
 pnpm format
 ```
@@ -89,6 +95,7 @@ This project follows the [Conventional Commits](https://conventionalcommits.org/
 ## Reporting Issues
 
 When reporting bugs, please include:
+
 - A clear description of the issue
 - Steps to reproduce
 - Expected vs actual behavior

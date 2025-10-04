@@ -99,7 +99,10 @@ export async function POST(
           const existingWithNewSlug = await prisma.page.findUnique({
             where: { slug: newSlug, isDeleted: false },
           });
-          if (!existingWithNewSlug || existingWithNewSlug.id === existingPage.id) {
+          if (
+            !existingWithNewSlug ||
+            existingWithNewSlug.id === existingPage.id
+          ) {
             updateData.slug = newSlug;
           }
         }
@@ -132,7 +135,10 @@ export async function POST(
   }
 }
 
-export async function DELETE(_request: NextRequest, context: { params: Promise<{ slug: string }> }) {
+export async function DELETE(
+  _request: NextRequest,
+  context: { params: Promise<{ slug: string }> },
+) {
   const { slug } = await context.params;
   if (!slug) {
     return new NextResponse("Bad Request: slug is required", { status: 400 });

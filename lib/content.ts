@@ -236,7 +236,7 @@ export async function readAllPages() {
 
 export async function readHomePage() {
   const homePage = await getPageBySlug("index");
-  
+
   if (!homePage) return null;
 
   return {

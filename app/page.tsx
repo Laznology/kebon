@@ -17,12 +17,15 @@ export async function generateMetadata() {
 
 export default async function HomePage() {
   const homePage = await getPageBySlug("index");
-  
+
   if (!homePage) {
     notFound();
   }
 
-  const content = homePage.content as JSONContent || { type: "doc", content: [] };
+  const content = (homePage.content as JSONContent) || {
+    type: "doc",
+    content: [],
+  };
   const initialPage: CurrentPage = {
     slug: "index",
     title: homePage.title,

@@ -19,7 +19,11 @@ interface ImageUrlDialogProps {
   onSubmit: (data: { url: string; alt?: string; title?: string }) => void;
 }
 
-export function ImageUrlDialog({ open, onOpenChange, onSubmit }: ImageUrlDialogProps) {
+export function ImageUrlDialog({
+  open,
+  onOpenChange,
+  onSubmit,
+}: ImageUrlDialogProps) {
   const [url, setUrl] = useState("");
   const [alt, setAlt] = useState("");
   const [title, setTitle] = useState("");
@@ -103,7 +107,7 @@ export function ImageUrlDialog({ open, onOpenChange, onSubmit }: ImageUrlDialogP
               onKeyDown={handleKeyDown}
               className={cn(
                 "text-sm",
-                showError && "border-red-500 focus:border-red-500"
+                showError && "border-red-500 focus:border-red-500",
               )}
               autoFocus
             />
@@ -145,9 +149,9 @@ export function ImageUrlDialog({ open, onOpenChange, onSubmit }: ImageUrlDialogP
           <Button type="button" variant="outline" onClick={handleClose}>
             Cancel
           </Button>
-          <Button 
-            type="submit" 
-            disabled={!isValid || !url} 
+          <Button
+            type="submit"
+            disabled={!isValid || !url}
             onClick={handleSubmit}
             className="gap-2"
           >

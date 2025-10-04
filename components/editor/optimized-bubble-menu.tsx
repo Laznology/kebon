@@ -18,12 +18,28 @@ interface OptimizedBubbleMenuProps {
   setOpenLink: (open: boolean) => void;
 }
 
-export function OptimizedBubbleMenu({ editor, openNode, setOpenNode, openColor, setOpenColor, openLink, setOpenLink }: OptimizedBubbleMenuProps) {
-
+export function OptimizedBubbleMenu({
+  editor,
+  openNode,
+  setOpenNode,
+  openColor,
+  setOpenColor,
+  openLink,
+  setOpenLink,
+}: OptimizedBubbleMenuProps) {
   if (!editor) return null;
 
   return (
-    <BubbleMenu editor={editor} options={{ placement: 'bottom', flip: false, shift: true, offset: 8, strategy: 'absolute'}} >
+    <BubbleMenu
+      editor={editor}
+      options={{
+        placement: "bottom",
+        flip: false,
+        shift: true,
+        offset: 8,
+        strategy: "absolute",
+      }}
+    >
       <div className="flex rounded border border-border bg-[rgb(var(--background))] shadow-xl">
         <LinkSelector
           open={openLink}

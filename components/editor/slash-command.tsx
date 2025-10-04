@@ -10,12 +10,12 @@ import {
   TextQuote,
   Link,
   SeparatorHorizontal,
-  Table
+  Table,
 } from "lucide-react";
-import { Extension, Range } from '@tiptap/core';
-import { Suggestion } from '@tiptap/suggestion';
-import { ReactRenderer } from '@tiptap/react';
-import tippy from 'tippy.js';
+import { Extension, Range } from "@tiptap/core";
+import { Suggestion } from "@tiptap/suggestion";
+import { ReactRenderer } from "@tiptap/react";
+import tippy from "tippy.js";
 import { showImageUrlDialog } from "@/lib/image-dialog-utils";
 
 import React, {
@@ -24,9 +24,9 @@ import React, {
   useImperativeHandle,
   forwardRef,
   useRef,
-} from 'react';
-import { Editor as TiptapEditor } from '@tiptap/react';
-import clsx from 'clsx';
+} from "react";
+import { Editor as TiptapEditor } from "@tiptap/react";
+import clsx from "clsx";
 
 interface SuggestionItem {
   title: string;
@@ -45,146 +45,156 @@ interface CommandListRef {
   onKeyDown: (props: { event: KeyboardEvent }) => boolean;
 }
 
-const CommandList = forwardRef<CommandListRef, CommandListProps>((props, ref) => {
-  const [selectedIndex, setSelectedIndex] = useState(0);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const itemRefs = useRef<(HTMLButtonElement | null)[]>([]);
+const CommandList = forwardRef<CommandListRef, CommandListProps>(
+  (props, ref) => {
+    const [selectedIndex, setSelectedIndex] = useState(0);
+    const containerRef = useRef<HTMLDivElement>(null);
+    const itemRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
-  const selectItem = (index: number) => {
-    const item = props.items[index];
-    if (item) {
-      props.command(item);
-    }
-  };
-
-  const scrollToSelected = (index: number) => {
-    const container = containerRef.current;
-    const selectedElement = itemRefs.current[index];
-    
-    if (container && selectedElement) {
-      const containerScrollTop = container.scrollTop;
-      const elementTop = selectedElement.offsetTop;
-      const elementHeight = selectedElement.offsetHeight;
-      const containerHeight = container.clientHeight;
-      
-      if (elementTop < containerScrollTop) {
-        container.scrollTop = elementTop;
+    const selectItem = (index: number) => {
+      const item = props.items[index];
+      if (item) {
+        props.command(item);
       }
-      else if (elementTop + elementHeight > containerScrollTop + containerHeight) {
-        container.scrollTop = elementTop + elementHeight - containerHeight;
+    };
+
+    const scrollToSelected = (index: number) => {
+      const container = containerRef.current;
+      const selectedElement = itemRefs.current[index];
+
+      if (container && selectedElement) {
+        const containerScrollTop = container.scrollTop;
+        const elementTop = selectedElement.offsetTop;
+        const elementHeight = selectedElement.offsetHeight;
+        const containerHeight = container.clientHeight;
+
+        if (elementTop < containerScrollTop) {
+          container.scrollTop = elementTop;
+        } else if (
+          elementTop + elementHeight >
+          containerScrollTop + containerHeight
+        ) {
+          container.scrollTop = elementTop + elementHeight - containerHeight;
+        }
       }
-    }
-  };  const upHandler = () => {
-    const newIndex = (selectedIndex + props.items.length - 1) % props.items.length;
-    setSelectedIndex(newIndex);
-    scrollToSelected(newIndex);
-  };
+    };
+    const upHandler = () => {
+      const newIndex =
+        (selectedIndex + props.items.length - 1) % props.items.length;
+      setSelectedIndex(newIndex);
+      scrollToSelected(newIndex);
+    };
 
-  const downHandler = () => {
-    const newIndex = (selectedIndex + 1) % props.items.length;
-    setSelectedIndex(newIndex);
-    scrollToSelected(newIndex);
-  };
+    const downHandler = () => {
+      const newIndex = (selectedIndex + 1) % props.items.length;
+      setSelectedIndex(newIndex);
+      scrollToSelected(newIndex);
+    };
 
-  const enterHandler = () => {
-    selectItem(selectedIndex);
-  };
+    const enterHandler = () => {
+      selectItem(selectedIndex);
+    };
 
-  useEffect(() => {
-    setSelectedIndex(0);
-    // Reset itemRefs array when items change
-    itemRefs.current = new Array(props.items.length).fill(null);
-  }, [props.items]);
+    useEffect(() => {
+      setSelectedIndex(0);
+      // Reset itemRefs array when items change
+      itemRefs.current = new Array(props.items.length).fill(null);
+    }, [props.items]);
 
-  useImperativeHandle(ref, () => ({
-    onKeyDown: ({ event }) => {
-      if (event.key === 'ArrowUp') {
-        upHandler();
-        return true;
-      }
+    useImperativeHandle(ref, () => ({
+      onKeyDown: ({ event }) => {
+        if (event.key === "ArrowUp") {
+          upHandler();
+          return true;
+        }
 
-      if (event.key === 'ArrowDown') {
-        downHandler();
-        return true;
-      }
+        if (event.key === "ArrowDown") {
+          downHandler();
+          return true;
+        }
 
-      if (event.key === 'Enter') {
-        enterHandler();
-        return true;
-      }
+        if (event.key === "Enter") {
+          enterHandler();
+          return true;
+        }
 
-      return false;
-    },
-  }));
+        return false;
+      },
+    }));
 
-  return (
-    <div
-      ref={containerRef}
-      role="listbox"
-      aria-label="Formatting options"
-      className="z-50 h-auto max-h-[330px] overflow-y-auto bg-[rgb(var(--background))] border border-border rounded-md px-1 py-2 shadow-md transition-all"
-    >
-      {props.items.length ? (
-        props.items.map((item, index) => {
-          const isSelected = index === selectedIndex;
+    return (
+      <div
+        ref={containerRef}
+        role="listbox"
+        aria-label="Formatting options"
+        className="z-50 h-auto max-h-[330px] overflow-y-auto bg-[rgb(var(--background))] border border-border rounded-md px-1 py-2 shadow-md transition-all"
+      >
+        {props.items.length ? (
+          props.items.map((item, index) => {
+            const isSelected = index === selectedIndex;
 
-          return (
-            <button
-              key={index}
-              ref={(el) => {
-                itemRefs.current[index] = el;
-              }}
-              type="button"
-              role="option"
-              aria-selected={isSelected}
-              tabIndex={-1}
-              data-selected={isSelected}
-              onClick={() => selectItem(index)}
-              onMouseEnter={() => {
-                setSelectedIndex(index);
-                scrollToSelected(index);
-              }}
-              className={clsx(
-                'flex w-full items-center space-x-3 rounded-md px-3 py-2 text-left text-sm cursor-pointer transition-all duration-150',
-                'hover:bg-accent hover:text-accent-foreground',
-                isSelected 
-                  ? 'shadow-md scale-[1.02]' 
-                  : 'bg-transparent border-l-4 border-transparent hover:border-l-4 hover:border-border',
-              )}
-            >
-              <div
+            return (
+              <button
+                key={index}
+                ref={(el) => {
+                  itemRefs.current[index] = el;
+                }}
+                type="button"
+                role="option"
+                aria-selected={isSelected}
+                tabIndex={-1}
+                data-selected={isSelected}
+                onClick={() => selectItem(index)}
+                onMouseEnter={() => {
+                  setSelectedIndex(index);
+                  scrollToSelected(index);
+                }}
                 className={clsx(
-                  'flex h-10 w-10 items-center justify-center rounded-md transition-colors',
-                  !isSelected && 'bg-muted text-foreground',
+                  "flex w-full items-center space-x-3 rounded-md px-3 py-2 text-left text-sm cursor-pointer transition-all duration-150",
+                  "hover:bg-accent hover:text-accent-foreground",
+                  isSelected
+                    ? "shadow-md scale-[1.02]"
+                    : "bg-transparent border-l-4 border-transparent hover:border-l-4 hover:border-border",
                 )}
               >
-                {item.icon}
-              </div>
-              <div>
-                <p className="font-medium">{item.title}</p>
-                <p
+                <div
                   className={clsx(
-                    'text-xs transition-colors',
-                    !isSelected && 'text-muted-foreground',
+                    "flex h-10 w-10 items-center justify-center rounded-md transition-colors",
+                    !isSelected && "bg-muted text-foreground",
                   )}
-                  style={isSelected ? {
-                    color: 'rgba(var(--primary), 0.8)'
-                  } : {}}
                 >
-                  {item.description}
-                </p>
-              </div>
-            </button>
-          );
-        })
-      ) : (
-        <div className="px-2 text-muted-foreground">No results</div>
-      )}
-    </div>
-  );
-});
+                  {item.icon}
+                </div>
+                <div>
+                  <p className="font-medium">{item.title}</p>
+                  <p
+                    className={clsx(
+                      "text-xs transition-colors",
+                      !isSelected && "text-muted-foreground",
+                    )}
+                    style={
+                      isSelected
+                        ? {
+                            color: "rgba(var(--primary), 0.8)",
+                          }
+                        : {}
+                    }
+                  >
+                    {item.description}
+                  </p>
+                </div>
+              </button>
+            );
+          })
+        ) : (
+          <div className="px-2 text-muted-foreground">No results</div>
+        )}
+      </div>
+    );
+  },
+);
 
-CommandList.displayName = 'CommandList';
+CommandList.displayName = "CommandList";
 
 export const suggestionItems: SuggestionItem[] = [
   {
@@ -269,51 +279,56 @@ export const suggestionItems: SuggestionItem[] = [
     command: ({ editor, range }) => {
       editor.chain().focus().deleteRange(range).toggleOrderedList().run();
     },
-    },
-    {
+  },
+  {
     title: "Quote",
     description: "Capture a quote.",
     searchTerms: ["blockquote"],
     icon: <TextQuote size={18} />,
     command: ({ editor, range }) =>
       editor
-      .chain()
-      .focus()
-      .deleteRange(range)
-      .toggleNode("paragraph", "paragraph")
-      .toggleBlockquote()
-      .run(),
-    },
-    {
+        .chain()
+        .focus()
+        .deleteRange(range)
+        .toggleNode("paragraph", "paragraph")
+        .toggleBlockquote()
+        .run(),
+  },
+  {
     title: "Separator",
     description: "Insert a horizontal divider to separate content.",
     searchTerms: ["horizontal, divider", "separator"],
     icon: <SeparatorHorizontal size={18} />,
-    command: ({ editor, range }) => editor.chain().focus().deleteRange(range).setHorizontalRule().run()
-    },
+    command: ({ editor, range }) =>
+      editor.chain().focus().deleteRange(range).setHorizontalRule().run(),
+  },
 
-    {
+  {
     title: "Code",
     description: "Capture a code snippet.",
     searchTerms: ["codeblock"],
     icon: <Code size={18} />,
     command: ({ editor, range }) =>
       editor.chain().focus().deleteRange(range).toggleCodeBlock().run(),
-    },
-    {
+  },
+  {
     title: "Image from URL",
     description: "Embed an image from an external link.",
     searchTerms: ["photo", "picture", "media", "url", "link", "external"],
     icon: <Link size={18} />,
     command: async ({ editor, range }) => {
       editor.chain().focus().deleteRange(range).run();
-      
 
-        const result = await showImageUrlDialog();
-        if (result && editor && !editor.isDestroyed && editor.view) {
-          editor.chain().focus().insertContent(`<img src="${result.url}" alt="${result.alt || ''}" title="${result.title || ''}" />`).run();
-        }
-
+      const result = await showImageUrlDialog();
+      if (result && editor && !editor.isDestroyed && editor.view) {
+        editor
+          .chain()
+          .focus()
+          .insertContent(
+            `<img src="${result.url}" alt="${result.alt || ""}" title="${result.title || ""}" />`,
+          )
+          .run();
+      }
     },
   },
   {
@@ -333,13 +348,21 @@ export const suggestionItems: SuggestionItem[] = [
 ];
 
 export const slashCommand = Extension.create({
-  name: 'slashCommand',
+  name: "slashCommand",
 
   addOptions() {
     return {
       suggestion: {
-        char: '/',
-        command: ({ editor, range, props }: { editor: TiptapEditor; range: Range; props: SuggestionItem }) => {
+        char: "/",
+        command: ({
+          editor,
+          range,
+          props,
+        }: {
+          editor: TiptapEditor;
+          range: Range;
+          props: SuggestionItem;
+        }) => {
           props.command({ editor, range });
         },
       },
@@ -352,13 +375,16 @@ export const slashCommand = Extension.create({
         editor: this.editor,
         ...this.options.suggestion,
         items: ({ query }) => {
-          return suggestionItems.filter(item => {
-            if (typeof query === 'string' && query.length > 0) {
+          return suggestionItems.filter((item) => {
+            if (typeof query === "string" && query.length > 0) {
               const search = query.toLowerCase();
               return (
                 item.title.toLowerCase().includes(search) ||
                 item.description.toLowerCase().includes(search) ||
-                (item.searchTerms && item.searchTerms.some(term => term.toLowerCase().includes(search)))
+                (item.searchTerms &&
+                  item.searchTerms.some((term) =>
+                    term.toLowerCase().includes(search),
+                  ))
               );
             }
             return suggestionItems;
@@ -366,7 +392,9 @@ export const slashCommand = Extension.create({
         },
         render: () => {
           let component: ReactRenderer;
-          let popup: ReturnType<typeof tippy> extends Array<infer T> ? T : ReturnType<typeof tippy>;
+          let popup: ReturnType<typeof tippy> extends Array<infer T>
+            ? T
+            : ReturnType<typeof tippy>;
 
           return {
             onStart: (props) => {
@@ -380,15 +408,16 @@ export const slashCommand = Extension.create({
               }
 
               const instances = tippy(document.body, {
-                getReferenceClientRect: () => props.clientRect?.() || new DOMRect(),
+                getReferenceClientRect: () =>
+                  props.clientRect?.() || new DOMRect(),
                 appendTo: () => document.body,
                 content: component.element,
                 showOnCreate: true,
                 interactive: true,
-                trigger: 'manual',
-                placement: 'bottom-start',
+                trigger: "manual",
+                placement: "bottom-start",
               });
-              
+
               popup = Array.isArray(instances) ? instances[0] : instances;
             },
 
@@ -400,12 +429,13 @@ export const slashCommand = Extension.create({
               }
 
               popup.setProps({
-                getReferenceClientRect: () => props.clientRect?.() || new DOMRect(),
+                getReferenceClientRect: () =>
+                  props.clientRect?.() || new DOMRect(),
               });
             },
 
             onKeyDown(props) {
-              if (props.event.key === 'Escape') {
+              if (props.event.key === "Escape") {
                 popup.hide();
                 return true;
               }

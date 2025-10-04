@@ -32,7 +32,10 @@ export async function PUT(request: NextRequest) {
     });
 
     if (!user || user.role !== "ADMIN") {
-      return NextResponse.json({ error: "Forbidden: Admin access required" }, { status: 403 });
+      return NextResponse.json(
+        { error: "Forbidden: Admin access required" },
+        { status: 403 },
+      );
     }
 
     const body = await request.json();

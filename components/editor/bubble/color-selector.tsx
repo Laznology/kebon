@@ -137,7 +137,7 @@ export const ColorSelector = ({
       >
         <div className="flex flex-col">
           <div className="my-1 px-2 text-sm font-semibold text-muted-foreground">
-            Color 
+            Color
           </div>
           {TEXT_COLORS.map(({ name, color }, index) => (
             <div

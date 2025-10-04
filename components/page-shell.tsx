@@ -81,7 +81,11 @@ const PageHeader = () => {
   }, [debouncedTitle, status, page, requestSave]);
 
   useEffect(() => {
-    if (status === "authenticated" && page && JSON.stringify(debouncedTags) !== JSON.stringify(page.tags)) {
+    if (
+      status === "authenticated" &&
+      page &&
+      JSON.stringify(debouncedTags) !== JSON.stringify(page.tags)
+    ) {
       requestSave(page.title, debouncedTags);
     }
   }, [debouncedTags, status, page, requestSave]);

@@ -1,5 +1,5 @@
 "use client";
-import {AddPageButton} from "@/components/add-page-button";
+import { AddPageButton } from "@/components/add-page-button";
 import { Box, Divider } from "@mantine/core";
 
 export default function NavigationMenu() {

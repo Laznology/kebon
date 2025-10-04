@@ -27,7 +27,7 @@
 }
 
 .prose hr {
-  border-color: rgb(var(--border)) !important; 
+  border-color: rgb(var(--border)) !important;
 }
 
 [data-mantine-color-scheme="dark"] .prose hr {
@@ -124,10 +124,8 @@
   font-size: 0.875rem !important;
   line-height: 1.5 !important;
   color: #e2e8f0 !important;
-  font-family: 'Jetbrains Mono', monospace !important;
+  font-family: "Jetbrains Mono", monospace !important;
 }
-
-
 
 [data-mantine-color-scheme="dark"] .prose pre::before {
   background: linear-gradient(90deg, #1e293b 0%, #334155 100%);
@@ -211,11 +209,15 @@
   background-color: rgb(var(--background)) !important;
   border: 1px solid rgb(var(--border)) !important;
   border-radius: 0.5rem !important;
-  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1) !important;
+  box-shadow:
+    0 10px 15px -3px rgb(0 0 0 / 0.1),
+    0 4px 6px -4px rgb(0 0 0 / 0.1) !important;
 }
 
 [data-mantine-color-scheme="dark"] .ProseMirror .suggestion-dropdown {
-  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.3), 0 4px 6px -4px rgb(0 0 0 / 0.2) !important;
+  box-shadow:
+    0 10px 15px -3px rgb(0 0 0 / 0.3),
+    0 4px 6px -4px rgb(0 0 0 / 0.2) !important;
 }
 
 .ProseMirror .suggestion-dropdown .suggestion-item {
@@ -236,7 +238,10 @@
   color: rgb(var(--foreground)) !important;
 }
 
-.ProseMirror .suggestion-dropdown .suggestion-item .suggestion-item-description {
+.ProseMirror
+  .suggestion-dropdown
+  .suggestion-item
+  .suggestion-item-description {
   color: rgb(var(--muted-foreground)) !important;
 }
 
@@ -321,7 +326,10 @@
   z-index: 2;
   position: absolute;
   content: "";
-  left: 0; right: 0; top: 0; bottom: 0;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
   background: rgba(59, 130, 246, 0.1);
   pointer-events: none;
 }
@@ -380,13 +388,13 @@
     table-layout: auto;
     display: table;
   }
-  
+
   .ProseMirror table td,
   .ProseMirror table th {
     width: 33.333% !important;
     min-width: 100px;
   }
-  
+
   .ProseMirror .tableWrapper {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;

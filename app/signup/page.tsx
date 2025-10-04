@@ -138,7 +138,10 @@ export default function SignupPage() {
         </Card>
       ) : (
         <Card withBorder padding="lg">
-          <Text>Registration is currently disabled. Please contact the administrator for assistance.</Text>
+          <Text>
+            Registration is currently disabled. Please contact the administrator
+            for assistance.
+          </Text>
         </Card>
       )}
     </div>

@@ -110,16 +110,16 @@ async function main() {
   const admin = await seedAdmin();
   await seedIndexPage(admin.id);
   await prisma.appSettings.upsert({
-    where: {id: 1},
+    where: { id: 1 },
     update: {},
     create: {
       allowRegister: false,
       allowedEmails: "",
       appName: "Kebon",
       appLogo: "/logo.webp",
-      siteIcon: "/favicon.ico"
-    }
-  })
+      siteIcon: "/favicon.ico",
+    },
+  });
 
   console.log("Seed completed: admin user ensured and index page ready.");
 }

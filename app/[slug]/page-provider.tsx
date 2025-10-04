@@ -42,11 +42,12 @@ function normalizeApiResponse(
     ],
   };
 
-  const updatedAt = typeof data.updatedAt === "string"
-    ? data.updatedAt
-    : data.updatedAt instanceof Date
-    ? data.updatedAt.toISOString()
-    : new Date().toISOString();
+  const updatedAt =
+    typeof data.updatedAt === "string"
+      ? data.updatedAt
+      : data.updatedAt instanceof Date
+        ? data.updatedAt.toISOString()
+        : new Date().toISOString();
 
   return {
     slug: data.slug || slug,
@@ -62,11 +63,13 @@ function normalizeApiResponse(
       updatedAt,
     },
     updatedAt,
-    author: data.author ? {
-      id: data.author.id,
-      name: data.author.name,
-      email: data.author.email,
-    } : null,
+    author: data.author
+      ? {
+          id: data.author.id,
+          name: data.author.name,
+          email: data.author.email,
+        }
+      : null,
   };
 }
 
@@ -85,11 +88,14 @@ export function PageProvider({
   const [page, setPage] = useState<CurrentPage | null>(initialPage || null);
   const [loading, setLoading] = useState<boolean>(!initialPage);
   const [tocItems, setTocItems] = useState<TocItem[]>(
-    initialToc || (initialPage?.content ? generateTocFromContent(initialPage.content) : [])
+    initialToc ||
+      (initialPage?.content ? generateTocFromContent(initialPage.content) : []),
   );
   const [saving, setSaving] = useState<boolean>(false);
 
-  const saveHandlerRef = useRef<(title?: string, tags?: string[]) => Promise<{ newSlug?: string } | void>>(() => Promise.resolve());
+  const saveHandlerRef = useRef<
+    (title?: string, tags?: string[]) => Promise<{ newSlug?: string } | void>
+  >(() => Promise.resolve());
 
   const computedTocItems = useMemo(() => {
     if (!page?.content) return [];
@@ -107,9 +113,19 @@ export function PageProvider({
     }
   }, [slug, page, tocItems]);
 
-  const setSaveHandler = useCallback((handler: ((title?: string, tags?: string[]) => Promise<{ newSlug?: string } | void>) | null) => {
-    saveHandlerRef.current = handler ?? (() => Promise.resolve());
-  }, []);
+  const setSaveHandler = useCallback(
+    (
+      handler:
+        | ((
+            title?: string,
+            tags?: string[],
+          ) => Promise<{ newSlug?: string } | void>)
+        | null,
+    ) => {
+      saveHandlerRef.current = handler ?? (() => Promise.resolve());
+    },
+    [],
+  );
 
   const requestSave = useCallback((title?: string, tags?: string[]) => {
     return saveHandlerRef.current(title, tags);
@@ -130,7 +146,7 @@ export function PageProvider({
     (updates: Partial<CurrentPage>) => {
       if (!slug || !page) return;
 
-      const hasChanges = Object.keys(updates).some(key => {
+      const hasChanges = Object.keys(updates).some((key) => {
         const updateValue = updates[key as keyof CurrentPage];
         const currentValue = page[key as keyof CurrentPage];
         return JSON.stringify(updateValue) !== JSON.stringify(currentValue);

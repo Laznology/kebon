@@ -36,7 +36,11 @@ interface LinkSelectorProps {
   editor?: TiptapEditor | null;
 }
 
-export const LinkSelector = ({ open, onOpenChange, editor }: LinkSelectorProps) => {
+export const LinkSelector = ({
+  open,
+  onOpenChange,
+  editor,
+}: LinkSelectorProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {

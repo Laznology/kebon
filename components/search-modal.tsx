@@ -74,7 +74,7 @@ export default function SearchModal() {
       ),
     }));
 
-    if (query.trim()) { 
+    if (query.trim()) {
       const createPageAction = {
         id: "create-new-page",
         label: `Create "${query.trim()}"`,
@@ -98,8 +98,7 @@ export default function SearchModal() {
             const data = await response.json();
             router.push(`/${data.page.slug}`);
             spotlight.close();
-          } catch {
-          }
+          } catch {}
         },
         leftSection: (
           <div style={{ marginRight: "12px", flexShrink: 0 }}>

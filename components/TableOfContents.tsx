@@ -96,7 +96,7 @@ export function TableOfContents({
   return (
     <div>
       <Group mb="md" gap="xs">
-        <Icon icon={"hugeicons:search-list-02"} width={20} height={20} /> 
+        <Icon icon={"hugeicons:search-list-02"} width={20} height={20} />
         <Text size="sm" fw={600}>
           Table of contents
         </Text>

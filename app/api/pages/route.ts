@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import type { JSONContent } from '@tiptap/core';
+import type { JSONContent } from "@tiptap/core";
 
 export async function GET() {
   try {
@@ -20,7 +20,7 @@ export async function GET() {
         },
       },
       orderBy: {
-        updatedAt: 'desc',
+        updatedAt: "desc",
       },
     });
 
@@ -53,20 +53,22 @@ export async function POST(request: NextRequest) {
       .trim();
 
     const defaultContent: JSONContent = {
-      type: 'doc',
+      type: "doc",
       content: [
         {
-          type: 'heading',
+          type: "heading",
           attrs: { level: 1 },
-          content: [{ type: 'text', text: title }],
+          content: [{ type: "text", text: title }],
         },
         {
-          type: 'paragraph',
-          content: [{ type: 'text', text: 'Start writing your content here...' }],
+          type: "paragraph",
+          content: [
+            { type: "text", text: "Start writing your content here..." },
+          ],
         },
       ],
     };
-    const defaultExcerpt = 'Start writing your content here...';
+    const defaultExcerpt = "Start writing your content here...";
 
     const existingPage = await prisma.page.findUnique({
       where: { slug },

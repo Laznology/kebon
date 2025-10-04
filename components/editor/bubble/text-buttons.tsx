@@ -33,7 +33,7 @@ export const TextButtons = ({ editor }: TextButtonsProps = {}) => {
   };
 
   if (!editor) return null;
-  
+
   const items: SelectorItem[] = [
     {
       name: "bold",

@@ -39,7 +39,9 @@ export function extractAndCleanText(
   if (!content) return "";
 
   const text =
-    typeof content === "string" ? stripMarkdown(content) : extractPlainText(content);
+    typeof content === "string"
+      ? stripMarkdown(content)
+      : extractPlainText(content);
 
   return text.replace(/\s+/g, " ").trim();
 }

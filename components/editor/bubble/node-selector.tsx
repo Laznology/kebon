@@ -6,7 +6,7 @@ import {
   Heading3,
   TextQuote,
   ListOrdered,
-  TextIcon,  
+  TextIcon,
   Code,
   CheckSquare,
   type LucideIcon,
@@ -37,7 +37,7 @@ const items: SelectorItem[] = [
       !editor?.isActive("orderedList"),
   },
   {
-    name: "Heading 1", 
+    name: "Heading 1",
     icon: Heading1,
     command: (editor) =>
       editor?.chain().focus().setNode("heading", { level: 1 }).run(),
@@ -70,7 +70,7 @@ const items: SelectorItem[] = [
     isActive: (editor) => !!editor?.isActive("bulletList"),
   },
   {
-    name: "Numbered List", 
+    name: "Numbered List",
     icon: ListOrdered,
     command: (editor) => editor?.chain().focus().toggleOrderedList().run(),
     isActive: (editor) => !!editor?.isActive("orderedList"),
@@ -95,22 +95,26 @@ interface NodeSelectorProps {
   editor?: TiptapEditor | null;
 }
 
-export const NodeSelector = ({ open, onOpenChange, editor }: NodeSelectorProps) => {
+export const NodeSelector = ({
+  open,
+  onOpenChange,
+  editor,
+}: NodeSelectorProps) => {
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768);
     };
-    
+
     checkMobile();
-    window.addEventListener('resize', checkMobile);
-    
-    return () => window.removeEventListener('resize', checkMobile);
+    window.addEventListener("resize", checkMobile);
+
+    return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
   if (!editor) return null;
-  
+
   const activeItem = items.filter((item) => item.isActive(editor)).pop() ?? {
     name: "Multiple",
   };
@@ -134,10 +138,12 @@ export const NodeSelector = ({ open, onOpenChange, editor }: NodeSelectorProps) 
         avoidCollisions={true}
         collisionPadding={isMobile ? 16 : 8}
       >
-        <div className={`grid ${isMobile ? 'grid-cols-1 gap-1' : 'grid-cols-1'}`}>
+        <div
+          className={`grid ${isMobile ? "grid-cols-1 gap-1" : "grid-cols-1"}`}
+        >
           {items.map((item, index) => (
             <div
-              key={index} 
+              key={index}
               onClick={() => {
                 item.command(editor);
                 onOpenChange(false);
@@ -150,7 +156,9 @@ export const NodeSelector = ({ open, onOpenChange, editor }: NodeSelectorProps) 
                 </div>
                 <span className="truncate">{item.name}</span>
               </div>
-              {activeItem.name === item.name && <Check className="h-4 w-4 flex-shrink-0" />}
+              {activeItem.name === item.name && (
+                <Check className="h-4 w-4 flex-shrink-0" />
+              )}
             </div>
           ))}
         </div>

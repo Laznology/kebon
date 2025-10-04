@@ -1,23 +1,25 @@
-import Link from 'next/link'
-import { AlertCircle, Home, ArrowLeft } from 'lucide-react'
+import Link from "next/link";
+import { AlertCircle, Home, ArrowLeft } from "lucide-react";
 
 const errorMessages = {
-  Configuration: 'There is a problem with the server configuration.',
-  AccessDenied: 'Access denied. You do not have permission to sign in.',
-  Verification: 'The verification token has expired or has already been used.',
-  Default: 'An error occurred during authentication.',
-}
+  Configuration: "There is a problem with the server configuration.",
+  AccessDenied: "Access denied. You do not have permission to sign in.",
+  Verification: "The verification token has expired or has already been used.",
+  Default: "An error occurred during authentication.",
+};
 
 interface AuthErrorPageProps {
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
-export default async function AuthErrorPage({ searchParams }: AuthErrorPageProps) {
-  const params = await searchParams
-  const error = params.error as keyof typeof errorMessages
+export default async function AuthErrorPage({
+  searchParams,
+}: AuthErrorPageProps) {
+  const params = await searchParams;
+  const error = params.error as keyof typeof errorMessages;
 
-  const errorMessage = errorMessages[error] || errorMessages.Default
-  const isAccessDenied = error === 'AccessDenied'
+  const errorMessage = errorMessages[error] || errorMessages.Default;
+  const isAccessDenied = error === "AccessDenied";
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background">
@@ -31,9 +33,7 @@ export default async function AuthErrorPage({ searchParams }: AuthErrorPageProps
             Authentication Error
           </h1>
 
-          <p className="mt-4 text-muted-foreground">
-            {errorMessage}
-          </p>
+          <p className="mt-4 text-muted-foreground">{errorMessage}</p>
 
           {isAccessDenied && (
             <div className="mt-4 p-4 bg-muted/50 rounded-lg">
@@ -64,5 +64,5 @@ export default async function AuthErrorPage({ searchParams }: AuthErrorPageProps
         </div>
       </div>
     </div>
-  )
+  );
 }

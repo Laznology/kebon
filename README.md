@@ -46,7 +46,7 @@ Blogging web app with a Notion-style editor. Basically you write in blocks inste
 pnpm install
 pnpm prisma migrate deploy   # applies committed migrations
 pnpm db:seed                 # ensures the Home (index) page exist
-pnpm dev             
+pnpm dev
 ```
 
 The seed script respects the following optional variables:
@@ -66,6 +66,7 @@ The seeded password is hashed with `bcryptjs`. Update these values in production
   ```
 
   This follows the official guidance in the Prisma docs: [https://www.prisma.io/docs/orm/prisma-migrate/working-with-prisma-migrate/development-and-production](https://www.prisma.io/docs/orm/prisma-migrate/working-with-prisma-migrate/development-and-production).
+
 - **Apply migrations in production**
 
   ```bash
@@ -73,6 +74,7 @@ The seeded password is hashed with `bcryptjs`. Update these values in production
   ```
 
   Run this during your deployment pipeline so the schema stays in sync. See the deployment checklist at [https://www.prisma.io/docs/orm/prisma-migrate/migrate-deploy](https://www.prisma.io/docs/orm/prisma-migrate/migrate-deploy).
+
 - **Re-run the seed script**
 
   ```bash

@@ -39,7 +39,7 @@ export async function POST(request: Request) {
         email,
         name,
         password,
-  role,
+        role,
       },
     });
     return NextResponse.json({ data: user }, { status: 201 });
@@ -64,7 +64,7 @@ export async function PATCH(request: Request) {
     }
     const user = await prisma.user.update({
       where: { id },
-  data: { email, name, role },
+      data: { email, name, role },
     });
     return NextResponse.json({ data: user }, { status: 200 });
   } catch {

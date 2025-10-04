@@ -10,7 +10,7 @@ export default function SignIn() {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
-  const [showPassword, setShowPassword] = useState<boolean>(false)
+  const [showPassword, setShowPassword] = useState<boolean>(false);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,7 +47,7 @@ export default function SignIn() {
           message: "Successfully logged in",
           color: "green",
         });
-        
+
         window.location.href = "/";
       }
     } catch {
@@ -90,11 +90,11 @@ export default function SignIn() {
             type={showPassword ? "text" : "password"}
             rightSection={
               <Icon
-          icon={showPassword ? "mdi:eye-off" : "mdi:eye"}
-          width={20}
-          height={20}
-          onClick={() => setShowPassword(!showPassword)}
-          style={{ cursor: 'pointer' }}
+                icon={showPassword ? "mdi:eye-off" : "mdi:eye"}
+                width={20}
+                height={20}
+                onClick={() => setShowPassword(!showPassword)}
+                style={{ cursor: "pointer" }}
               />
             }
           />

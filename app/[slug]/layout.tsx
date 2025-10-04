@@ -35,12 +35,15 @@ export default async function EditPageLayout({
 }) {
   const { slug } = await params;
   const pageData = await getPageBySlug(slug);
-  
+
   if (!pageData) {
     notFound();
   }
 
-  const content = pageData.content as JSONContent || { type: "doc", content: [] };
+  const content = (pageData.content as JSONContent) || {
+    type: "doc",
+    content: [],
+  };
   const initialPage: CurrentPage = {
     slug,
     title: pageData.title,
