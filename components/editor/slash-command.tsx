@@ -289,7 +289,7 @@ export const suggestionItems: SuggestionItem[] = [
     description: "Insert a horizontal divider to separate content.",
     searchTerms: ["horizontal, divider", "separator"],
     icon: <SeparatorHorizontal size={18} />,
-    command: ({ editor }) => editor.chain().focus().setHorizontalRule().run()
+    command: ({ editor, range }) => editor.chain().focus().deleteRange(range).setHorizontalRule().run()
     },
 
     {
