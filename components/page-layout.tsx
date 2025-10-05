@@ -75,7 +75,9 @@ export default function PageLayout({ children, toc }: PageLayoutProps) {
         />
 
         <Box mb="md" mt="md">
-          <AddPageButton />
+          {status === "authenticated" && (
+            <AddPageButton />
+          )}
         </Box>
 
         <Group justify="space-between" align="center" mb="md">
