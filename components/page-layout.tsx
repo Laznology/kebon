@@ -93,7 +93,11 @@ export default function PageLayout({ children, toc }: PageLayoutProps) {
       <Box className="flex-1 overflow-hidden">
         <ScrollArea h="100%" type="auto">
           <div className="space-y-1">
-            {(pages || []).map((page) => (
+            {(pages || [])
+              .filter((page) => 
+                status === "authenticated" ? true : page.published
+              )
+              .map((page) => (
               <NavLink
                 key={page.slug}
                 component={Link}
