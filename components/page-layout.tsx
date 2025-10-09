@@ -75,9 +75,7 @@ export default function PageLayout({ children, toc }: PageLayoutProps) {
         />
 
         <Box mb="md" mt="md">
-          {status === "authenticated" && (
-            <AddPageButton />
-          )}
+          {status === "authenticated" && <AddPageButton />}
         </Box>
 
         <Group justify="space-between" align="center" mb="md">
@@ -94,128 +92,128 @@ export default function PageLayout({ children, toc }: PageLayoutProps) {
         <ScrollArea h="100%" type="auto">
           <div className="space-y-1">
             {(pages || [])
-              .filter((page) => 
-                status === "authenticated" ? true : page.published
+              .filter((page) =>
+                status === "authenticated" ? true : page.published,
               )
               .map((page) => (
-              <NavLink
-                key={page.slug}
-                component={Link}
-                href={`/${page.slug}`}
-                label={
-                  <Group justify="space-between" wrap="nowrap">
-                    <Text size="sm" truncate="end">
-                      {page.title}
-                    </Text>
-                    {status === "authenticated" && (
-                      <Badge
-                        size="xs"
-                        variant="light"
-                        color={page.published ? "green" : "orange"}
-                        style={{ fontSize: "10px", minWidth: "auto" }}
-                      >
-                        {page.published ? "✓" : "○"}
-                      </Badge>
-                    )}
-                  </Group>
-                }
-                onClick={() => {
-                  if (closeOnNavigate) {
-                    closeMobileNav();
-                  }
-                }}
-                rightSection={
-                  status === "authenticated" && (
-                    <Popover>
-                      <Popover.Target>
-                        <Button
-                          variant="transparent"
-                          size="sm"
-                          aria-label="Edit page options"
+                <NavLink
+                  key={page.slug}
+                  component={Link}
+                  href={`/${page.slug}`}
+                  label={
+                    <Group justify="space-between" wrap="nowrap">
+                      <Text size="sm" truncate="end">
+                        {page.title}
+                      </Text>
+                      {status === "authenticated" && (
+                        <Badge
+                          size="xs"
+                          variant="light"
+                          color={page.published ? "green" : "orange"}
+                          style={{ fontSize: "10px", minWidth: "auto" }}
                         >
-                          <Icon icon={"mdi:file-edit-outline"} />
-                        </Button>
-                      </Popover.Target>
-                      <Popover.Dropdown>
-                        <Stack gap={2}>
+                          {page.published ? "✓" : "○"}
+                        </Badge>
+                      )}
+                    </Group>
+                  }
+                  onClick={() => {
+                    if (closeOnNavigate) {
+                      closeMobileNav();
+                    }
+                  }}
+                  rightSection={
+                    status === "authenticated" && (
+                      <Popover>
+                        <Popover.Target>
                           <Button
                             variant="transparent"
-                            size="xs"
-                            onClick={async (e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              const nextPublished = !page.published;
-
-                              const response = await fetch(
-                                `/api/pages/${page.slug}`,
-                                {
-                                  method: "POST",
-                                  headers: {
-                                    "Content-Type": "application/json",
-                                  },
-                                  body: JSON.stringify({
-                                    published: nextPublished,
-                                  }),
-                                },
-                              );
-
-                              if (!response.ok) {
-                                return;
-                              }
-
-                              await refetchPages();
-                              router.refresh();
-                            }}
+                            size="sm"
+                            aria-label="Edit page options"
                           >
-                            {page.published ? "Unpublish" : "Publish"}
+                            <Icon icon={"mdi:file-edit-outline"} />
                           </Button>
-                          <Button
-                            variant="transparent"
-                            size="xs"
-                            color="red"
-                            onClick={async (e) => {
-                              e.preventDefault();
-                              const response = await fetch(
-                                `/api/pages/${page.slug}`,
-                                {
-                                  method: "DELETE",
-                                  headers: {
-                                    "Content-Type": "application.json",
+                        </Popover.Target>
+                        <Popover.Dropdown>
+                          <Stack gap={2}>
+                            <Button
+                              variant="transparent"
+                              size="xs"
+                              onClick={async (e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                const nextPublished = !page.published;
+
+                                const response = await fetch(
+                                  `/api/pages/${page.slug}`,
+                                  {
+                                    method: "POST",
+                                    headers: {
+                                      "Content-Type": "application/json",
+                                    },
+                                    body: JSON.stringify({
+                                      published: nextPublished,
+                                    }),
                                   },
-                                },
-                              );
-                              const data = await response.json();
-                              if (!response.ok) {
+                                );
+
+                                if (!response.ok) {
+                                  return;
+                                }
+
+                                await refetchPages();
+                                router.refresh();
+                              }}
+                            >
+                              {page.published ? "Unpublish" : "Publish"}
+                            </Button>
+                            <Button
+                              variant="transparent"
+                              size="xs"
+                              color="red"
+                              onClick={async (e) => {
+                                e.preventDefault();
+                                const response = await fetch(
+                                  `/api/pages/${page.slug}`,
+                                  {
+                                    method: "DELETE",
+                                    headers: {
+                                      "Content-Type": "application.json",
+                                    },
+                                  },
+                                );
+                                const data = await response.json();
+                                if (!response.ok) {
+                                  notifications.show({
+                                    title: `Error deleting ${page.title}`,
+                                    message: data.message,
+                                    color: "red",
+                                  });
+                                }
                                 notifications.show({
-                                  title: `Error deleting ${page.title}`,
-                                  message: data.message,
-                                  color: "red",
+                                  title: `Succesfully`,
+                                  message: `Deleted ${page.title}`,
+                                  color: "green",
                                 });
-                              }
-                              notifications.show({
-                                title: `Succesfully`,
-                                message: `Deleted ${page.title}`,
-                                color: "green",
-                              });
-                              await refetchPages();
-                            }}
-                          >
-                            Delete
-                          </Button>
-                        </Stack>
-                      </Popover.Dropdown>
-                    </Popover>
-                  )
-                }
-                leftSection={
-                  <Icon
-                    icon="mdi:file-document-outline"
-                    width={16}
-                    height={16}
-                  />
-                }
-              />
-            ))}
+                                await refetchPages();
+                              }}
+                            >
+                              Delete
+                            </Button>
+                          </Stack>
+                        </Popover.Dropdown>
+                      </Popover>
+                    )
+                  }
+                  leftSection={
+                    <Icon
+                      icon="mdi:file-document-outline"
+                      width={16}
+                      height={16}
+                    />
+                  }
+                />
+              ))}
           </div>
         </ScrollArea>
       </Box>
@@ -256,7 +254,18 @@ export default function PageLayout({ children, toc }: PageLayoutProps) {
                 </Button>
               </Popover.Target>
               <Popover.Dropdown>
-                <Stack gap={4}>
+                <Stack gap={4} align="flex-start" >
+                  <Button
+                    variant="subtle"
+                    color="gray"
+                    size="xs"
+                    fullWidth
+                    component={Link}
+                    href="/profile"
+                    leftSection={<Icon icon="mdi:account" width={14} height={14} />}
+                  >
+                    Profile
+                  </Button>
                   <Button
                     variant="subtle"
                     color="gray"
