@@ -15,7 +15,7 @@ export interface BubbleColorMenuItem {
 const TEXT_COLORS: BubbleColorMenuItem[] = [
   {
     name: "Default",
-    color: "#000000",
+    color: "transparent",
   },
   {
     name: "Purple",
@@ -54,7 +54,7 @@ const TEXT_COLORS: BubbleColorMenuItem[] = [
 const HIGHLIGHT_COLORS: BubbleColorMenuItem[] = [
   {
     name: "Default",
-    color: "#000000",
+    color: "transparent",
   },
   {
     name: "Purple",
@@ -103,12 +103,19 @@ export const ColorSelector = ({
 }: ColorSelectorProps) => {
   if (!editor) return null;
 
-  const activeColorItem = TEXT_COLORS.find(({ color }) =>
-    editor.isActive("textStyle", { color }),
+  const hasCustomTextColor = TEXT_COLORS.slice(1).some(({ color }) =>
+    editor.isActive("textStyle", { color })
   );
-  const activeBackgroundItem = HIGHLIGHT_COLORS.find(({ color }) =>
-    editor.isActive("textStyle", { backgroundColor: color }),
+  const activeColorItem = hasCustomTextColor 
+    ? TEXT_COLORS.find(({ color }) => editor.isActive("textStyle", { color }))
+    : TEXT_COLORS[0];
+
+  const hasCustomBackgroundColor = HIGHLIGHT_COLORS.slice(1).some(({ color }) =>
+    editor.isActive("textStyle", { backgroundColor: color })
   );
+  const activeBackgroundItem = hasCustomBackgroundColor
+    ? HIGHLIGHT_COLORS.find(({ color }) => editor.isActive("textStyle", { backgroundColor: color }))
+    : HIGHLIGHT_COLORS[0];
 
   return (
     <Popover modal={true} open={open} onOpenChange={onOpenChange}>
@@ -120,8 +127,8 @@ export const ColorSelector = ({
           <span
             className="rounded-sm px-1 text-xs"
             style={{
-              color: activeColorItem?.color,
-              backgroundColor: activeBackgroundItem?.color,
+              color: activeColorItem?.name === "Default" ? "rgb(var(--foreground))" : activeColorItem?.color,
+              backgroundColor: activeBackgroundItem?.name === "Default" ? "transparent" : activeBackgroundItem?.color,
             }}
           >
             A
@@ -143,8 +150,9 @@ export const ColorSelector = ({
             <div
               key={index}
               onClick={() => {
-                editor.commands.unsetColor();
-                if (name !== "Default") {
+                if (name === "Default") {
+                  editor.chain().focus().unsetColor().run();
+                } else {
                   editor
                     .chain()
                     .focus()
@@ -157,7 +165,10 @@ export const ColorSelector = ({
               <div className="flex items-center gap-2">
                 <div
                   className="rounded-sm border px-2 py-px font-medium"
-                  style={{ color }}
+                  style={{ 
+                    color: name === "Default" ? "rgb(var(--foreground))" : color,
+                    backgroundColor: "rgb(var(--background))"
+                  }}
                 >
                   A
                 </div>
@@ -174,17 +185,21 @@ export const ColorSelector = ({
             <div
               key={index}
               onClick={() => {
-                editor.commands.unsetBackgroundColor();
-                if (name !== "Default") {
-                  editor.commands.setBackgroundColor(color);
+                if (name === "Default") {
+                  editor.chain().focus().unsetBackgroundColor().run();
+                } else {
+                  editor.chain().focus().setBackgroundColor(color).run();
                 }
               }}
               className="flex cursor-pointer items-center justify-between px-2 py-1 text-sm hover:bg-accent"
             >
               <div className="flex items-center gap-2">
                 <div
-                  className="rounded-sm border px-2 py-px font-medium text-primary"
-                  style={{ backgroundColor: color }}
+                  className="rounded-sm border px-2 py-px font-medium"
+                  style={{ 
+                    backgroundColor: name === "Default" ? "transparent" : color,
+                    color: "rgb(var(--foreground))"
+                  }}
                 >
                   A
                 </div>
